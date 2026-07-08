@@ -5,12 +5,6 @@ trusted-public-keys = [
 
 systems = ["x86_64-linux", "aarch64-linux", "aarch64-darwin"]
 
-include = [
-  "legacyPackages.*.*",
-  "legacyPackages.*.crates.*",
-  "devShells.*.default",
-]
+include = ["checks.**", "devShells.**", "formatter.**", "legacyPackages.**"]
 
-exclude = [
-  "packages.*.*", # not exported
-]
+exclude = ["packages.*.*"]
