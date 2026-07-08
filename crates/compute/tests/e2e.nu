@@ -27,6 +27,13 @@ def checks [url: string, log: string] {
   sleep 500ms
   assert equal (fetch $"($url)/ping" | get status) 204
   assert (not (open $log | str contains "WebAssembly exited with error"))
+
+  # regression guard: small guest read buffers make viceroy rebuffer the
+  # unread remainder per read, turning 50mb uploads quadratic (~40s)
+  let elapsed = timeit {
+    http post --content-type application/octet-stream $"($url)/up" (random binary 50_000_000) | ignore
+  }
+  assert ($elapsed < 10sec) $"50mb upload took ($elapsed)"
 }
 
 def main [] {

@@ -1,4 +1,4 @@
-use std::io::{self, Write};
+use std::io::{Read, Write};
 use std::time::Instant;
 
 use fastly::http::{StatusCode, header};
@@ -44,8 +44,17 @@ pub fn down(req: Request, start: Instant) {
 }
 
 pub fn up(req: Request) -> Response {
+    // drain with large reads: viceroy rebuffers the unread remainder on
+    // every read, so small buffers make big uploads quadratic
     let mut body = req.into_body();
-    let received = io::copy(&mut body, &mut io::sink()).unwrap_or(0);
+    let mut buf = vec![0u8; 2 * 1024 * 1024];
+    let mut received: u64 = 0;
+    loop {
+        match body.read(&mut buf) {
+            Ok(0) | Err(_) => break,
+            Ok(n) => received += n as u64,
+        }
+    }
     // dur starts after the drain: receive time is the client's upload
     // measurement, not server overhead
     base(StatusCode::OK, Instant::now()).with_body(received.to_string())
