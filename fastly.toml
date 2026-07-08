@@ -1,6 +1,6 @@
 authors          = ["ysun@hey.com"]
 description      = "HowFastly: how fast is your connection to the Fastly network"
-language         = "rust"
+language         = "other"
 manifest_version = 3
 name             = "howfastly"
 
