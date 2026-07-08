@@ -16,8 +16,8 @@
           then imported { inherit config crane lib pkgs; }
           else imported;
       in
-      # force export cargo deps, i.e. there must NOT be a crate called drac-deps
-      { drac-deps = crane.cargoArtifacts; }
+      # force export cargo deps, i.e. there must NOT be a crate called deps
+      { deps = crane.cargoArtifacts; }
       //
       lib.genAttrs
         # drop crates w/ { disable = true; }
