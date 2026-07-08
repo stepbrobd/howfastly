@@ -36,7 +36,7 @@ fn csv(r: &SpeedtestResults) -> String {
 // progress already streamed each measurement to stderr; only summarize
 // what is new (p90 headline and loaded latency)
 fn direction_block(name: &str, d: &DirectionSummary) -> String {
-    let mut out = format!("{name}: {} mbps (p90)\n", fmt_opt(d.p90_mbps));
+    let mut out = format!("{name}: {} Mbps (p90)\n", fmt_opt(d.p90_mbps));
     if let Some(l) = &d.loaded_latency {
         out += &format!(
             "{name} loaded latency: med {:.1} ms / jitter {:.1} ms\n",
@@ -48,7 +48,7 @@ fn direction_block(name: &str, d: &DirectionSummary) -> String {
 
 fn human(r: &SpeedtestResults) -> String {
     let mut out = String::from("\n");
-    for (name, dir) in [("download", &r.download), ("upload", &r.upload)] {
+    for (name, dir) in [("Download", &r.download), ("Upload", &r.upload)] {
         if let Some(d) = dir {
             out += &direction_block(name, d);
         }
@@ -96,7 +96,7 @@ mod tests {
     fn human_mentions_sections() {
         let s = render(&results(), crate::OutputFormat::Human).unwrap();
         assert!(s.contains("latency"));
-        assert!(s.contains("download"));
-        assert!(!s.contains("upload:"));
+        assert!(s.contains("Download"));
+        assert!(!s.contains("Upload:"));
     }
 }

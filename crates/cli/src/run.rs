@@ -21,9 +21,9 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     };
     let cfg = args.config();
 
-    let meta = runner.meta().await.context("service unreachable")?;
+    let meta = runner.meta().await.context("Service unreachable")?;
     eprintln!(
-        "server: pop {} | client: {} | as{} {} | {}, {}",
+        "Server: POP {} | Client: {} | AS{} {} | {}, {}",
         meta.pop, meta.client_ip, meta.asn, meta.as_org, meta.city, meta.country,
     );
 
@@ -36,14 +36,14 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     for i in 0..cfg.latency_samples {
         match runner.ping().await {
             Ok(ms) => pings.push(ms),
-            Err(e) => eprintln!("warn: latency sample {i}: {e}"),
+            Err(e) => eprintln!("Warning: latency sample {i}: {e}"),
         }
     }
-    ensure!(!pings.is_empty(), "all latency samples failed");
+    ensure!(!pings.is_empty(), "All latency samples failed");
     results.latency = summarize_latency(&pings);
     if let Some(l) = &results.latency {
         eprintln!(
-            "latency: min {:.1} / med {:.1} / avg {:.1} / jitter {:.1} ms",
+            "Latency: min {:.1} / med {:.1} / avg {:.1} / jitter {:.1} ms",
             l.min_ms, l.median_ms, l.avg_ms, l.jitter_ms,
         );
     }
@@ -128,7 +128,7 @@ impl Runner {
     }
 
     async fn direction(&self, upload: bool, cfg: &TestConfig) -> Result<DirectionSummary> {
-        let name = if upload { "upload" } else { "download" };
+        let name = if upload { "Upload" } else { "Download" };
         let stop = Arc::new(AtomicBool::new(false));
         let loaded = Arc::new(Mutex::new(Vec::new()));
 
@@ -167,15 +167,15 @@ impl Runner {
                 match self.sample(upload, bytes).await {
                     Ok(mbps) => {
                         if self.verbose {
-                            eprintln!("{name} {} sample {i}: {mbps:.2} mbps", size_label(bytes));
+                            eprintln!("{name} {} sample {i}: {mbps:.2} Mbps", size_label(bytes));
                         }
                         s.mbps.push(mbps);
                     }
-                    Err(e) => eprintln!("warn: {name} {} sample {i}: {e}", size_label(bytes)),
+                    Err(e) => eprintln!("Warning: {name} {} sample {i}: {e}", size_label(bytes)),
                 }
             }
             eprintln!(
-                "{name} {}: {} mbps ({} samples{})",
+                "{name} {}: {} Mbps ({} samples{})",
                 size_label(bytes),
                 stats::median(&s.mbps)
                     .map(|m| format!("{m:.2}"))
@@ -192,7 +192,8 @@ impl Runner {
 
         ensure!(
             out.iter().any(|s| !s.mbps.is_empty()),
-            "all {name} samples failed"
+            "All {} samples failed",
+            name.to_lowercase(),
         );
         Ok(summarize_direction(&out, &loaded_ms))
     }

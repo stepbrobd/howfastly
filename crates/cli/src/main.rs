@@ -39,7 +39,10 @@ impl PayloadSize {
 }
 
 #[derive(Debug, Parser)]
-#[command(name = "howfastly", about = "speed test for the fastly network")]
+#[command(
+    name = "howfastly",
+    about = "HowFastly: speed test for the Fastly network"
+)]
 pub struct Args {
     #[arg(long, env = "HOWFASTLY_URL", default_value = "http://localhost:7676")]
     pub url: String,
