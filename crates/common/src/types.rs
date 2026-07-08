@@ -79,6 +79,22 @@ pub struct SpeedtestResults {
     pub upload: Option<DirectionSummary>,
 }
 
+// fastly geo data arrives lowercased; capitalize at word boundaries and
+// leave already-cased characters alone
+pub fn title_case(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    let mut boundary = true;
+    for c in s.chars() {
+        if boundary {
+            out.extend(c.to_uppercase());
+        } else {
+            out.push(c);
+        }
+        boundary = matches!(c, ' ' | '-' | '.');
+    }
+    out
+}
+
 pub fn size_label(bytes: u64) -> String {
     if bytes >= 1_000_000 {
         format!("{} MB", bytes / 1_000_000)
@@ -148,6 +164,15 @@ mod tests {
         assert_eq!(d.sizes[0].median_mbps, Some(15.0));
         assert!(d.sizes[1].skipped);
         assert!(d.loaded_latency.is_none());
+    }
+
+    #[test]
+    fn title_cases() {
+        assert_eq!(title_case("nantes"), "Nantes");
+        assert_eq!(title_case("linkt sas"), "Linkt Sas");
+        assert_eq!(title_case("stoke-on-trent"), "Stoke-On-Trent");
+        assert_eq!(title_case("San Francisco"), "San Francisco");
+        assert_eq!(title_case(""), "");
     }
 
     #[test]
