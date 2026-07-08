@@ -6,6 +6,7 @@ debug
 **/mutants.out*/
 **/.nixos-test-history
 *.pdb
+pkg
 result
 result-*
 **/*.rs.bk
