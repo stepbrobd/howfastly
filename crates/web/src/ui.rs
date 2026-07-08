@@ -88,8 +88,13 @@ pub fn App() -> impl IntoView {
                 <h1 class="text-2xl font-black">HowFastly</h1>
                 {move || meta.get().map(|m| view! {
                     <p><small>
-                        {format!("{} | AS{} {} | {}, {} -> POP {}",
-                            m.client_ip, m.asn, m.as_org, m.city, m.country, m.pop)}
+                        <a href=format!("https://bgp.tools/prefix/{}", m.client_ip)
+                            target="_blank" rel="noopener">{m.client_ip.clone()}</a>
+                        " | "
+                        <a href=format!("https://bgp.tools/as/{}", m.asn)
+                            target="_blank" rel="noopener">{format!("AS{}", m.asn)}</a>
+                        {format!(" {} | {}, {} -> POP {}",
+                            m.as_org, m.city, m.country, m.pop)}
                     </small></p>
                 })}
             </header>
