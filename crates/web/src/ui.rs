@@ -25,10 +25,10 @@ impl Phase {
     fn label(self) -> &'static str {
         match self {
             Self::Idle => "",
-            Self::Latency => "measuring latency...",
-            Self::Download => "measuring download...",
-            Self::Upload => "measuring upload...",
-            Self::Done => "done",
+            Self::Latency => "Measuring latency...",
+            Self::Download => "Measuring download...",
+            Self::Upload => "Measuring upload...",
+            Self::Done => "Done",
         }
     }
 
@@ -83,42 +83,48 @@ pub fn App() -> impl IntoView {
     };
 
     view! {
-        <main>
+        <main class="container mx-auto flex min-h-screen flex-col gap-8 p-4">
             <header>
-                <h1>howfastly</h1>
+                <h1 class="text-2xl font-black">HowFastly</h1>
                 {move || meta.get().map(|m| view! {
-                    <p class="meta">
-                        {format!("{} | as{} {} | {}, {} -> pop {}",
+                    <p><small>
+                        {format!("{} | AS{} {} | {}, {} -> POP {}",
                             m.client_ip, m.asn, m.as_org, m.city, m.country, m.pop)}
-                    </p>
+                    </small></p>
                 })}
             </header>
 
-            <section class="headline">
-                <Headline label="download" upload=false state=state/>
-                <Headline label="upload" upload=true state=state/>
+            <section class="flex flex-col gap-4 sm:flex-row">
+                <Headline label="Download" upload=false state=state/>
+                <Headline label="Upload" upload=true state=state/>
             </section>
 
-            <section class="cards">
+            <section class="flex flex-wrap gap-4">
                 {move || state.latency.get().map(|l| view! {
-                    <LatencyCard label="latency (unloaded)" summary=l/>
+                    <LatencyCard label="Latency (unloaded)" summary=l/>
                 })}
                 {move || state.download.get().and_then(|d| d.loaded_latency).map(|l| view! {
-                    <LatencyCard label="latency (down loaded)" summary=l/>
+                    <LatencyCard label="Latency (download loaded)" summary=l/>
                 })}
                 {move || state.upload.get().and_then(|d| d.loaded_latency).map(|l| view! {
-                    <LatencyCard label="latency (up loaded)" summary=l/>
+                    <LatencyCard label="Latency (upload loaded)" summary=l/>
                 })}
             </section>
 
-            {move || state.download.get().map(|d| view! { <SizeTable title="download" dir=d/> })}
-            {move || state.upload.get().map(|d| view! { <SizeTable title="upload" dir=d/> })}
+            {move || state.download.get().map(|d| view! { <SizeTable title="Download" dir=d/> })}
+            {move || state.upload.get().map(|d| view! { <SizeTable title="Upload" dir=d/> })}
 
-            {move || state.error.get().map(|e| view! { <div class="error">{e}</div> })}
-            <p class="phase">{move || state.phase.get().label()}</p>
+            {move || state.error.get().map(|e| view! {
+                <div class="rounded border border-nord-11 bg-nord-1 p-4 text-nord-11">{e}</div>
+            })}
+            <p>{move || state.phase.get().label()}</p>
 
-            <button on:click=start disabled=move || state.phase.get().running()>
-                {move || if state.phase.get() == Phase::Idle { "start" } else { "run again" }}
+            <button
+                class="w-fit cursor-pointer rounded bg-nord-10 px-8 py-3 text-nord-6 hover:bg-nord-9 disabled:cursor-wait disabled:bg-nord-3"
+                on:click=start
+                disabled=move || state.phase.get().running()
+            >
+                {move || if state.phase.get() == Phase::Idle { "Start" } else { "Run again" }}
             </button>
         </main>
     }
@@ -137,9 +143,9 @@ fn Headline(label: &'static str, upload: bool, state: State) -> impl IntoView {
         }
     };
     view! {
-        <div class="big">
-            <div class="value">{value}</div>
-            <div class="label">{label} " mbps"</div>
+        <div class="flex-1 rounded bg-nord-1 p-4">
+            <div class="font-mono text-4xl text-nord-8">{value}</div>
+            <div>{label} " (Mbps)"</div>
         </div>
     }
 }
@@ -147,10 +153,12 @@ fn Headline(label: &'static str, upload: bool, state: State) -> impl IntoView {
 #[component]
 fn LatencyCard(label: &'static str, summary: LatencySummary) -> impl IntoView {
     view! {
-        <div class="card">
-            <div class="label">{label}</div>
-            <div>{format!("med {:.1} ms | jitter {:.1} ms", summary.median_ms, summary.jitter_ms)}</div>
-            <div class="label">{format!("min {:.1} / avg {:.1}", summary.min_ms, summary.avg_ms)}</div>
+        <div class="flex-1 basis-48 rounded bg-nord-1 p-4">
+            <div><small>{label}</small></div>
+            <div class="text-nord-6">
+                {format!("Median {:.1} ms / jitter {:.1} ms", summary.median_ms, summary.jitter_ms)}
+            </div>
+            <div><small>{format!("Min {:.1} / avg {:.1}", summary.min_ms, summary.avg_ms)}</small></div>
         </div>
     }
 }
@@ -163,12 +171,16 @@ fn SizeTable(title: &'static str, dir: DirectionSummary) -> impl IntoView {
         .filter_map(|s| s.median_mbps)
         .fold(f64::EPSILON, f64::max);
     view! {
-        <table>
+        <table class="w-full border-separate border-spacing-0 overflow-hidden rounded border border-nord-3">
             <thead>
                 <tr>
-                    <th>{title}</th>
-                    <th>"mbps (median)"</th>
-                    <th></th>
+                    <th class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6">
+                        {title}
+                    </th>
+                    <th class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6">
+                        "Mbps (median)"
+                    </th>
+                    <th class="w-1/2 border-b border-nord-3 bg-nord-0 px-4 py-2"></th>
                 </tr>
             </thead>
             <tbody>
@@ -176,17 +188,17 @@ fn SizeTable(title: &'static str, dir: DirectionSummary) -> impl IntoView {
                     let label = size_label(s.bytes);
                     let text = match (s.median_mbps, s.skipped) {
                         (Some(m), _) => format!("{m:.1}"),
-                        (None, true) => "skipped".to_string(),
+                        (None, true) => "Skipped".to_string(),
                         (None, false) => "-".to_string(),
                     };
                     let width = s.median_mbps.map(|m| m / max * 100.0).unwrap_or(0.0);
                     view! {
-                        <tr>
-                            <td>{label}</td>
-                            <td>{text}</td>
-                            <td>
-                                <svg class="bar" viewBox="0 0 100 8" preserveAspectRatio="none">
-                                    <rect width=format!("{width:.1}") height="8"/>
+                        <tr class="odd:bg-nord-1">
+                            <td class="px-4 py-2">{label}</td>
+                            <td class="px-4 py-2 font-mono">{text}</td>
+                            <td class="px-4 py-2">
+                                <svg class="block h-2 w-full" viewBox="0 0 100 8" preserveAspectRatio="none">
+                                    <rect class="fill-nord-8" width=format!("{width:.1}") height="8"/>
                                 </svg>
                             </td>
                         </tr>

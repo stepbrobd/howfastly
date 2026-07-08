@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* theme tokens shared with ysun.co */
+@theme {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica
+    neue, Cantarell, Ubuntu, roboto, noto, helvetica, arial, sans-serif;
+  --font-serif:
+    Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif,
+    Times, Source Serif Pro, serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI
+    Symbol;
+  --font-mono:
+    Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+  --color-nord-0: #2e3440;
+  --color-nord-1: #3b4252;
+  --color-nord-2: #434c5e;
+  --color-nord-3: #4c566a;
+  --color-nord-4: #d8dee9;
+  --color-nord-5: #e5e9f0;
+  --color-nord-6: #eceff4;
+  --color-nord-7: #8fbcbb;
+  --color-nord-8: #88c0d0;
+  --color-nord-9: #81a1c1;
+  --color-nord-10: #5e81ac;
+  --color-nord-11: #bf616a;
+  --color-nord-12: #d08770;
+  --color-nord-13: #ebcb8b;
+  --color-nord-14: #a3be8c;
+  --color-nord-15: #b48ead;
+}
+
+@layer base {
+  body {
+    @apply bg-nord-0 text-nord-4 min-h-screen;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-nord-6;
+  }
+
+  a {
+    @apply text-nord-8 hover:text-nord-7;
+  }
+}
