@@ -14,7 +14,17 @@
         cargo-hakari
         cargo-nextest
         rust-analyzer
+
+        # fastly + web
+        fastly
+        trunk
+        viceroy
+        wasm-bindgen-cli
       ];
+
+      shellHook = ''
+        export WEB_DIST="$PWD/crates/web/dist"
+      '';
     };
   };
 }

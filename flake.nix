@@ -31,5 +31,8 @@
     autopilot.inputs.systems.follows = "systems";
     # c
     crane.url = "github:ipetkov/crane";
+    # f
+    fenix.url = "github:nix-community/fenix";
+    fenix.inputs.nixpkgs.follows = "nixpkgs";
   };
 }
