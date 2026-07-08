@@ -3,10 +3,10 @@ mod handlers;
 
 use std::time::Instant;
 
+use fastly::Request;
 use fastly::http::Method;
-use fastly::{Error, Request};
 
-fn main() -> Result<(), Error> {
+fn main() {
     let start = Instant::now();
     let req = Request::from_client();
     let method = req.get_method().clone();
@@ -14,7 +14,7 @@ fn main() -> Result<(), Error> {
 
     match (method, path.as_str()) {
         (Method::GET, "/ping") => handlers::ping(start).send_to_client(),
-        (Method::GET, "/down") => return handlers::down(req, start),
+        (Method::GET, "/down") => handlers::down(req, start),
         (Method::POST, "/up") => handlers::up(req).send_to_client(),
         (Method::GET, "/meta") => handlers::meta(&req, start).send_to_client(),
         (_, "/ping" | "/down" | "/up" | "/meta") => handlers::method_not_allowed().send_to_client(),
@@ -24,6 +24,4 @@ fn main() -> Result<(), Error> {
         },
         _ => handlers::not_found().send_to_client(),
     }
-
-    Ok(())
 }

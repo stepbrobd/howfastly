@@ -20,10 +20,10 @@ pub fn ping(start: Instant) -> Response {
     base(StatusCode::NO_CONTENT, start)
 }
 
-pub fn down(req: Request, start: Instant) -> Result<(), fastly::Error> {
+pub fn down(req: Request, start: Instant) {
     let Some(n) = common::http::parse_bytes(req.get_query_parameter("bytes")) else {
         base(StatusCode::BAD_REQUEST, start).send_to_client();
-        return Ok(());
+        return;
     };
 
     let resp = base(StatusCode::OK, start)
@@ -34,11 +34,13 @@ pub fn down(req: Request, start: Instant) -> Result<(), fastly::Error> {
     let mut left = n;
     while left > 0 {
         let take = left.min(CHUNK.len() as u64) as usize;
-        body.write_all(&CHUNK[..take])?;
+        if body.write_all(&CHUNK[..take]).is_err() {
+            // client hung up mid-transfer, normal for a speed test
+            return;
+        }
         left -= take as u64;
     }
-    body.finish()?;
-    Ok(())
+    let _ = body.finish();
 }
 
 pub fn up(req: Request) -> Response {
