@@ -17,6 +17,7 @@
 
         # fastly + web
         fastly
+        nushell
         trunk
         viceroy
         wasm-bindgen-cli
