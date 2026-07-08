@@ -1,5 +1,5 @@
 use anyhow::Result;
-use common::types::{DirectionSummary, LatencySummary, SpeedtestResults, size_label};
+use common::types::{DirectionSummary, SpeedtestResults};
 
 use crate::OutputFormat;
 
@@ -33,38 +33,23 @@ fn csv(r: &SpeedtestResults) -> String {
     out
 }
 
-fn latency_line(label: &str, l: &LatencySummary) -> String {
-    format!(
-        "{label}: min {:.1} ms / med {:.1} ms / avg {:.1} ms / jitter {:.1} ms\n",
-        l.min_ms, l.median_ms, l.avg_ms, l.jitter_ms,
-    )
-}
-
+// progress already streamed each measurement to stderr; only summarize
+// what is new (p90 headline and loaded latency)
 fn direction_block(name: &str, d: &DirectionSummary) -> String {
-    let mut out = String::new();
-    for s in &d.sizes {
-        let value = match (s.median_mbps, s.skipped) {
-            (Some(m), false) => format!("{m:.2} mbps ({} samples)", s.samples),
-            (Some(m), true) => format!("{m:.2} mbps ({} samples, budget hit)", s.samples),
-            (None, _) => "skipped (budget hit)".to_string(),
-        };
-        out += &format!("{name} {}: {value}\n", size_label(s.bytes));
-    }
-    out += &format!("{name}: {} mbps (p90)\n", fmt_opt(d.p90_mbps));
+    let mut out = format!("{name}: {} mbps (p90)\n", fmt_opt(d.p90_mbps));
     if let Some(l) = &d.loaded_latency {
-        out += &latency_line(&format!("{name} loaded latency"), l);
+        out += &format!(
+            "{name} loaded latency: med {:.1} ms / jitter {:.1} ms\n",
+            l.median_ms, l.jitter_ms,
+        );
     }
     out
 }
 
 fn human(r: &SpeedtestResults) -> String {
-    let mut out = String::new();
-    if let Some(l) = &r.latency {
-        out += &latency_line("latency", l);
-    }
+    let mut out = String::from("\n");
     for (name, dir) in [("download", &r.download), ("upload", &r.upload)] {
         if let Some(d) = dir {
-            out += "\n";
             out += &direction_block(name, d);
         }
     }
