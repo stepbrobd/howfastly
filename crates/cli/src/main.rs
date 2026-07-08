@@ -44,7 +44,11 @@ impl PayloadSize {
     about = "HowFastly: speed test for the Fastly network"
 )]
 pub struct Args {
-    #[arg(long, env = "HOWFASTLY_URL", default_value = "http://localhost:7676")]
+    #[arg(
+        long,
+        env = "HOWFASTLY_URL",
+        default_value = "https://howfastly.edgecompute.app"
+    )]
     pub url: String,
 
     #[arg(long, default_value_t = types::ITERATIONS)]
