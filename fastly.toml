@@ -1,0 +1,8 @@
+authors          = ["ysun@hey.com"]
+description      = "how fast is your connection to the fastly network"
+language         = "rust"
+manifest_version = 3
+name             = "howfastly"
+
+[scripts]
+build = "cargo build --package compute --release --target wasm32-wasip1 && mkdir -p bin && cp target/wasm32-wasip1/release/compute.wasm bin/main.wasm"

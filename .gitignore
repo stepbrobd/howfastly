@@ -3,6 +3,8 @@
 **/mutants.out*/
 *.pdb
 .direnv
+bin
+crates/web/dist
 debug
 result
 result-*
