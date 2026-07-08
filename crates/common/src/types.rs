@@ -81,9 +81,9 @@ pub struct SpeedtestResults {
 
 pub fn size_label(bytes: u64) -> String {
     if bytes >= 1_000_000 {
-        format!("{}mb", bytes / 1_000_000)
+        format!("{} MB", bytes / 1_000_000)
     } else {
-        format!("{}kb", bytes / 1_000)
+        format!("{} kB", bytes / 1_000)
     }
 }
 
@@ -152,9 +152,9 @@ mod tests {
 
     #[test]
     fn size_labels() {
-        assert_eq!(size_label(100_000), "100kb");
-        assert_eq!(size_label(1_000_000), "1mb");
-        assert_eq!(size_label(25_000_000), "25mb");
+        assert_eq!(size_label(100_000), "100 kB");
+        assert_eq!(size_label(1_000_000), "1 MB");
+        assert_eq!(size_label(25_000_000), "25 MB");
     }
 
     #[test]
