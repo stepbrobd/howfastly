@@ -1,0 +1,10 @@
+**/*.rs.bk
+**/.nixos-test-history
+**/mutants.out*/
+*.pdb
+.direnv
+debug
+result
+result-*
+rustc-ice-*.txt
+target

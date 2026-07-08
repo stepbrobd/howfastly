@@ -1,0 +1,35 @@
+name: Merge
+
+on:
+  workflow_run: # zizmor: ignore[dangerous-triggers]
+    workflows: [CI]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  Merge:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          {
+            gh pr list --author "app/github-actions" --state open --json number --jq '.[].number'
+            gh pr list --author "app/dependabot" --state open --json number --jq '.[].number'
+          } | sort -u | while read -r pr; do
+            if gh pr checks "$pr" 2>/dev/null; then
+              echo "All checks passed for PR #${pr}, merging."
+              gh pr merge "$pr" --rebase --delete-branch || true
+            else
+              echo "PR #${pr} has pending or failed checks, skipping."
+            fi
+          done
