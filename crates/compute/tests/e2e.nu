@@ -17,7 +17,7 @@ def checks [url: string, log: string] {
   assert equal ($up | get status) 200
 
   assert ((http get $"($url)/meta" | get client_ip | str length) > 0)
-  assert ((http get $"($url)/" | into string) =~ "howfastly")
+  assert ((http get $"($url)/" | into string) =~ "HowFastly")
   assert ((fetch $"($url)/ping" | get headers.response | where name == "server-timing" | length) > 0)
 
   # clients hanging up mid-download are normal for a speed test: the guest
