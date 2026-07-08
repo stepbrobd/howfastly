@@ -69,11 +69,11 @@ pub fn meta(req: &Request, start: Instant) -> Response {
         asn: geo.as_ref().map(|g| g.as_number()).unwrap_or_default(),
         as_org: geo
             .as_ref()
-            .map(|g| g.as_name().to_string())
+            .map(|g| common::types::title_case(g.as_name()))
             .unwrap_or_default(),
         city: geo
             .as_ref()
-            .map(|g| g.city().to_string())
+            .map(|g| common::types::title_case(g.city()))
             .unwrap_or_default(),
         country: geo
             .as_ref()
