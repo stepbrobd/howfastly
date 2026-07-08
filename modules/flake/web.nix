@@ -36,6 +36,7 @@
         strictDeps = true;
         cargoExtraArgs = "--package web";
         wasm-bindgen-cli = pkgs.wasm-bindgen-cli;
+        nativeBuildInputs = [ pkgs.tailwindcss_4 ];
 
         # trunk resolves the target crate from cwd, and the workspace root
         # is a virtual manifest

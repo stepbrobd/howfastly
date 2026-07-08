@@ -18,6 +18,7 @@
         # fastly + web
         fastly
         nushell
+        tailwindcss_4
         trunk
         viceroy
         wasm-bindgen-cli
