@@ -20,16 +20,17 @@ def checks [url: string, log: string] {
   assert ((http get $"($url)/" | into string) =~ "HowFastly")
   assert ((fetch $"($url)/ping" | get headers.response | where name == "server-timing" | length) > 0)
 
-  # clients hanging up mid-download are normal for a speed test: the guest
-  # must stay quiet and the server must keep serving (nu http does not
-  # abort mid-body, curl does)
+  # clients hanging up mid-download are normal for a speed test
+  # the guest must stay quiet and the server must keep serving
+  # curl aborts mid-body where nu http does not
   curl -so /dev/null --max-time 0.3 $"($url)/down?bytes=1000000000" | complete | ignore
   sleep 500ms
   assert equal (fetch $"($url)/ping" | get status) 204
   assert (not (open $log | str contains "WebAssembly exited with error"))
 
-  # regression guard: small guest read buffers make viceroy rebuffer the
-  # unread remainder per read, turning 50mb uploads quadratic (~40s)
+  # regression guard for quadratic uploads
+  # small guest read buffers make viceroy rebuffer the unread remainder
+  # on every read, which once turned 50mb uploads into ~40s
   let elapsed = timeit {
     http post --content-type application/octet-stream $"($url)/up" (random binary 50_000_000) | ignore
   }
@@ -38,7 +39,7 @@ def checks [url: string, log: string] {
 
 def main [] {
   let root = git rev-parse --show-toplevel | str trim
-  # not viceroy's default port: a dev serve session may be running
+  # avoid viceroy's default port since a dev serve session may be running
   let addr = "127.0.0.1:17676"
   let url = $"http://($addr)"
 
@@ -46,7 +47,8 @@ def main [] {
   let wasm = $"($root)/target/wasm32-wasip1/release/compute.wasm"
   let log = mktemp -t viceroy-e2e-XXXXXX.log
 
-  # jobs are NOT killed when a script dies on an error: clean up explicitly
+  # jobs are not killed when a script dies on an error
+  # clean up explicitly on both paths
   let server = job spawn { viceroy serve --addr $addr $wasm o+e> $log }
 
   mut ready = false

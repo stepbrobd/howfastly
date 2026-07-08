@@ -38,8 +38,8 @@
         wasm-bindgen-cli = pkgs.wasm-bindgen-cli;
         nativeBuildInputs = [ pkgs.tailwindcss_4 ];
 
-        # trunk resolves the target crate from cwd, and the workspace root
-        # is a virtual manifest
+        # trunk resolves the target crate from cwd
+        # the workspace root is a virtual manifest
         buildPhaseCargoCommand = ''
           (cd crates/web && trunk build --release=true index.html)
         '';

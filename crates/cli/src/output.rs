@@ -33,8 +33,8 @@ fn csv(r: &SpeedtestResults) -> String {
     out
 }
 
-// progress already streamed each measurement to stderr; only summarize
-// what is new (p90 headline and loaded latency)
+// progress already streamed each measurement to stderr
+// only summarize what is new (p90 headline and loaded latency)
 fn direction_block(name: &str, d: &DirectionSummary) -> String {
     let mut out = format!("{name}: {} Mbps (p90)\n", fmt_opt(d.p90_mbps));
     if let Some(l) = &d.loaded_latency {

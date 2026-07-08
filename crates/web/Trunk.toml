@@ -1,7 +1,8 @@
 [build]
 public_url = "/assets/"
 
-# style.css is generated, tailwind scans src/ and index.html on its own
+# style.css is generated
+# tailwind scans src/ and index.html on its own
 [[hooks]]
 stage = "pre_build"
 command = "tailwindcss"

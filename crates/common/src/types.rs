@@ -79,8 +79,8 @@ pub struct SpeedtestResults {
     pub upload: Option<DirectionSummary>,
 }
 
-// fastly geo data arrives lowercased; capitalize at word boundaries and
-// leave already-cased characters alone
+// fastly geo data arrives lowercased
+// capitalize at word boundaries and leave already-cased characters alone
 pub fn title_case(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     let mut boundary = true;

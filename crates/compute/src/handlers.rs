@@ -35,7 +35,7 @@ pub fn down(req: Request, start: Instant) {
     while left > 0 {
         let take = left.min(CHUNK.len() as u64) as usize;
         if body.write_all(&CHUNK[..take]).is_err() {
-            // client hung up mid-transfer, normal for a speed test
+            // a client hanging up mid-transfer is normal for a speed test
             return;
         }
         left -= take as u64;
@@ -44,8 +44,9 @@ pub fn down(req: Request, start: Instant) {
 }
 
 pub fn up(req: Request) -> Response {
-    // drain with large reads: viceroy rebuffers the unread remainder on
-    // every read, so small buffers make big uploads quadratic
+    // drain with large reads
+    // viceroy rebuffers the unread remainder on every read
+    // small buffers therefore make big uploads quadratic
     let mut body = req.into_body();
     let mut buf = vec![0u8; 2 * 1024 * 1024];
     let mut received: u64 = 0;
@@ -55,8 +56,8 @@ pub fn up(req: Request) -> Response {
             Ok(n) => received += n as u64,
         }
     }
-    // dur starts after the drain: receive time is the client's upload
-    // measurement, not server overhead
+    // dur starts after the drain
+    // receive time belongs to the client's upload measurement
     base(StatusCode::OK, Instant::now()).with_body(received.to_string())
 }
 

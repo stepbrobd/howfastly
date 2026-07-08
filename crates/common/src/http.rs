@@ -8,7 +8,8 @@ pub fn parse_server_timing(header: &str) -> Option<f64> {
     dur.parse().ok()
 }
 
-// missing param means 0 bytes, unparsable means bad request
+// missing param means 0 bytes
+// unparsable means bad request
 pub fn parse_bytes(param: Option<&str>) -> Option<u64> {
     match param {
         None => Some(0),
