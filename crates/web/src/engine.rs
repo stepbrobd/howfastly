@@ -101,7 +101,7 @@ pub async fn upload(
     JsFuture::from(promise).await?;
 
     let status = xhr.status().unwrap_or(0);
-    if status != 200 {
+    if !(200..300).contains(&status) {
         return Err(JsValue::from_str(&format!(
             "upload failed with status {status}"
         )));
