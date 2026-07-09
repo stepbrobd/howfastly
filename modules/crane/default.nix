@@ -5,16 +5,21 @@ let inherit (inputs.nixpkgs) lib; in
 pkgs: # pass from call site
 
 lib.fix (crane: {
-  toolchain = with inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}; combine [
-    stable.cargo
-    stable.clippy
-    stable.rust-src
-    stable.rust-std
-    stable.rustc
-    stable.rustfmt
-    targets.wasm32-unknown-unknown.stable.rust-std
-    targets.wasm32-wasip1.stable.rust-std
-  ];
+  toolchain = with inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}; combine (lib.flatten [
+    (with stable; [
+      cargo
+      clippy
+      rust-analyzer
+      rust-src
+      rust-std
+      rustc
+      rustfmt
+    ])
+
+    (with targets.wasm32-unknown-unknown.stable; [ rust-std ])
+
+    (with targets.wasm32-wasip1.stable; [ rust-std ])
+  ]);
 
   lib = (inputs.crane.mkLib pkgs).overrideToolchain crane.toolchain;
 
