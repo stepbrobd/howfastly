@@ -1,9 +1,10 @@
-authors          = ["ysun@hey.com"]
-description      = "HowFastly: how fast is your connection to the Fastly network"
-language         = "other"
 manifest_version = 3
-name             = "howfastly"
 service_id       = "ZaPiGtAev5CKoDO3c7W4jZ"
+
+name        = "howfastly"
+description = "how fast is your connection to the Fastly network?"
+authors     = ["ysun@stepbrobd.com"]
+language    = "other"
 
 [scripts]
 build = "cargo build --package compute --release --target wasm32-wasip1 && mkdir -p bin && cp target/wasm32-wasip1/release/compute.wasm bin/main.wasm"
