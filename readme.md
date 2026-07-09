@@ -41,11 +41,7 @@ nix run github:stepbrobd/howfastly#howfastly
 ```
 
 `howfastly` mirrors [cfspeedtest](https://github.com/code-inflation/cfspeedtest)
-flags: `--nr-tests` (flat override for the iteration plan),
-`--nr-latency-tests`, `--max-payload-size 100k|1m|10m|25m|100m`,
-`--download-only`, `--upload-only`,
-`--output-format human|json|json-pretty|csv`, and `--url` (or `HOWFASTLY_URL`)
-to point at another deployment.
+flags, see `--help`.
 
 ## Development
 
