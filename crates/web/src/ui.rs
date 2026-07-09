@@ -4,8 +4,8 @@ use std::rc::Rc;
 use common::chart::{format_speed, svg_path, throughput_points};
 use common::stats;
 use common::types::{
-    DOWNLOAD_SIZES, DirectionSummary, ITERATIONS, LOADED_PING_INTERVAL_MS, LatencySummary,
-    MetaResponse, SizeSamples, TestConfig, UPLOAD_SIZES, size_label, summarize_direction,
+    DOWNLOAD_PLAN, DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse,
+    SizePlan, SizeSamples, TestConfig, UPLOAD_PLAN, size_label, summarize_direction,
     summarize_latency,
 };
 use gloo_timers::future::TimeoutFuture;
@@ -15,25 +15,13 @@ use wasm_bindgen::JsValue;
 
 use crate::engine;
 
-#[derive(Clone, Copy)]
-enum Phase {
-    Idle,
-    Running,
-    Done,
-}
-
-impl Phase {
-    fn running(self) -> bool {
-        matches!(self, Self::Running)
-    }
-}
-
 const WINDOW_MS: f64 = 500.0;
 const EMIT_MS: f64 = 100.0;
 
 #[derive(Clone, Copy)]
 struct Direction {
     upload: bool,
+    running: RwSignal<bool>,
     points: RwSignal<Vec<(f64, f64)>>,
     sizes: RwSignal<Vec<SizeSamples>>,
     summary: RwSignal<Option<DirectionSummary>>,
@@ -43,6 +31,7 @@ impl Direction {
     fn new(upload: bool) -> Self {
         Self {
             upload,
+            running: RwSignal::new(false),
             points: RwSignal::new(Vec::new()),
             sizes: RwSignal::new(Vec::new()),
             summary: RwSignal::new(None),
@@ -50,6 +39,7 @@ impl Direction {
     }
 
     fn reset(self) {
+        self.running.set(false);
         self.points.set(Vec::new());
         self.sizes.set(Vec::new());
         self.summary.set(None);
@@ -58,7 +48,7 @@ impl Direction {
 
 #[derive(Clone, Copy)]
 struct State {
-    phase: RwSignal<Phase>,
+    running: RwSignal<bool>,
     error: RwSignal<Option<String>>,
     latency: RwSignal<Option<LatencySummary>>,
     down: Direction,
@@ -69,7 +59,7 @@ struct State {
 pub fn App() -> impl IntoView {
     let meta = RwSignal::new(None::<MetaResponse>);
     let state = State {
-        phase: RwSignal::new(Phase::Idle),
+        running: RwSignal::new(true),
         error: RwSignal::new(None),
         latency: RwSignal::new(None),
         down: Direction::new(false),
@@ -82,22 +72,15 @@ pub fn App() -> impl IntoView {
         }
     });
 
-    let start = move |_| {
-        if state.phase.get().running() {
-            return;
+    // start measuring as soon as the page loads
+    spawn_local(async move {
+        if let Err(e) = run_all(state).await {
+            state.error.set(Some(format!("{e:?}")));
         }
-        state.error.set(None);
-        state.latency.set(None);
-        state.down.reset();
-        state.up.reset();
-        state.phase.set(Phase::Running);
-        spawn_local(async move {
-            if let Err(e) = run_test(state).await {
-                state.error.set(Some(format!("{e:?}")));
-            }
-            state.phase.set(Phase::Done);
-        });
-    };
+        state.down.running.set(false);
+        state.up.running.set(false);
+        state.running.set(false);
+    });
 
     view! {
         <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4 lg:max-w-6xl">
@@ -118,11 +101,11 @@ pub fn App() -> impl IntoView {
 
             <div class="grid gap-8 lg:grid-cols-2">
                 <section class="flex flex-col gap-4">
-                    <Headline label="Download" dir=state.down/>
+                    <Headline label="Download" dir=state.down state=state/>
                     <SizeTable title="Download" dir=state.down/>
                 </section>
                 <section class="flex flex-col gap-4">
-                    <Headline label="Upload" dir=state.up/>
+                    <Headline label="Upload" dir=state.up state=state/>
                     <SizeTable title="Upload" dir=state.up/>
                 </section>
             </div>
@@ -150,17 +133,11 @@ pub fn App() -> impl IntoView {
                 <div class="rounded border border-nord-11 bg-nord-1 p-4 text-nord-11">{e}</div>
             })}
 
-            <button
-                class="w-fit cursor-pointer rounded bg-nord-10 px-8 py-3 text-nord-6 hover:bg-nord-9 disabled:cursor-wait disabled:bg-nord-3"
-                on:click=start
-                disabled=move || state.phase.get().running()
-            >
-                {move || match state.phase.get() {
-                    Phase::Idle => "Start",
-                    Phase::Running => "Measuring...",
-                    Phase::Done => "Run again",
-                }}
-            </button>
+            <p class="text-nord-3"><small>
+                "Tests run automatically and transfer up to ~640 MB in total. "
+                "Close the page early to spend less. "
+                "Tap a speed card to run that test again."
+            </small></p>
         </main>
     }
 }
@@ -218,16 +195,49 @@ fn SpeedChart(dir: Direction) -> impl IntoView {
 }
 
 #[component]
-fn Headline(label: &'static str, dir: Direction) -> impl IntoView {
+fn Headline(label: &'static str, dir: Direction, state: State) -> impl IntoView {
+    // live estimate while this direction transfers, p90 once summarized
     let speed = move || {
-        let bps = match dir.summary.get().and_then(|d| d.p90_mbps) {
-            Some(p90) => Some(p90 * 1e6),
-            None => dir.points.get().last().map(|&(_, bps)| bps),
+        let live = dir.points.get().last().map(|&(_, bps)| bps);
+        let bps = if dir.running.get() {
+            live
+        } else {
+            dir.summary
+                .get()
+                .and_then(|d| d.p90_mbps)
+                .map(|p90| p90 * 1e6)
+                .or(live)
         };
         bps.map(format_speed)
     };
+    let rerun = move |_| {
+        if state.running.get() {
+            return;
+        }
+        state.running.set(true);
+        state.error.set(None);
+        dir.reset();
+        spawn_local(async move {
+            if let Err(e) = run_one(dir).await {
+                state.error.set(Some(format!("{e:?}")));
+            }
+            dir.running.set(false);
+            state.running.set(false);
+        });
+    };
     view! {
-        <div class="flex-1 rounded bg-nord-1 p-4">
+        <div
+            class=move || {
+                let cursor = if state.running.get() {
+                    "cursor-wait"
+                } else {
+                    "cursor-pointer hover:ring-1 hover:ring-nord-3"
+                };
+                format!("flex-1 rounded bg-nord-1 p-4 {cursor}")
+            }
+            title="Run this test again"
+            on:click=rerun
+        >
             <div class="font-mono text-4xl text-nord-6">
                 {move || match speed() {
                     Some((v, unit)) => view! {
@@ -352,31 +362,33 @@ fn BoxPlot(samples: Vec<f64>, max: f64, upload: bool) -> impl IntoView {
 
 #[component]
 fn SizeTable(title: &'static str, dir: Direction) -> impl IntoView {
-    // render every configured size from the start so the height never changes
-    let bytes_list: &'static [u64] = if dir.upload {
-        &UPLOAD_SIZES
+    // render every planned size from the start so the height never changes
+    let plans: &'static [SizePlan] = if dir.upload {
+        &UPLOAD_PLAN
     } else {
-        &DOWNLOAD_SIZES
+        &DOWNLOAD_PLAN
     };
     view! {
         {move || {
             let live = dir.sizes.get();
-            let sizes: Vec<SizeSamples> = bytes_list
+            let sizes: Vec<(SizeSamples, usize)> = plans
                 .iter()
-                .map(|&bytes| {
-                    live.iter()
+                .map(|&SizePlan { bytes, iterations }| {
+                    let s = live
+                        .iter()
                         .find(|s| s.bytes == bytes)
                         .cloned()
                         .unwrap_or(SizeSamples {
                             bytes,
                             mbps: Vec::new(),
                             skipped: false,
-                        })
+                        });
+                    (s, iterations)
                 })
                 .collect();
             let max = sizes
                 .iter()
-                .flat_map(|s| s.mbps.iter().copied())
+                .flat_map(|(s, _)| s.mbps.iter().copied())
                 .fold(f64::EPSILON, f64::max);
             view! {
                 <table class="w-full border-separate border-spacing-0 overflow-hidden rounded border border-nord-3">
@@ -394,12 +406,12 @@ fn SizeTable(title: &'static str, dir: Direction) -> impl IntoView {
                     <tbody>
                         {sizes
                             .into_iter()
-                            .map(|s| {
+                            .map(|(s, iterations)| {
                                 let label = format!(
                                     "{} ({}/{})",
                                     size_label(s.bytes),
                                     s.mbps.len(),
-                                    ITERATIONS,
+                                    iterations,
                                 );
                                 let text = match (stats::median(&s.mbps), s.skipped) {
                                     (Some(m), _) => {
@@ -427,7 +439,30 @@ fn SizeTable(title: &'static str, dir: Direction) -> impl IntoView {
     }
 }
 
-async fn run_test(state: State) -> Result<(), JsValue> {
+// per direction bookkeeping that survives across interleaved segments
+struct DirRun {
+    dir: Direction,
+    plans: Vec<SizePlan>,
+    events: Rc<RefCell<Vec<(f64, u64)>>>,
+    active_ms: f64,
+    out: Vec<SizeSamples>,
+    loaded: Vec<f64>,
+}
+
+impl DirRun {
+    fn new(dir: Direction, plans: Vec<SizePlan>) -> Self {
+        Self {
+            dir,
+            plans,
+            events: Rc::new(RefCell::new(Vec::new())),
+            active_ms: 0.0,
+            out: Vec::new(),
+            loaded: Vec::new(),
+        }
+    }
+}
+
+async fn run_all(state: State) -> Result<(), JsValue> {
     let cfg = TestConfig::default();
 
     let mut pings = Vec::new();
@@ -436,88 +471,106 @@ async fn run_test(state: State) -> Result<(), JsValue> {
     }
     state.latency.set(summarize_latency(&pings));
 
-    for dir in [state.down, state.up] {
-        let (sizes, loaded) = run_direction(dir, &cfg).await?;
-        dir.summary.set(Some(summarize_direction(&sizes, &loaded)));
+    // alternate size classes so both directions estimate early
+    let mut down = DirRun::new(state.down, cfg.download.clone());
+    let mut up = DirRun::new(state.up, cfg.upload.clone());
+    for i in 0..down.plans.len().max(up.plans.len()) {
+        for run in [&mut down, &mut up] {
+            if let Some(&plan) = run.plans.get(i) {
+                segment(run, plan, cfg.time_budget_secs).await?;
+            }
+        }
     }
     Ok(())
 }
 
-async fn run_direction(
-    dir: Direction,
-    cfg: &TestConfig,
-) -> Result<(Vec<SizeSamples>, Vec<f64>), JsValue> {
+async fn run_one(dir: Direction) -> Result<(), JsValue> {
+    let cfg = TestConfig::default();
+    let plans = if dir.upload { cfg.upload } else { cfg.download };
+    let mut run = DirRun::new(dir, plans.clone());
+    for plan in plans {
+        segment(&mut run, plan, cfg.time_budget_secs).await?;
+    }
+    Ok(())
+}
+
+// one size class for one direction with its own loaded latency pinger
+async fn segment(run: &mut DirRun, plan: SizePlan, budget_secs: f64) -> Result<(), JsValue> {
+    run.dir.running.set(true);
     let stop = Rc::new(Cell::new(false));
-    let loaded = Rc::new(RefCell::new(Vec::new()));
+    let seg_loaded = Rc::new(RefCell::new(Vec::new()));
 
     spawn_local({
         let stop = stop.clone();
-        let loaded = loaded.clone();
+        let seg_loaded = seg_loaded.clone();
         async move {
             while !stop.get() {
                 if let Ok(ms) = engine::ping().await {
-                    loaded.borrow_mut().push(ms);
+                    seg_loaded.borrow_mut().push(ms);
                 }
                 TimeoutFuture::new(LOADED_PING_INTERVAL_MS as u32).await;
             }
         }
     });
 
-    let result = transfers(dir, cfg).await;
-    stop.set(true);
-    let loaded_ms = loaded.borrow().clone();
-    Ok((result?, loaded_ms))
-}
-
-async fn transfers(dir: Direction, cfg: &TestConfig) -> Result<Vec<SizeSamples>, JsValue> {
-    let phase_start = engine::now_ms();
-    let events: Rc<RefCell<Vec<(f64, u64)>>> = Rc::new(RefCell::new(Vec::new()));
-    let sizes = if dir.upload {
-        &cfg.upload_sizes
-    } else {
-        &cfg.download_sizes
+    let seg_start = engine::now_ms();
+    let mut s = SizeSamples {
+        bytes: plan.bytes,
+        mbps: Vec::new(),
+        skipped: false,
     };
-    let mut out = Vec::new();
-    for &bytes in sizes {
-        let mut s = SizeSamples {
-            bytes,
-            mbps: Vec::new(),
-            skipped: false,
-        };
-        for _ in 0..cfg.iterations {
-            if (engine::now_ms() - phase_start) / 1e3 > cfg.time_budget_secs {
-                s.skipped = true;
-                break;
-            }
-            let progress = recorder(dir, phase_start, events.clone());
-            let mbps = if dir.upload {
-                engine::upload(bytes, progress).await?
-            } else {
-                engine::download(bytes, progress).await?
-            };
-            s.mbps.push(mbps);
-            let mut live = out.clone();
-            live.push(s.clone());
-            dir.sizes.set(live);
+    for _ in 0..plan.iterations {
+        if (run.active_ms + engine::now_ms() - seg_start) / 1e3 > budget_secs {
+            s.skipped = true;
+            break;
         }
-        out.push(s);
+        let progress = recorder(run.dir, run.active_ms, seg_start, run.events.clone());
+        let sample = if run.dir.upload {
+            engine::upload(plan.bytes, progress).await
+        } else {
+            engine::download(plan.bytes, progress).await
+        };
+        let mbps = match sample {
+            Ok(mbps) => mbps,
+            Err(e) => {
+                stop.set(true);
+                run.dir.running.set(false);
+                return Err(e);
+            }
+        };
+        s.mbps.push(mbps);
+        let mut live = run.out.clone();
+        live.push(s.clone());
+        run.dir.sizes.set(live);
     }
-    dir.points
-        .set(throughput_points(&events.borrow(), WINDOW_MS, EMIT_MS));
-    dir.sizes.set(out.clone());
-    Ok(out)
+    stop.set(true);
+
+    run.active_ms += engine::now_ms() - seg_start;
+    run.out.push(s);
+    run.loaded.extend(seg_loaded.borrow().iter().copied());
+    run.dir
+        .points
+        .set(throughput_points(&run.events.borrow(), WINDOW_MS, EMIT_MS));
+    run.dir.sizes.set(run.out.clone());
+    run.dir
+        .summary
+        .set(Some(summarize_direction(&run.out, &run.loaded)));
+    run.dir.running.set(false);
+    Ok(())
 }
 
-// per transfer closure turning cumulative bytes into phase timeline deltas
+// per transfer closure turning cumulative bytes into active timeline deltas
+// the x axis counts only this direction's own transfer time
 fn recorder(
     dir: Direction,
-    phase_start: f64,
+    base_ms: f64,
+    seg_start: f64,
     events: Rc<RefCell<Vec<(f64, u64)>>>,
 ) -> impl FnMut(f64, u64) + 'static {
     let mut last_bytes = 0u64;
     let mut last_set = 0.0f64;
     move |now, cumulative| {
-        let t = now - phase_start;
+        let t = base_ms + (now - seg_start);
         let delta = cumulative.saturating_sub(last_bytes);
         last_bytes = cumulative;
         events.borrow_mut().push((t, delta));
