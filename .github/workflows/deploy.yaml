@@ -1,0 +1,30 @@
+name: Deploy
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          nix_path: nixpkgs=https://github.com/nixos/nixpkgs/archive/refs/heads/nixos-unstable.tar.gz
+          extra_nix_config: |
+            trusted-public-keys = cache.ysun.co-1:WxPYwT5g3kt9XhUhHPpNLZKI9HIOsVVAuqSHpok8Qt4= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+            substituters = https://cache.ysun.co https://cache.nixos.org/
+      - name: Build
+        run: nix build -L .#crates.compute
+      - name: Deploy
+        if: github.ref == 'refs/heads/master'
+        env:
+          FASTLY_API_TOKEN: ${{ secrets.FASTLY_API_TOKEN }}
+        run: |
+          nix shell --inputs-from . nixpkgs#fastly --command \
+            fastly compute pack --wasm-binary result/bin/compute.wasm
+          nix shell --inputs-from . nixpkgs#fastly --command \
+            fastly compute deploy --non-interactive --no-default-domain --status-check-off
