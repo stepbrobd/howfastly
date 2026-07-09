@@ -250,7 +250,7 @@ fn Headline(label: &'static str, dir: Direction, state: State) -> impl IntoView 
             </div>
             <div class="flex justify-between">
                 <span>{label}</span>
-                <span class="text-nord-3">
+                <span class="text-nord-4">
                     <small>
                         {move || {
                             let peak = dir
