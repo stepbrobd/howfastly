@@ -1,12 +1,15 @@
+#[cfg(target_arch = "wasm32")]
 mod assets;
+#[cfg(target_arch = "wasm32")]
 mod handlers;
 
-use std::time::Instant;
-
-use fastly::Request;
-use fastly::http::Method;
-
+#[cfg(target_arch = "wasm32")]
 fn main() {
+    use std::time::Instant;
+
+    use fastly::Request;
+    use fastly::http::Method;
+
     let start = Instant::now();
     let req = Request::from_client();
     let method = req.get_method().clone();
@@ -25,3 +28,8 @@ fn main() {
         _ => handlers::not_found().send_to_client(),
     }
 }
+
+// hostcalls in the fastly crate cannot link natively
+// the stub lets cargo build host integration tests for this package
+#[cfg(not(target_arch = "wasm32"))]
+fn main() {}

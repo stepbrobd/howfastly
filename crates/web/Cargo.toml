@@ -3,6 +3,12 @@ name    = "web"
 edition = "2024"
 version = "0.1.0"
 
+# the bin only builds for wasm32-unknown-unknown, keep it out of host
+# test builds
+[[bin]]
+name = "web"
+path = "src/main.rs"
+test = false
 
 [dependencies]
 common.workspace                   = true

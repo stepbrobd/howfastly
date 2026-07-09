@@ -3,6 +3,11 @@ name    = "compute"
 edition = "2024"
 version = "0.1.0"
 
+# the bin only builds for wasm32-wasip1, keep it out of host test builds
+[[bin]]
+name = "compute"
+path = "src/main.rs"
+test = false
 
 [dependencies]
 common.workspace      = true
