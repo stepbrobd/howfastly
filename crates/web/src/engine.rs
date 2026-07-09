@@ -19,6 +19,23 @@ pub fn now_ms() -> f64 {
     window().performance().expect("no performance").now()
 }
 
+const AUTOSTART_KEY: &str = "howfastly-autostart";
+
+pub fn autostart_saved() -> bool {
+    window()
+        .local_storage()
+        .ok()
+        .flatten()
+        .and_then(|s| s.get_item(AUTOSTART_KEY).ok().flatten())
+        .is_some()
+}
+
+pub fn save_autostart() {
+    if let Ok(Some(s)) = window().local_storage() {
+        let _ = s.set_item(AUTOSTART_KEY, "1");
+    }
+}
+
 async fn fetch(method: &str, url: &str, body: Option<Uint8Array>) -> Result<Response, JsValue> {
     let init = RequestInit::new();
     init.set_method(method);

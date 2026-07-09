@@ -59,7 +59,7 @@ struct State {
 pub fn App() -> impl IntoView {
     let meta = RwSignal::new(None::<MetaResponse>);
     let state = State {
-        running: RwSignal::new(true),
+        running: RwSignal::new(false),
         error: RwSignal::new(None),
         latency: RwSignal::new(None),
         down: Direction::new(false),
@@ -72,15 +72,28 @@ pub fn App() -> impl IntoView {
         }
     });
 
-    // start measuring as soon as the page loads
-    spawn_local(async move {
-        if let Err(e) = run_all(state).await {
-            state.error.set(Some(format!("{e:?}")));
-        }
-        state.down.running.set(false);
-        state.up.running.set(false);
-        state.running.set(false);
-    });
+    let launch = move || {
+        state.running.set(true);
+        spawn_local(async move {
+            if let Err(e) = run_all(state).await {
+                state.error.set(Some(format!("{e:?}")));
+            }
+            state.down.running.set(false);
+            state.up.running.set(false);
+            state.running.set(false);
+        });
+    };
+
+    // first visit gates behind the popup, later visits start right away
+    let gate = RwSignal::new(!engine::autostart_saved());
+    if !gate.get_untracked() {
+        launch();
+    }
+    let begin = move |_| {
+        engine::save_autostart();
+        gate.set(false);
+        launch();
+    };
 
     view! {
         <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4 lg:max-w-6xl">
@@ -139,11 +152,24 @@ pub fn App() -> impl IntoView {
                 <div class="rounded border border-nord-11 bg-nord-1 p-4 text-nord-11">{e}</div>
             })}
 
-            <p class="text-nord-3"><small>
-                "Tests run automatically and transfer up to ~640 MB in total. "
-                "Close the page early to spend less. "
-                "Tap a speed card to run that test again."
-            </small></p>
+            {move || gate.get().then(|| view! {
+                <div class="fixed inset-0 z-10 flex items-center justify-center bg-nord-0/80 p-4">
+                    <div class="w-full max-w-md rounded bg-nord-1 p-6">
+                        <h2 class="text-lg font-semibold">HowFastly</h2>
+                        <p class="mt-2">
+                            "Tests run automatically and transfer up to ~640 MB in total. "
+                            "Close the page early to spend less. "
+                            "Tap a speed card to run that test again."
+                        </p>
+                        <button
+                            class="mt-4 w-full cursor-pointer rounded bg-nord-10 px-8 py-3 text-nord-6 hover:bg-nord-9"
+                            on:click=begin
+                        >
+                            "Start"
+                        </button>
+                    </div>
+                </div>
+            })}
         </main>
     }
 }
