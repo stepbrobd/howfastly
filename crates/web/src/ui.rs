@@ -83,7 +83,7 @@ pub fn App() -> impl IntoView {
     };
 
     view! {
-        <main class="container mx-auto flex min-h-screen flex-col gap-8 p-4">
+        <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4">
             <header>
                 <h1 class="text-2xl font-black">HowFastly</h1>
                 {move || meta.get().map(|m| view! {
