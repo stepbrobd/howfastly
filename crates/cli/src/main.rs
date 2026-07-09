@@ -47,7 +47,7 @@ pub struct Args {
     #[arg(
         long,
         env = "HOWFASTLY_URL",
-        default_value = "https://howfastly.edgecompute.app"
+        default_value = "https://speed.edgecompute.app"
     )]
     pub url: String,
 
