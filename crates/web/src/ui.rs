@@ -84,20 +84,26 @@ pub fn App() -> impl IntoView {
 
     view! {
         <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4 lg:max-w-6xl">
-            <header>
-                <h1 class="text-2xl font-black">HowFastly</h1>
-                {move || meta.get().map(|m| view! {
-                    <p><small>
-                        <a href=format!("https://bgp.tools/prefix/{}", m.client_ip)
-                            target="_blank" rel="noopener">{m.client_ip.clone()}</a>
-                        " | "
-                        <a href=format!("https://bgp.tools/as/{}", m.asn)
-                            target="_blank" rel="noopener">{format!("AS{}", m.asn)}</a>
-                        {format!(" {} | {}, {} -> POP {}",
-                            m.as_org, m.city, m.country, m.pop)}
-                    </small></p>
-                })}
-            </header>
+            <section class="overflow-x-auto rounded bg-nord-1 p-4">
+                <div class="mx-auto w-max whitespace-nowrap font-mono">
+                    {move || match meta.get() {
+                        Some(m) => view! {
+                            <a href=format!("https://bgp.tools/prefix/{}", m.client_ip)
+                                target="_blank" rel="noopener">{m.client_ip.clone()}</a>
+                            " ("
+                            <a href=format!("https://bgp.tools/as/{}", m.asn)
+                                target="_blank" rel="noopener">{format!("AS{}", m.asn)}</a>
+                            ") @ "
+                            {format!("{}, {}", m.city, m.country)}
+                            " \u{2192} "
+                            <a href="https://www.fastly.com/documentation/guides/getting-started/concepts/using-fastlys-global-pop-network/#complete-list-of-pops"
+                                target="_blank" rel="noopener">{m.pop.clone()}</a>
+                        }
+                            .into_any(),
+                        None => view! { "-" }.into_any(),
+                    }}
+                </div>
+            </section>
 
             <div class="grid gap-8 lg:grid-cols-2">
                 <section class="flex flex-col gap-4">
