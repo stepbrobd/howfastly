@@ -2,9 +2,10 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use common::chart::{format_speed, svg_path, throughput_points};
+use common::stats;
 use common::types::{
-    DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse, SizeSamples,
-    TestConfig, size_label, summarize_direction, summarize_latency,
+    DirectionSummary, ITERATIONS, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse,
+    SizeSamples, TestConfig, size_label, summarize_direction, summarize_latency,
 };
 use gloo_timers::future::TimeoutFuture;
 use leptos::prelude::*;
@@ -142,8 +143,8 @@ pub fn App() -> impl IntoView {
                 })}
             </section>
 
-            {move || state.down.summary.get().map(|d| view! { <SizeTable title="Download" dir=d/> })}
-            {move || state.up.summary.get().map(|d| view! { <SizeTable title="Upload" dir=d/> })}
+            <SizeTable title="Download" dir=state.down/>
+            <SizeTable title="Upload" dir=state.up/>
 
             {move || state.error.get().map(|e| view! {
                 <div class="rounded border border-nord-11 bg-nord-1 p-4 text-nord-11">{e}</div>
@@ -261,48 +262,127 @@ fn LatencyCard(label: &'static str, summary: LatencySummary) -> impl IntoView {
 }
 
 #[component]
-fn SizeTable(title: &'static str, dir: DirectionSummary) -> impl IntoView {
-    let max = dir
-        .sizes
+fn BoxPlot(samples: Vec<f64>, max: f64, upload: bool) -> impl IntoView {
+    let (stroke, fill) = if upload {
+        ("stroke-nord-12", "fill-nord-12")
+    } else {
+        ("stroke-nord-8", "fill-nord-8")
+    };
+    if samples.is_empty() {
+        return view! { <svg class="block h-4 w-full"></svg> }.into_any();
+    }
+    let x = move |v: f64| (v / max * 100.0).clamp(0.0, 100.0);
+    let q = |p: f64| stats::percentile(&samples, p).unwrap_or(0.0);
+    let (lo, q1, med, q3, hi) = (q(0.0), q(25.0), q(50.0), q(75.0), q(100.0));
+    let ticks = samples
         .iter()
-        .filter_map(|s| s.median_mbps)
-        .fold(f64::EPSILON, f64::max);
+        .map(|&s| {
+            view! {
+                <line
+                    x1=format!("{:.1}", x(s))
+                    x2=format!("{:.1}", x(s))
+                    y1="12"
+                    y2="16"
+                    class=stroke
+                    stroke-opacity="0.5"
+                    vector-effect="non-scaling-stroke"
+                />
+            }
+        })
+        .collect_view();
     view! {
-        <table class="w-full border-separate border-spacing-0 overflow-hidden rounded border border-nord-3">
-            <thead>
-                <tr>
-                    <th class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6">
-                        {title}
-                    </th>
-                    <th class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6">
-                        "Mbps (median)"
-                    </th>
-                    <th class="w-1/2 border-b border-nord-3 bg-nord-0 px-4 py-2"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {dir.sizes.into_iter().map(|s| {
-                    let label = size_label(s.bytes);
-                    let text = match (s.median_mbps, s.skipped) {
-                        (Some(m), _) => format!("{m:.1}"),
-                        (None, true) => "Skipped".to_string(),
-                        (None, false) => "-".to_string(),
-                    };
-                    let width = s.median_mbps.map(|m| m / max * 100.0).unwrap_or(0.0);
-                    view! {
-                        <tr class="odd:bg-nord-1">
-                            <td class="px-4 py-2">{label}</td>
-                            <td class="px-4 py-2 font-mono">{text}</td>
-                            <td class="px-4 py-2">
-                                <svg class="block h-2 w-full" viewBox="0 0 100 8" preserveAspectRatio="none">
-                                    <rect class="fill-nord-8" width=format!("{width:.1}") height="8"/>
-                                </svg>
-                            </td>
+        <svg class="block h-4 w-full" viewBox="0 0 100 16" preserveAspectRatio="none">
+            <line
+                x1=format!("{:.1}", x(lo))
+                x2=format!("{:.1}", x(hi))
+                y1="6"
+                y2="6"
+                class=stroke
+                stroke-opacity="0.6"
+                vector-effect="non-scaling-stroke"
+            />
+            <rect
+                x=format!("{:.1}", x(q1))
+                width=format!("{:.1}", (x(q3) - x(q1)).max(0.5))
+                y="2"
+                height="8"
+                class=fill
+                fill-opacity="0.4"
+            />
+            <line
+                x1=format!("{:.1}", x(med))
+                x2=format!("{:.1}", x(med))
+                y1="1"
+                y2="11"
+                class=stroke
+                stroke-width="2"
+                vector-effect="non-scaling-stroke"
+            />
+            {ticks}
+        </svg>
+    }
+        .into_any()
+}
+
+#[component]
+fn SizeTable(title: &'static str, dir: Direction) -> impl IntoView {
+    view! {
+        {move || {
+            let sizes = dir.sizes.get();
+            if sizes.is_empty() {
+                return view! { <Waiting class="h-24 bg-nord-1"/> }.into_any();
+            }
+            let max = sizes
+                .iter()
+                .flat_map(|s| s.mbps.iter().copied())
+                .fold(f64::EPSILON, f64::max);
+            view! {
+                <table class="w-full border-separate border-spacing-0 overflow-hidden rounded border border-nord-3">
+                    <thead>
+                        <tr>
+                            <th class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6">
+                                {title}
+                            </th>
+                            <th class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6">
+                                "Median"
+                            </th>
+                            <th class="w-1/2 border-b border-nord-3 bg-nord-0 px-4 py-2"></th>
                         </tr>
-                    }
-                }).collect_view()}
-            </tbody>
-        </table>
+                    </thead>
+                    <tbody>
+                        {sizes
+                            .into_iter()
+                            .map(|s| {
+                                let label = format!(
+                                    "{} ({}/{})",
+                                    size_label(s.bytes),
+                                    s.mbps.len(),
+                                    ITERATIONS,
+                                );
+                                let text = match (stats::median(&s.mbps), s.skipped) {
+                                    (Some(m), _) => {
+                                        let (v, unit) = format_speed(m * 1e6);
+                                        format!("{v:.1} {unit}")
+                                    }
+                                    (None, true) => "Skipped".to_string(),
+                                    (None, false) => "-".to_string(),
+                                };
+                                view! {
+                                    <tr class="odd:bg-nord-1">
+                                        <td class="px-4 py-2">{label}</td>
+                                        <td class="px-4 py-2 font-mono">{text}</td>
+                                        <td class="px-4 py-2">
+                                            <BoxPlot samples=s.mbps max=max upload=dir.upload/>
+                                        </td>
+                                    </tr>
+                                }
+                            })
+                            .collect_view()}
+                    </tbody>
+                </table>
+            }
+                .into_any()
+        }}
     }
 }
 
