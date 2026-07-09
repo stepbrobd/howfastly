@@ -9,12 +9,14 @@ HowFastly measures your connection speed to the [Fastly](https://www.fastly.com)
 network, inspired by [speed.cloudflare.com](https://speed.cloudflare.com).
 People keep asking for a Fastly equivalent, and
 [fastly-debug.com](https://fastly-debug.com) reports connectivity diagnostics
-rather than throughput. A single
-[Fastly Compute](https://www.fastly.com/products/edge-compute) service
-(wasm32-wasip1) streams the test payloads, answers latency pings, and serves the
-Leptos web UI, built to showcase the flexibility of the Compute platform.
+rather than throughput.
 
-- Web: <https://howfastly.edgecompute.app> (or <https://speed.edgecompute.app>)
+This tool runs as a
+[Fastly Compute](https://www.fastly.com/products/edge-compute) instance
+(wasm32-wasip1) and streams test payloads, latency pings, and serves the Leptos
+web UI, built to showcase the flexibility of the Compute platform.
+
+- Web: <https://speed.edgecompute.app> (or <https://howfastly.edgecompute.app>)
 - CLI: `nix run github:stepbrobd/howfastly#howfastly`
 
 For Nix users: [cache.nixos.org](https://cache.nixos.org) and
@@ -31,38 +33,27 @@ Methodology (following Cloudflare's):
   variance and need fewer repeats
 - p90 headline speed, per size medians and box plots, loaded latency per
   direction (bufferbloat)
-- 30 s time budget per direction, roughly 640 MB transferred worst case
+- 30s time budget per direction, roughly 640 MB transferred worst case
 - Server processing time is subtracted from every sample via Server-Timing
 
-## CLI
+For CLI:
 
 ```
 nix run github:stepbrobd/howfastly#howfastly
 ```
 
-`howfastly` mirrors [cfspeedtest](https://github.com/code-inflation/cfspeedtest)
+`howfastly` follows [cfspeedtest](https://github.com/code-inflation/cfspeedtest)
 flags, see `--help`.
 
-## Development
+Planned:
 
-```
-nix develop        # rust toolchain, trunk, viceroy, fastly cli
-nix run .#serve    # local simulator on 127.0.0.1:7676
-cargo nextest run  # unit, property, and e2e tests
-```
-
-Pushes to master build on CI and deploy to Fastly automatically.
-
-## Planned
-
-- HTTP/3. All measurements currently ride TCP (HTTP/2 in browsers, HTTP/1.1 in
-  the CLI). The Fastly edge already terminates HTTP/3 for this service
+- HTTP/3. All measurements are currently on TCP (HTTP/2 in browsers, HTTP/1.1 in
+  CLI). The Fastly edge already terminates HTTP/3 for this service
   (`curl --http3-only` gets a 200), but neither an Alt-Svc header nor an HTTPS
-  DNS record advertises it, so no real client negotiates QUIC. Nix recently
-  gained HTTP/3 support
-  ([NixOS/nix#15961](https://github.com/NixOS/nix/pull/15961)) and both caches
-  above speak it, so TCP-only results are not representative of h3 cache
-  fetches.
+  DNS record advertises it, so no real client can use QUIC. Nix recently added
+  HTTP/3 support in [NixOS/nix#15961](https://github.com/NixOS/nix/pull/15961)
+  by me ;) and both caches already uses it, so TCP-only results are not
+  representative of h3 cache fetches.
 
 ## Sponsorship disclaimer
 
