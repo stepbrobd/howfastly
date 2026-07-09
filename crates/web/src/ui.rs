@@ -1,7 +1,7 @@
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use common::chart::throughput_points;
+use common::chart::{format_speed, svg_path, throughput_points};
 use common::types::{
     DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse, SizeSamples,
     TestConfig, size_label, summarize_direction, summarize_latency,
@@ -126,8 +126,8 @@ pub fn App() -> impl IntoView {
             </header>
 
             <section class="flex flex-col gap-4 sm:flex-row">
-                <Headline label="Download" upload=false state=state/>
-                <Headline label="Upload" upload=true state=state/>
+                <Headline label="Download" dir=state.down/>
+                <Headline label="Upload" dir=state.up/>
             </section>
 
             <section class="flex flex-wrap gap-4">
@@ -161,22 +161,88 @@ pub fn App() -> impl IntoView {
     }
 }
 
+const CHART_W: f64 = 300.0;
+const CHART_H: f64 = 80.0;
+
 #[component]
-fn Headline(label: &'static str, upload: bool, state: State) -> impl IntoView {
-    let value = move || {
-        let dir = if upload { state.up } else { state.down };
-        if let Some(p90) = dir.summary.get().and_then(|d| d.p90_mbps) {
-            return format!("{p90:.1}");
-        }
-        match dir.points.get().last() {
-            Some(&(_, bps)) => format!("{:.1}", bps / 1e6),
-            None => "-".to_string(),
-        }
+fn Waiting(class: &'static str) -> impl IntoView {
+    view! {
+        <div class=format!("flex items-center justify-center rounded text-nord-3 {class}")>
+            <small>"Waiting for measurements..."</small>
+        </div>
+    }
+}
+
+#[component]
+fn SpeedChart(dir: Direction) -> impl IntoView {
+    let (stroke, fill) = if dir.upload {
+        ("stroke-nord-12", "fill-nord-12")
+    } else {
+        ("stroke-nord-8", "fill-nord-8")
+    };
+    view! {
+        <div class="mt-2 h-24 w-full">
+            {move || {
+                let pts = dir.points.get();
+                let line = svg_path(&pts, CHART_W, CHART_H);
+                if line.is_empty() {
+                    return view! { <Waiting class="h-full bg-nord-0"/> }.into_any();
+                }
+                let area = format!("{line} L{CHART_W:.1},{CHART_H:.1} L0.0,{CHART_H:.1} Z");
+                let peak = pts.iter().map(|&(_, b)| b).fold(0.0, f64::max);
+                let (v, unit) = format_speed(peak);
+                view! {
+                    <div class="relative h-full">
+                        <svg
+                            class="h-full w-full"
+                            viewBox=format!("0 0 {CHART_W} {CHART_H}")
+                            preserveAspectRatio="none"
+                        >
+                            <path d=area class=fill fill-opacity="0.15" stroke="none"/>
+                            <path
+                                d=line
+                                class=stroke
+                                fill="none"
+                                stroke-width="2"
+                                stroke-linejoin="round"
+                                stroke-linecap="round"
+                                vector-effect="non-scaling-stroke"
+                            />
+                        </svg>
+                        <div class="absolute top-0 left-0 text-nord-3">
+                            <small>{format!("Peak {v:.1} {unit}")}</small>
+                        </div>
+                    </div>
+                }
+                    .into_any()
+            }}
+        </div>
+    }
+}
+
+#[component]
+fn Headline(label: &'static str, dir: Direction) -> impl IntoView {
+    let speed = move || {
+        let bps = match dir.summary.get().and_then(|d| d.p90_mbps) {
+            Some(p90) => Some(p90 * 1e6),
+            None => dir.points.get().last().map(|&(_, bps)| bps),
+        };
+        bps.map(format_speed)
     };
     view! {
         <div class="flex-1 rounded bg-nord-1 p-4">
-            <div class="font-mono text-4xl text-nord-8">{value}</div>
-            <div>{label} " (Mbps)"</div>
+            <div class="font-mono text-4xl text-nord-6">
+                {move || match speed() {
+                    Some((v, unit)) => view! {
+                        {format!("{v:.1}")}
+                        <span class="pl-1 text-base text-nord-4">{unit}</span>
+                    }
+                        .into_any(),
+                    None => view! { "-" }.into_any(),
+                }}
+            </div>
+            <div>{label}</div>
+            <SpeedChart dir=dir/>
         </div>
     }
 }
