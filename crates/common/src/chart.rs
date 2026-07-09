@@ -46,6 +46,29 @@ pub fn svg_path(points: &[(f64, f64)], width: f64, height: f64) -> String {
         .join(" ")
 }
 
+// events are (elapsed ms, bytes since previous event) in time order
+// emit at most one point per emit_ms, speed over the trailing window_ms
+pub fn throughput_points(events: &[(f64, u64)], window_ms: f64, emit_ms: f64) -> Vec<(f64, f64)> {
+    let mut out = Vec::new();
+    let mut next_emit = emit_ms;
+    for (i, &(t, _)) in events.iter().enumerate() {
+        if t < next_emit {
+            continue;
+        }
+        let from = t - window_ms;
+        let bytes: u64 = events[..=i]
+            .iter()
+            .rev()
+            .take_while(|&&(tt, _)| tt > from)
+            .map(|&(_, b)| b)
+            .sum();
+        let secs = (window_ms.min(t).max(f64::EPSILON)) / 1e3;
+        out.push((t / 1e3, bytes as f64 * 8.0 / secs));
+        next_emit = t + emit_ms;
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -111,5 +134,38 @@ mod tests {
     fn chart_coords_flat_series_sits_on_baseline() {
         let coords = chart_coords(&[(0.0, 0.0), (1.0, 0.0)], 300.0, 80.0);
         assert_eq!(coords, vec![(0.0, 80.0), (300.0, 80.0)]);
+    }
+
+    proptest! {
+        #[test]
+        fn throughput_points_monotone_finite(
+            deltas in prop::collection::vec((0.1f64..500.0, 0u64..10_000_000), 1..300),
+        ) {
+            let mut t = 0.0;
+            let events: Vec<(f64, u64)> = deltas
+                .into_iter()
+                .map(|(dt, b)| {
+                    t += dt;
+                    (t, b)
+                })
+                .collect();
+            let pts = throughput_points(&events, 500.0, 100.0);
+            prop_assert!(pts.len() <= events.len());
+            for w in pts.windows(2) {
+                prop_assert!(w[1].0 > w[0].0);
+            }
+            for &(_, bps) in &pts {
+                prop_assert!(bps.is_finite() && bps >= 0.0);
+            }
+        }
+    }
+
+    #[test]
+    fn throughput_points_exact() {
+        assert!(throughput_points(&[], 500.0, 100.0).is_empty());
+        // one event of 1000 bytes at 200ms, window truncated to elapsed time
+        // 1000 bytes * 8 bits over 0.2s = 40_000 bps at t 0.2s
+        let pts = throughput_points(&[(200.0, 1_000)], 500.0, 100.0);
+        assert_eq!(pts, vec![(0.2, 40_000.0)]);
     }
 }
