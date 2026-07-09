@@ -132,15 +132,19 @@ pub fn App() -> impl IntoView {
             </section>
 
             <section class="flex flex-wrap gap-4">
-                {move || state.latency.get().map(|l| view! {
-                    <LatencyCard label="Latency (unloaded)" summary=l/>
-                })}
-                {move || state.down.summary.get().and_then(|d| d.loaded_latency).map(|l| view! {
-                    <LatencyCard label="Latency (download loaded)" summary=l/>
-                })}
-                {move || state.up.summary.get().and_then(|d| d.loaded_latency).map(|l| view! {
-                    <LatencyCard label="Latency (upload loaded)" summary=l/>
-                })}
+                <LatencyCard label="Latency (unloaded)" summary=state.latency.into()/>
+                <LatencyCard
+                    label="Latency (download loaded)"
+                    summary=Signal::derive(move || {
+                        state.down.summary.get().and_then(|d| d.loaded_latency)
+                    })
+                />
+                <LatencyCard
+                    label="Latency (upload loaded)"
+                    summary=Signal::derive(move || {
+                        state.up.summary.get().and_then(|d| d.loaded_latency)
+                    })
+                />
             </section>
 
             <SizeTable title="Download" dir=state.down/>
@@ -249,14 +253,20 @@ fn Headline(label: &'static str, dir: Direction) -> impl IntoView {
 }
 
 #[component]
-fn LatencyCard(label: &'static str, summary: LatencySummary) -> impl IntoView {
+fn LatencyCard(label: &'static str, summary: Signal<Option<LatencySummary>>) -> impl IntoView {
     view! {
         <div class="flex-1 basis-48 rounded bg-nord-1 p-4">
             <div><small>{label}</small></div>
-            <div class="text-nord-6">
-                {format!("Median {:.1} ms / jitter {:.1} ms", summary.median_ms, summary.jitter_ms)}
-            </div>
-            <div><small>{format!("Min {:.1} / avg {:.1}", summary.min_ms, summary.avg_ms)}</small></div>
+            {move || match summary.get() {
+                Some(s) => view! {
+                    <div class="text-nord-6">
+                        {format!("Median {:.1} ms / jitter {:.1} ms", s.median_ms, s.jitter_ms)}
+                    </div>
+                    <div><small>{format!("Min {:.1} / avg {:.1}", s.min_ms, s.avg_ms)}</small></div>
+                }
+                    .into_any(),
+                None => view! { <div class="text-nord-3">"-"</div> }.into_any(),
+            }}
         </div>
     }
 }
