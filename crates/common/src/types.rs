@@ -2,12 +2,36 @@ use serde::{Deserialize, Serialize};
 
 use crate::stats;
 
-pub const DOWNLOAD_SIZES: [u64; 5] = [100_000, 1_000_000, 10_000_000, 25_000_000, 100_000_000];
-pub const UPLOAD_SIZES: [u64; 5] = [100_000, 1_000_000, 10_000_000, 25_000_000, 50_000_000];
+// larger transfers have lower relative variance and need fewer repeats
+pub const DOWNLOAD_PLAN: [SizePlan; 5] = [
+    SizePlan::new(100_000, 8),
+    SizePlan::new(1_000_000, 8),
+    SizePlan::new(10_000_000, 6),
+    SizePlan::new(25_000_000, 4),
+    SizePlan::new(100_000_000, 2),
+];
+pub const UPLOAD_PLAN: [SizePlan; 5] = [
+    SizePlan::new(100_000, 8),
+    SizePlan::new(1_000_000, 8),
+    SizePlan::new(10_000_000, 6),
+    SizePlan::new(25_000_000, 4),
+    SizePlan::new(50_000_000, 2),
+];
 pub const LATENCY_SAMPLES: usize = 25;
-pub const ITERATIONS: usize = 8;
 pub const TIME_BUDGET_SECS: f64 = 30.0;
 pub const LOADED_PING_INTERVAL_MS: u64 = 400;
+
+#[derive(Clone, Copy, Debug)]
+pub struct SizePlan {
+    pub bytes: u64,
+    pub iterations: usize,
+}
+
+impl SizePlan {
+    pub const fn new(bytes: u64, iterations: usize) -> Self {
+        Self { bytes, iterations }
+    }
+}
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct MetaResponse {
@@ -23,9 +47,8 @@ pub struct MetaResponse {
 #[derive(Clone, Debug)]
 pub struct TestConfig {
     pub latency_samples: usize,
-    pub iterations: usize,
-    pub download_sizes: Vec<u64>,
-    pub upload_sizes: Vec<u64>,
+    pub download: Vec<SizePlan>,
+    pub upload: Vec<SizePlan>,
     pub time_budget_secs: f64,
 }
 
@@ -33,9 +56,8 @@ impl Default for TestConfig {
     fn default() -> Self {
         Self {
             latency_samples: LATENCY_SAMPLES,
-            iterations: ITERATIONS,
-            download_sizes: DOWNLOAD_SIZES.to_vec(),
-            upload_sizes: UPLOAD_SIZES.to_vec(),
+            download: DOWNLOAD_PLAN.to_vec(),
+            upload: UPLOAD_PLAN.to_vec(),
             time_budget_secs: TIME_BUDGET_SECS,
         }
     }
