@@ -4,8 +4,9 @@ use std::rc::Rc;
 use common::chart::{format_speed, svg_path, throughput_points};
 use common::stats;
 use common::types::{
-    DirectionSummary, ITERATIONS, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse,
-    SizeSamples, TestConfig, size_label, summarize_direction, summarize_latency,
+    DOWNLOAD_SIZES, DirectionSummary, ITERATIONS, LOADED_PING_INTERVAL_MS, LatencySummary,
+    MetaResponse, SizeSamples, TestConfig, UPLOAD_SIZES, size_label, summarize_direction,
+    summarize_latency,
 };
 use gloo_timers::future::TimeoutFuture;
 use leptos::prelude::*;
@@ -276,7 +277,11 @@ fn LatencyCard(label: &'static str, summary: Signal<Option<LatencySummary>>) -> 
                     <div><small>{format!("Min {:.1} / Avg {:.1}", s.min_ms, s.avg_ms)}</small></div>
                 }
                     .into_any(),
-                None => view! { <div class="text-nord-3">"-"</div> }.into_any(),
+                None => view! {
+                    <div class="text-nord-3">"Median - / Jitter -"</div>
+                    <div class="text-nord-3"><small>"Min - / Avg -"</small></div>
+                }
+                    .into_any(),
             }}
         </div>
     }
@@ -347,12 +352,28 @@ fn BoxPlot(samples: Vec<f64>, max: f64, upload: bool) -> impl IntoView {
 
 #[component]
 fn SizeTable(title: &'static str, dir: Direction) -> impl IntoView {
+    // render every configured size from the start so the height never changes
+    let bytes_list: &'static [u64] = if dir.upload {
+        &UPLOAD_SIZES
+    } else {
+        &DOWNLOAD_SIZES
+    };
     view! {
         {move || {
-            let sizes = dir.sizes.get();
-            if sizes.is_empty() {
-                return view! { <Waiting class="h-24 bg-nord-1"/> }.into_any();
-            }
+            let live = dir.sizes.get();
+            let sizes: Vec<SizeSamples> = bytes_list
+                .iter()
+                .map(|&bytes| {
+                    live.iter()
+                        .find(|s| s.bytes == bytes)
+                        .cloned()
+                        .unwrap_or(SizeSamples {
+                            bytes,
+                            mbps: Vec::new(),
+                            skipped: false,
+                        })
+                })
+                .collect();
             let max = sizes
                 .iter()
                 .flat_map(|s| s.mbps.iter().copied())
@@ -402,7 +423,6 @@ fn SizeTable(title: &'static str, dir: Direction) -> impl IntoView {
                     </tbody>
                 </table>
             }
-                .into_any()
         }}
     }
 }
