@@ -11,12 +11,71 @@ pub fn format_speed(bps: f64) -> (f64, &'static str) {
     }
 }
 
+// map samples into svg space
+// x spans the input range, y spans 0 to the max with larger values higher
+pub fn chart_coords(points: &[(f64, f64)], width: f64, height: f64) -> Vec<(f64, f64)> {
+    let (x0, x1) = match (points.first(), points.last()) {
+        (Some(&(a, _)), Some(&(b, _))) => (a, b),
+        _ => return Vec::new(),
+    };
+    let span = (x1 - x0).max(f64::EPSILON);
+    let max = points.iter().map(|&(_, y)| y).fold(f64::EPSILON, f64::max);
+    points
+        .iter()
+        .map(|&(x, y)| {
+            let sx = (x - x0) / span * width;
+            let sy = height - y.max(0.0) / max * height;
+            (sx, sy)
+        })
+        .collect()
+}
+
+pub fn svg_path(points: &[(f64, f64)], width: f64, height: f64) -> String {
+    let coords = chart_coords(points, width, height);
+    if coords.len() < 2 {
+        return String::new();
+    }
+    coords
+        .iter()
+        .enumerate()
+        .map(|(i, (x, y))| {
+            let cmd = if i == 0 { 'M' } else { 'L' };
+            format!("{cmd}{x:.1},{y:.1}")
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use proptest::prelude::*;
 
     proptest! {
+        #[test]
+        fn chart_coords_within_bounds(
+            raw in prop::collection::vec((0.0f64..1e4, 0.0f64..1e10), 2..200),
+        ) {
+            let mut pts = raw;
+            pts.sort_by(|a, b| a.0.total_cmp(&b.0));
+            for (x, y) in chart_coords(&pts, 300.0, 80.0) {
+                prop_assert!((-1e-9..=300.0 + 1e-9).contains(&x));
+                prop_assert!((-1e-9..=80.0 + 1e-9).contains(&y));
+            }
+        }
+
+        #[test]
+        fn chart_coords_x_monotone(
+            raw in prop::collection::vec((0.0f64..1e4, 0.0f64..1e10), 2..200),
+        ) {
+            let mut pts = raw;
+            pts.sort_by(|a, b| a.0.total_cmp(&b.0));
+            let coords = chart_coords(&pts, 300.0, 80.0);
+            for w in coords.windows(2) {
+                prop_assert!(w[1].0 >= w[0].0);
+            }
+        }
+
         #[test]
         fn format_speed_value_in_display_range(bps in 1.0f64..1e12) {
             let (v, _) = format_speed(bps);
@@ -38,5 +97,19 @@ mod tests {
         assert_eq!(format_speed(2.5e9), (2.5, "Gbps"));
         assert_eq!(format_speed(f64::NAN), (0.0, "bps"));
         assert_eq!(format_speed(-5.0), (0.0, "bps"));
+    }
+
+    #[test]
+    fn svg_path_exact() {
+        assert_eq!(svg_path(&[], 300.0, 80.0), "");
+        assert_eq!(svg_path(&[(0.0, 1.0)], 300.0, 80.0), "");
+        let p = svg_path(&[(0.0, 0.0), (1.0, 10.0)], 300.0, 80.0);
+        assert_eq!(p, "M0.0,80.0 L300.0,0.0");
+    }
+
+    #[test]
+    fn chart_coords_flat_series_sits_on_baseline() {
+        let coords = chart_coords(&[(0.0, 0.0), (1.0, 0.0)], 300.0, 80.0);
+        assert_eq!(coords, vec![(0.0, 80.0), (300.0, 80.0)]);
     }
 }
