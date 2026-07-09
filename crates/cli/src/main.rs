@@ -41,7 +41,7 @@ impl PayloadSize {
 #[derive(Debug, Parser)]
 #[command(
     name = "howfastly",
-    about = "HowFastly: speed test for the Fastly network"
+    about = "HowFastly: how fast is your connection to the Fastly network?"
 )]
 pub struct Args {
     #[arg(
