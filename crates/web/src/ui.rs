@@ -194,30 +194,23 @@ fn SpeedChart(dir: Direction) -> impl IntoView {
                     return view! { <Waiting class="h-full bg-nord-0"/> }.into_any();
                 }
                 let area = format!("{line} L{CHART_W:.1},{CHART_H:.1} L0.0,{CHART_H:.1} Z");
-                let peak = pts.iter().map(|&(_, b)| b).fold(0.0, f64::max);
-                let (v, unit) = format_speed(peak);
                 view! {
-                    <div class="relative h-full">
-                        <svg
-                            class="h-full w-full"
-                            viewBox=format!("0 0 {CHART_W} {CHART_H}")
-                            preserveAspectRatio="none"
-                        >
-                            <path d=area class=fill fill-opacity="0.15" stroke="none"/>
-                            <path
-                                d=line
-                                class=stroke
-                                fill="none"
-                                stroke-width="2"
-                                stroke-linejoin="round"
-                                stroke-linecap="round"
-                                vector-effect="non-scaling-stroke"
-                            />
-                        </svg>
-                        <div class="absolute top-0 left-0 text-nord-3">
-                            <small>{format!("Peak {v:.1} {unit}")}</small>
-                        </div>
-                    </div>
+                    <svg
+                        class="h-full w-full"
+                        viewBox=format!("0 0 {CHART_W} {CHART_H}")
+                        preserveAspectRatio="none"
+                    >
+                        <path d=area class=fill fill-opacity="0.15" stroke="none"/>
+                        <path
+                            d=line
+                            class=stroke
+                            fill="none"
+                            stroke-width="2"
+                            stroke-linejoin="round"
+                            stroke-linecap="round"
+                            vector-effect="non-scaling-stroke"
+                        />
+                    </svg>
                 }
                     .into_any()
             }}
@@ -246,7 +239,27 @@ fn Headline(label: &'static str, dir: Direction) -> impl IntoView {
                     None => view! { "-" }.into_any(),
                 }}
             </div>
-            <div>{label}</div>
+            <div class="flex justify-between">
+                <span>{label}</span>
+                <span class="text-nord-3">
+                    <small>
+                        {move || {
+                            let peak = dir
+                                .points
+                                .get()
+                                .iter()
+                                .map(|&(_, b)| b)
+                                .fold(0.0, f64::max);
+                            if peak > 0.0 {
+                                let (v, unit) = format_speed(peak);
+                                format!("Peak {v:.1} {unit}")
+                            } else {
+                                String::new()
+                            }
+                        }}
+                    </small>
+                </span>
+            </div>
             <SpeedChart dir=dir/>
         </div>
     }
