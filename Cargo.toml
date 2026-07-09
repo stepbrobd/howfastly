@@ -7,13 +7,13 @@ anyhow                   = "1"
 clap                     = { version = "4", features = ["derive", "env"] }
 common                   = { path = "crates/common" }
 console_error_panic_hook = "0.1"
-fastly                   = "0.11"
-gloo-timers              = { version = "0.3", features = ["futures"] }
+fastly                   = "0.13"
+gloo-timers              = { version = "0.4", features = ["futures"] }
 include_dir              = "0.7"
 js-sys                   = "0.3"
 leptos                   = { version = "0.8", features = ["csr"] }
 proptest                 = "1"
-reqwest                  = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+reqwest                  = { version = "0.13", default-features = false, features = ["json", "rustls", "webpki-roots"] }
 serde                    = { version = "1", features = ["derive"] }
 serde_json               = "1"
 tokio                    = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
