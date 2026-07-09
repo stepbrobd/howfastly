@@ -2,7 +2,7 @@ mod output;
 mod run;
 
 use clap::{Parser, ValueEnum};
-use common::types::{self, TestConfig};
+use common::types::{self, SizePlan, TestConfig};
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum OutputFormat {
@@ -51,8 +51,9 @@ pub struct Args {
     )]
     pub url: String,
 
-    #[arg(long, default_value_t = types::ITERATIONS)]
-    pub nr_tests: usize,
+    // flat override for the per size iteration plan
+    #[arg(long)]
+    pub nr_tests: Option<usize>,
 
     #[arg(long, default_value_t = types::LATENCY_SAMPLES)]
     pub nr_latency_tests: usize,
@@ -76,12 +77,20 @@ pub struct Args {
 impl Args {
     pub fn config(&self) -> TestConfig {
         let cap = self.max_payload_size.bytes();
-        let keep = |sizes: &[u64]| sizes.iter().copied().filter(|b| *b <= cap).collect();
+        let keep = |plan: &[SizePlan]| {
+            plan.iter()
+                .copied()
+                .filter(|p| p.bytes <= cap)
+                .map(|p| SizePlan {
+                    iterations: self.nr_tests.unwrap_or(p.iterations),
+                    ..p
+                })
+                .collect()
+        };
         TestConfig {
             latency_samples: self.nr_latency_tests,
-            iterations: self.nr_tests,
-            download_sizes: keep(&types::DOWNLOAD_SIZES),
-            upload_sizes: keep(&types::UPLOAD_SIZES),
+            download: keep(&types::DOWNLOAD_PLAN),
+            upload: keep(&types::UPLOAD_PLAN),
             time_budget_secs: types::TIME_BUDGET_SECS,
         }
     }

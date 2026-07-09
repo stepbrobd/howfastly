@@ -6,8 +6,8 @@ use anyhow::{Context, Result, ensure};
 use common::http::parse_server_timing;
 use common::stats;
 use common::types::{
-    DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizeSamples, SpeedtestResults,
-    TestConfig, size_label, summarize_direction, summarize_latency,
+    DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
+    SpeedtestResults, TestConfig, size_label, summarize_direction, summarize_latency,
 };
 use reqwest::{Client, Response};
 
@@ -147,19 +147,15 @@ impl Runner {
         });
 
         let phase_start = Instant::now();
-        let sizes = if upload {
-            &cfg.upload_sizes
-        } else {
-            &cfg.download_sizes
-        };
+        let plans = if upload { &cfg.upload } else { &cfg.download };
         let mut out = Vec::new();
-        for &bytes in sizes {
+        for &SizePlan { bytes, iterations } in plans {
             let mut s = SizeSamples {
                 bytes,
                 mbps: Vec::new(),
                 skipped: false,
             };
-            for i in 0..cfg.iterations {
+            for i in 0..iterations {
                 if phase_start.elapsed().as_secs_f64() > cfg.time_budget_secs {
                     s.skipped = true;
                     break;
