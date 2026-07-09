@@ -5,22 +5,39 @@ let inherit (inputs.nixpkgs) lib; in
 pkgs: # pass from call site
 
 lib.fix (crane: {
-  toolchain = with inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}; combine (lib.flatten [
-    (with latest; [
-      cargo
-      clippy
-      miri
-      rust-analyzer
-      rust-src
-      rust-std
-      rustc
-      rustfmt
-    ])
+  toolchain =
+    let
+      combined = with inputs.fenix.packages.${pkgs.stdenv.hostPlatform.system}; combine (lib.flatten [
+        (with latest; [
+          cargo
+          clippy
+          miri
+          rust-analyzer
+          rust-src
+          rust-std
+          rustc
+          rustfmt
+        ])
 
-    (with targets.wasm32-unknown-unknown.latest; [ rust-std ])
+        (with targets.wasm32-unknown-unknown.latest; [ rust-std ])
 
-    (with targets.wasm32-wasip1.latest; [ rust-std ])
-  ]);
+        (with targets.wasm32-wasip1.latest; [ rust-std ])
+      ]);
+    in
+    if !pkgs.stdenv.isDarwin then combined else
+      # nightly darwin dists ship rustlib/<host>/bin/rust-lld with an rpath
+      # that cannot resolve libLLVM.dylib
+      # fenix only fixes up top-level bin, mirror it for the nested linkers
+    combined.overrideAttrs (old: {
+      postBuild = (old.postBuild or "") + ''
+        for file in $(find $out/lib/rustlib -path '*/bin/*' -type l); do
+          target=$(realpath "$file")
+          rm "$file"
+          install -m755 "$target" "$file"
+          install_name_tool -add_rpath $out/lib "$file" || true
+        done
+      '';
+    });
 
   lib = (inputs.crane.mkLib pkgs).overrideToolchain crane.toolchain;
 
