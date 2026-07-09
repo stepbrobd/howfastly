@@ -331,7 +331,7 @@ fn BoxPlot(samples: Vec<f64>, max: f64, upload: bool) -> impl IntoView {
             {ticks}
         </svg>
     }
-        .into_any()
+    .into_any()
 }
 
 #[component]
