@@ -1,4 +1,4 @@
-{ config, crane, ... }:
+{ crane, pkgs, ... }:
 
 {
   cargoArtifacts = crane.lib.buildDepsOnly (crane.commonArgs // {
@@ -11,5 +11,6 @@
   src = crane.fileSetForCrates [ ../common ../compute ];
 
   env.CARGO_BUILD_TARGET = "wasm32-wasip1";
-  env.WEB_DIST = "${config.legacyPackages.web}";
+  # web comes from the flake self overlay
+  env.WEB_DIST = "${pkgs.web}";
 }

@@ -13,7 +13,7 @@
           { crane.mkLib = import ./modules/crane { inherit inputs; }; }
         ];
 
-        # nixpkgs.overlays = with inputs; [ self.overlays.default ];
+        nixpkgs.overlays = with inputs; [ self.overlays.default ];
         nixpkgs.instances.pkgs = inputs.nixpkgs;
       };
     }
