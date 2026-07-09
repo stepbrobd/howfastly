@@ -43,7 +43,7 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     results.latency = summarize_latency(&pings);
     if let Some(l) = &results.latency {
         eprintln!(
-            "Latency: min {:.1} / med {:.1} / avg {:.1} / jitter {:.1} ms",
+            "Latency: Min {:.1} / Median {:.1} / Avg {:.1} / Jitter {:.1} ms",
             l.min_ms, l.median_ms, l.avg_ms, l.jitter_ms,
         );
     }

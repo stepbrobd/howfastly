@@ -39,7 +39,7 @@ fn direction_block(name: &str, d: &DirectionSummary) -> String {
     let mut out = format!("{name}: {} Mbps (p90)\n", fmt_opt(d.p90_mbps));
     if let Some(l) = &d.loaded_latency {
         out += &format!(
-            "{name} loaded latency: med {:.1} ms / jitter {:.1} ms\n",
+            "{name} loaded latency: Median {:.1} ms / Jitter {:.1} ms\n",
             l.median_ms, l.jitter_ms,
         );
     }
