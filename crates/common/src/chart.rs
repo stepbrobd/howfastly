@@ -12,7 +12,8 @@ pub fn format_speed(bps: f64) -> (f64, &'static str) {
 }
 
 // map samples into svg space
-// x spans the input range, y spans 0 to the max with larger values higher
+// x spans the input range
+// y spans 0 to the max with larger values higher
 pub fn chart_coords(points: &[(f64, f64)], width: f64, height: f64) -> Vec<(f64, f64)> {
     let (x0, x1) = match (points.first(), points.last()) {
         (Some(&(a, _)), Some(&(b, _))) => (a, b),
@@ -47,7 +48,8 @@ pub fn svg_path(points: &[(f64, f64)], width: f64, height: f64) -> String {
 }
 
 // events are (elapsed ms, bytes since previous event) in time order
-// emit at most one point per emit_ms, speed over the trailing window_ms
+// emit at most one point per emit_ms
+// speed is measured over the trailing window_ms
 pub fn throughput_points(events: &[(f64, u64)], window_ms: f64, emit_ms: f64) -> Vec<(f64, f64)> {
     let mut out = Vec::new();
     let mut next_emit = emit_ms;
@@ -117,6 +119,7 @@ mod tests {
         assert_eq!(format_speed(999.0), (999.0, "bps"));
         assert_eq!(format_speed(1_000.0), (1.0, "kbps"));
         assert_eq!(format_speed(1e6), (1.0, "Mbps"));
+        assert_eq!(format_speed(1e9), (1.0, "Gbps"));
         assert_eq!(format_speed(2.5e9), (2.5, "Gbps"));
         assert_eq!(format_speed(f64::NAN), (0.0, "bps"));
         assert_eq!(format_speed(-5.0), (0.0, "bps"));
@@ -163,7 +166,8 @@ mod tests {
     #[test]
     fn throughput_points_exact() {
         assert!(throughput_points(&[], 500.0, 100.0).is_empty());
-        // one event of 1000 bytes at 200ms, window truncated to elapsed time
+        // one event of 1000 bytes at 200ms
+        // the window truncates to elapsed time
         // 1000 bytes * 8 bits over 0.2s = 40_000 bps at t 0.2s
         let pts = throughput_points(&[(200.0, 1_000)], 500.0, 100.0);
         assert_eq!(pts, vec![(0.2, 40_000.0)]);
