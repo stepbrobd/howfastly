@@ -110,7 +110,7 @@ pub fn App() -> impl IntoView {
                             {format!("{}, {}", m.city, m.country)}
                             " "
                             <svg
-                                class="inline h-[1em] w-[1em] align-[-0.125em]"
+                                class="inline h-[1lh] w-[1em] align-bottom"
                                 viewBox="0 0 16 16"
                                 fill="none"
                                 stroke="currentColor"
