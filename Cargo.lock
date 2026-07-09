@@ -329,7 +329,7 @@ checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
 name = "cli"
-version = "0.1.0"
+version = "2026.709.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -383,7 +383,7 @@ dependencies = [
 
 [[package]]
 name = "common"
-version = "0.1.0"
+version = "2026.708.0"
 dependencies = [
  "proptest",
  "serde",
@@ -392,7 +392,7 @@ dependencies = [
 
 [[package]]
 name = "compute"
-version = "0.1.0"
+version = "2026.708.0"
 dependencies = [
  "common",
  "fastly",
@@ -3074,7 +3074,7 @@ dependencies = [
 
 [[package]]
 name = "web"
-version = "0.1.0"
+version = "2026.708.0"
 dependencies = [
  "common",
  "console_error_panic_hook",
