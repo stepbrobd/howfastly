@@ -108,7 +108,19 @@ pub fn App() -> impl IntoView {
                                 target="_blank" rel="noopener">{format!("AS{}", m.asn)}</a>
                             ") @ "
                             {format!("{}, {}", m.city, m.country)}
-                            " \u{2192} "
+                            " "
+                            <svg
+                                class="inline h-[1em] w-[1em] align-[-0.125em]"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M2.5 8h11M9.5 4l4 4-4 4"/>
+                            </svg>
+                            " "
                             <a href="https://www.fastly.com/documentation/guides/getting-started/concepts/using-fastlys-global-pop-network/#complete-list-of-pops"
                                 target="_blank" rel="noopener">{m.pop.clone()}</a>
                         }
