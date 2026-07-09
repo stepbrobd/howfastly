@@ -287,9 +287,9 @@ async fn transfers(
                 break;
             }
             let mbps = if upload {
-                engine::upload(bytes).await?
+                engine::upload(bytes, |_, _| {}).await?
             } else {
-                engine::download(bytes).await?
+                engine::download(bytes, |_, _| {}).await?
             };
             state.live.set(Some((upload, mbps)));
             s.mbps.push(mbps);
