@@ -1,6 +1,7 @@
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
+use common::chart::throughput_points;
 use common::types::{
     DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse, SizeSamples,
     TestConfig, size_label, summarize_direction, summarize_latency,
@@ -37,14 +38,41 @@ impl Phase {
     }
 }
 
+const WINDOW_MS: f64 = 500.0;
+const EMIT_MS: f64 = 100.0;
+
+#[derive(Clone, Copy)]
+struct Direction {
+    upload: bool,
+    points: RwSignal<Vec<(f64, f64)>>,
+    sizes: RwSignal<Vec<SizeSamples>>,
+    summary: RwSignal<Option<DirectionSummary>>,
+}
+
+impl Direction {
+    fn new(upload: bool) -> Self {
+        Self {
+            upload,
+            points: RwSignal::new(Vec::new()),
+            sizes: RwSignal::new(Vec::new()),
+            summary: RwSignal::new(None),
+        }
+    }
+
+    fn reset(self) {
+        self.points.set(Vec::new());
+        self.sizes.set(Vec::new());
+        self.summary.set(None);
+    }
+}
+
 #[derive(Clone, Copy)]
 struct State {
     phase: RwSignal<Phase>,
     error: RwSignal<Option<String>>,
     latency: RwSignal<Option<LatencySummary>>,
-    download: RwSignal<Option<DirectionSummary>>,
-    upload: RwSignal<Option<DirectionSummary>>,
-    live: RwSignal<Option<(bool, f64)>>,
+    down: Direction,
+    up: Direction,
 }
 
 #[component]
@@ -54,9 +82,8 @@ pub fn App() -> impl IntoView {
         phase: RwSignal::new(Phase::Idle),
         error: RwSignal::new(None),
         latency: RwSignal::new(None),
-        download: RwSignal::new(None),
-        upload: RwSignal::new(None),
-        live: RwSignal::new(None),
+        down: Direction::new(false),
+        up: Direction::new(true),
     };
 
     spawn_local(async move {
@@ -71,9 +98,8 @@ pub fn App() -> impl IntoView {
         }
         state.error.set(None);
         state.latency.set(None);
-        state.download.set(None);
-        state.upload.set(None);
-        state.live.set(None);
+        state.down.reset();
+        state.up.reset();
         spawn_local(async move {
             if let Err(e) = run_test(state).await {
                 state.error.set(Some(format!("{e:?}")));
@@ -108,16 +134,16 @@ pub fn App() -> impl IntoView {
                 {move || state.latency.get().map(|l| view! {
                     <LatencyCard label="Latency (unloaded)" summary=l/>
                 })}
-                {move || state.download.get().and_then(|d| d.loaded_latency).map(|l| view! {
+                {move || state.down.summary.get().and_then(|d| d.loaded_latency).map(|l| view! {
                     <LatencyCard label="Latency (download loaded)" summary=l/>
                 })}
-                {move || state.upload.get().and_then(|d| d.loaded_latency).map(|l| view! {
+                {move || state.up.summary.get().and_then(|d| d.loaded_latency).map(|l| view! {
                     <LatencyCard label="Latency (upload loaded)" summary=l/>
                 })}
             </section>
 
-            {move || state.download.get().map(|d| view! { <SizeTable title="Download" dir=d/> })}
-            {move || state.upload.get().map(|d| view! { <SizeTable title="Upload" dir=d/> })}
+            {move || state.down.summary.get().map(|d| view! { <SizeTable title="Download" dir=d/> })}
+            {move || state.up.summary.get().map(|d| view! { <SizeTable title="Upload" dir=d/> })}
 
             {move || state.error.get().map(|e| view! {
                 <div class="rounded border border-nord-11 bg-nord-1 p-4 text-nord-11">{e}</div>
@@ -138,13 +164,13 @@ pub fn App() -> impl IntoView {
 #[component]
 fn Headline(label: &'static str, upload: bool, state: State) -> impl IntoView {
     let value = move || {
-        let done = if upload { state.upload } else { state.download };
-        if let Some(p90) = done.get().and_then(|d| d.p90_mbps) {
+        let dir = if upload { state.up } else { state.down };
+        if let Some(p90) = dir.summary.get().and_then(|d| d.p90_mbps) {
             return format!("{p90:.1}");
         }
-        match state.live.get() {
-            Some((up, mbps)) if up == upload => format!("{mbps:.1}"),
-            _ => "-".to_string(),
+        match dir.points.get().last() {
+            Some(&(_, bps)) => format!("{:.1}", bps / 1e6),
+            None => "-".to_string(),
         }
     };
     view! {
@@ -224,22 +250,21 @@ async fn run_test(state: State) -> Result<(), JsValue> {
     }
     state.latency.set(summarize_latency(&pings));
 
-    state.phase.set(Phase::Download);
-    let (sizes, loaded) = run_direction(false, &cfg, state).await?;
-    state
-        .download
-        .set(Some(summarize_direction(&sizes, &loaded)));
-
-    state.phase.set(Phase::Upload);
-    let (sizes, loaded) = run_direction(true, &cfg, state).await?;
-    state.upload.set(Some(summarize_direction(&sizes, &loaded)));
+    for dir in [state.down, state.up] {
+        state.phase.set(if dir.upload {
+            Phase::Upload
+        } else {
+            Phase::Download
+        });
+        let (sizes, loaded) = run_direction(dir, &cfg).await?;
+        dir.summary.set(Some(summarize_direction(&sizes, &loaded)));
+    }
     Ok(())
 }
 
 async fn run_direction(
-    upload: bool,
+    dir: Direction,
     cfg: &TestConfig,
-    state: State,
 ) -> Result<(Vec<SizeSamples>, Vec<f64>), JsValue> {
     let stop = Rc::new(Cell::new(false));
     let loaded = Rc::new(RefCell::new(Vec::new()));
@@ -257,19 +282,16 @@ async fn run_direction(
         }
     });
 
-    let result = transfers(upload, cfg, state).await;
+    let result = transfers(dir, cfg).await;
     stop.set(true);
     let loaded_ms = loaded.borrow().clone();
     Ok((result?, loaded_ms))
 }
 
-async fn transfers(
-    upload: bool,
-    cfg: &TestConfig,
-    state: State,
-) -> Result<Vec<SizeSamples>, JsValue> {
+async fn transfers(dir: Direction, cfg: &TestConfig) -> Result<Vec<SizeSamples>, JsValue> {
     let phase_start = engine::now_ms();
-    let sizes = if upload {
+    let events: Rc<RefCell<Vec<(f64, u64)>>> = Rc::new(RefCell::new(Vec::new()));
+    let sizes = if dir.upload {
         &cfg.upload_sizes
     } else {
         &cfg.download_sizes
@@ -286,15 +308,42 @@ async fn transfers(
                 s.skipped = true;
                 break;
             }
-            let mbps = if upload {
-                engine::upload(bytes, |_, _| {}).await?
+            let progress = recorder(dir, phase_start, events.clone());
+            let mbps = if dir.upload {
+                engine::upload(bytes, progress).await?
             } else {
-                engine::download(bytes, |_, _| {}).await?
+                engine::download(bytes, progress).await?
             };
-            state.live.set(Some((upload, mbps)));
             s.mbps.push(mbps);
+            let mut live = out.clone();
+            live.push(s.clone());
+            dir.sizes.set(live);
         }
         out.push(s);
     }
+    dir.points
+        .set(throughput_points(&events.borrow(), WINDOW_MS, EMIT_MS));
+    dir.sizes.set(out.clone());
     Ok(out)
+}
+
+// per transfer closure turning cumulative bytes into phase timeline deltas
+fn recorder(
+    dir: Direction,
+    phase_start: f64,
+    events: Rc<RefCell<Vec<(f64, u64)>>>,
+) -> impl FnMut(f64, u64) + 'static {
+    let mut last_bytes = 0u64;
+    let mut last_set = 0.0f64;
+    move |now, cumulative| {
+        let t = now - phase_start;
+        let delta = cumulative.saturating_sub(last_bytes);
+        last_bytes = cumulative;
+        events.borrow_mut().push((t, delta));
+        if t - last_set >= EMIT_MS {
+            last_set = t;
+            dir.points
+                .set(throughput_points(&events.borrow(), WINDOW_MS, EMIT_MS));
+        }
+    }
 }
