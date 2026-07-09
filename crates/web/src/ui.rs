@@ -14,28 +14,16 @@ use wasm_bindgen::JsValue;
 
 use crate::engine;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy)]
 enum Phase {
     Idle,
-    Latency,
-    Download,
-    Upload,
+    Running,
     Done,
 }
 
 impl Phase {
-    fn label(self) -> &'static str {
-        match self {
-            Self::Idle => "",
-            Self::Latency => "Measuring latency...",
-            Self::Download => "Measuring download...",
-            Self::Upload => "Measuring upload...",
-            Self::Done => "Done",
-        }
-    }
-
     fn running(self) -> bool {
-        !matches!(self, Self::Idle | Self::Done)
+        matches!(self, Self::Running)
     }
 }
 
@@ -101,6 +89,7 @@ pub fn App() -> impl IntoView {
         state.latency.set(None);
         state.down.reset();
         state.up.reset();
+        state.phase.set(Phase::Running);
         spawn_local(async move {
             if let Err(e) = run_test(state).await {
                 state.error.set(Some(format!("{e:?}")));
@@ -110,7 +99,7 @@ pub fn App() -> impl IntoView {
     };
 
     view! {
-        <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4">
+        <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4 lg:max-w-6xl">
             <header>
                 <h1 class="text-2xl font-black">HowFastly</h1>
                 {move || meta.get().map(|m| view! {
@@ -126,41 +115,50 @@ pub fn App() -> impl IntoView {
                 })}
             </header>
 
-            <section class="flex flex-col gap-4 sm:flex-row">
-                <Headline label="Download" dir=state.down/>
-                <Headline label="Upload" dir=state.up/>
-            </section>
+            <div class="grid gap-8 lg:grid-cols-2">
+                <section class="flex flex-col gap-4">
+                    <Headline label="Download" dir=state.down/>
+                    <SizeTable title="Download" dir=state.down/>
+                </section>
+                <section class="flex flex-col gap-4">
+                    <Headline label="Upload" dir=state.up/>
+                    <SizeTable title="Upload" dir=state.up/>
+                </section>
+            </div>
 
-            <section class="flex flex-wrap gap-4">
-                <LatencyCard label="Latency (unloaded)" summary=state.latency.into()/>
-                <LatencyCard
-                    label="Latency (download loaded)"
-                    summary=Signal::derive(move || {
-                        state.down.summary.get().and_then(|d| d.loaded_latency)
-                    })
-                />
-                <LatencyCard
-                    label="Latency (upload loaded)"
-                    summary=Signal::derive(move || {
-                        state.up.summary.get().and_then(|d| d.loaded_latency)
-                    })
-                />
+            <section class="rounded bg-nord-1 p-4">
+                <h2 class="font-semibold">Latency</h2>
+                <div class="mt-2 grid gap-4 sm:grid-cols-3">
+                    <LatencyCard label="Unloaded" summary=state.latency.into()/>
+                    <LatencyCard
+                        label="Download loaded"
+                        summary=Signal::derive(move || {
+                            state.down.summary.get().and_then(|d| d.loaded_latency)
+                        })
+                    />
+                    <LatencyCard
+                        label="Upload loaded"
+                        summary=Signal::derive(move || {
+                            state.up.summary.get().and_then(|d| d.loaded_latency)
+                        })
+                    />
+                </div>
             </section>
-
-            <SizeTable title="Download" dir=state.down/>
-            <SizeTable title="Upload" dir=state.up/>
 
             {move || state.error.get().map(|e| view! {
                 <div class="rounded border border-nord-11 bg-nord-1 p-4 text-nord-11">{e}</div>
             })}
-            <p>{move || state.phase.get().label()}</p>
 
             <button
                 class="w-fit cursor-pointer rounded bg-nord-10 px-8 py-3 text-nord-6 hover:bg-nord-9 disabled:cursor-wait disabled:bg-nord-3"
                 on:click=start
                 disabled=move || state.phase.get().running()
             >
-                {move || if state.phase.get() == Phase::Idle { "Start" } else { "Run again" }}
+                {move || match state.phase.get() {
+                    Phase::Idle => "Start",
+                    Phase::Running => "Measuring...",
+                    Phase::Done => "Run again",
+                }}
             </button>
         </main>
     }
@@ -268,14 +266,14 @@ fn Headline(label: &'static str, dir: Direction) -> impl IntoView {
 #[component]
 fn LatencyCard(label: &'static str, summary: Signal<Option<LatencySummary>>) -> impl IntoView {
     view! {
-        <div class="flex-1 basis-48 rounded bg-nord-1 p-4">
+        <div>
             <div><small>{label}</small></div>
             {move || match summary.get() {
                 Some(s) => view! {
                     <div class="text-nord-6">
-                        {format!("Median {:.1} ms / jitter {:.1} ms", s.median_ms, s.jitter_ms)}
+                        {format!("Median {:.1} ms / Jitter {:.1} ms", s.median_ms, s.jitter_ms)}
                     </div>
-                    <div><small>{format!("Min {:.1} / avg {:.1}", s.min_ms, s.avg_ms)}</small></div>
+                    <div><small>{format!("Min {:.1} / Avg {:.1}", s.min_ms, s.avg_ms)}</small></div>
                 }
                     .into_any(),
                 None => view! { <div class="text-nord-3">"-"</div> }.into_any(),
@@ -412,7 +410,6 @@ fn SizeTable(title: &'static str, dir: Direction) -> impl IntoView {
 async fn run_test(state: State) -> Result<(), JsValue> {
     let cfg = TestConfig::default();
 
-    state.phase.set(Phase::Latency);
     let mut pings = Vec::new();
     for _ in 0..cfg.latency_samples {
         pings.push(engine::ping().await?);
@@ -420,11 +417,6 @@ async fn run_test(state: State) -> Result<(), JsValue> {
     state.latency.set(summarize_latency(&pings));
 
     for dir in [state.down, state.up] {
-        state.phase.set(if dir.upload {
-            Phase::Upload
-        } else {
-            Phase::Download
-        });
         let (sizes, loaded) = run_direction(dir, &cfg).await?;
         dir.summary.set(Some(summarize_direction(&sizes, &loaded)));
     }
