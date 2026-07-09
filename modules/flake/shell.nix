@@ -7,13 +7,14 @@
         nixpkgs-fmt
         taplo
 
-        # cargo   # from crane
-        # clippy  # from crane
-        # rustc   # from crane
-        # rustfmt # from crane
+        # cargo         # from crane
+        # clippy        # from crane
+        # rust-analyzer # from crane
+        # rustc         # from crane
+        # rustfmt       # from crane
+
         cargo-hakari
         cargo-nextest
-        rust-analyzer
 
         # fastly + web
         fastly
