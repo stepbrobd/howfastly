@@ -49,6 +49,7 @@ lib.fix (crane: {
     root = ../..;
 
     fileset = lib.fileset.unions ([
+      ../../.cargo/config.toml
       ../../Cargo.toml
       ../../Cargo.lock
     ] ++ lib.map crane.lib.fileset.commonCargoSources crates);

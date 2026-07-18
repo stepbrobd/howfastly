@@ -1,0 +1,2 @@
+[target.'cfg(not(target_family = "wasm"))']
+rustflags = ["--cfg", "reqwest_unstable"]
