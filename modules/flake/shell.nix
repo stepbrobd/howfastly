@@ -2,6 +2,8 @@
   perSystem = { crane, pkgs, ... }: {
     devShells.default = crane.lib.devShell {
       packages = with pkgs; [
+        nushell
+
         # formatter stuff
         deno
         nixpkgs-fmt
@@ -16,12 +18,14 @@
         cargo-hakari
         cargo-nextest
 
-        # fastly + web
+        # fastly
         fastly
-        nushell
+        viceroy
+
+        # web
+        binaryen
         tailwindcss_4
         trunk
-        viceroy
         wasm-bindgen-cli
       ];
 

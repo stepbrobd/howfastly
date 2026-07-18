@@ -1,5 +1,6 @@
 { lib
 , pkgsFinal
+, binaryen
 , tailwindcss_4
 , wasm-bindgen-cli
 }:
@@ -39,7 +40,7 @@ crane.lib.buildTrunkPackage {
   strictDeps = true;
   cargoExtraArgs = "--package web";
   inherit wasm-bindgen-cli;
-  nativeBuildInputs = [ tailwindcss_4 ];
+  nativeBuildInputs = [ binaryen tailwindcss_4 ];
 
   # trunk resolves the target crate from cwd
   # the workspace root is a virtual manifest
