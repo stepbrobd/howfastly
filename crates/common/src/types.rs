@@ -41,6 +41,8 @@ pub struct MetaResponse {
     pub city: String,
     pub country: String,
     pub pop: String,
+    #[serde(default)]
+    pub protocol: String,
     pub service_version: String,
 }
 

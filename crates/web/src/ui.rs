@@ -123,6 +123,7 @@ pub fn App() -> impl IntoView {
                             " "
                             <a href="https://www.fastly.com/documentation/guides/getting-started/concepts/using-fastlys-global-pop-network/#complete-list-of-pops"
                                 target="_blank" rel="noopener">{m.pop.clone()}</a>
+                            {(!m.protocol.is_empty()).then(|| format!(" via {}", m.protocol))}
                         }
                             .into_any(),
                         None => view! { "-" }.into_any(),

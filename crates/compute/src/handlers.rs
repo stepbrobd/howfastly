@@ -83,6 +83,9 @@ pub fn meta(req: &Request, start: Instant) -> Response {
             .map(|g| g.country_code().to_string())
             .unwrap_or_default(),
         pop: std::env::var("FASTLY_POP").unwrap_or_default(),
+        protocol: format!("{:?}", req.get_version())
+            .trim_end_matches(".0")
+            .to_string(),
         service_version: std::env::var("FASTLY_SERVICE_VERSION").unwrap_or_default(),
     };
 

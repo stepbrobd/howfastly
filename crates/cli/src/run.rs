@@ -9,14 +9,17 @@ use common::types::{
     DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
     SpeedtestResults, TestConfig, size_label, summarize_direction, summarize_latency,
 };
-use reqwest::{Client, Response, Version};
+use reqwest::{Client, ClientBuilder, Method, RequestBuilder, Response, Version};
 
 use crate::Args;
 
 pub async fn run(args: &Args) -> Result<SpeedtestResults> {
+    let base = args.url.trim_end_matches('/').to_string();
+    let (client, version) = connect(&base).await;
     let runner = Runner {
-        client: Client::new(),
-        base: args.url.trim_end_matches('/').to_string(),
+        client,
+        version,
+        base,
         verbose: args.verbose,
     };
     let cfg = args.config();
@@ -57,9 +60,33 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     Ok(results)
 }
 
+// transports alpn cannot negotiate get probed explicitly in order
+// everything else is left to the default client
+async fn connect(base: &str) -> (Client, Option<Version>) {
+    let probed: [(Version, fn() -> ClientBuilder); 1] = [(Version::HTTP_3, || {
+        Client::builder().http3_prior_knowledge()
+    })];
+    for (version, builder) in probed {
+        let Ok(client) = builder().build() else {
+            continue;
+        };
+        let probe = client
+            .get(format!("{base}/ping"))
+            .version(version)
+            .timeout(Duration::from_secs(2))
+            .send()
+            .await;
+        if probe.is_ok() {
+            return (client, Some(version));
+        }
+    }
+    (Client::new(), None)
+}
+
 #[derive(Clone)]
 struct Runner {
     client: Client,
+    version: Option<Version>,
     base: String,
     verbose: bool,
 }
@@ -73,23 +100,23 @@ fn server_dur_ms(resp: &Response) -> f64 {
 }
 
 impl Runner {
+    fn req(&self, method: Method, path: &str) -> RequestBuilder {
+        let req = self.client.request(method, format!("{}{path}", self.base));
+        match self.version {
+            Some(v) => req.version(v),
+            None => req,
+        }
+    }
+
     async fn meta(&self) -> Result<(MetaResponse, Version)> {
-        let resp = self
-            .client
-            .get(format!("{}/meta", self.base))
-            .send()
-            .await?;
+        let resp = self.req(Method::GET, "/meta").send().await?;
         let version = resp.version();
         Ok((resp.error_for_status()?.json().await?, version))
     }
 
     async fn ping(&self) -> Result<f64> {
         let start = Instant::now();
-        let resp = self
-            .client
-            .get(format!("{}/ping", self.base))
-            .send()
-            .await?;
+        let resp = self.req(Method::GET, "/ping").send().await?;
         let elapsed = start.elapsed().as_secs_f64() * 1e3;
         resp.error_for_status_ref()?;
         Ok((elapsed - server_dur_ms(&resp)).max(0.0))
@@ -97,8 +124,12 @@ impl Runner {
 
     async fn download(&self, bytes: u64) -> Result<f64> {
         let start = Instant::now();
-        let url = format!("{}/down?bytes={bytes}", self.base);
-        let mut resp = self.client.get(url).send().await?.error_for_status()?;
+        let path = format!("/down?bytes={bytes}");
+        let mut resp = self
+            .req(Method::GET, &path)
+            .send()
+            .await?
+            .error_for_status()?;
         let dur = server_dur_ms(&resp);
         while resp.chunk().await?.is_some() {}
         let secs = (start.elapsed().as_secs_f64() - dur / 1e3).max(1e-9);
@@ -108,10 +139,8 @@ impl Runner {
     async fn upload(&self, bytes: u64) -> Result<f64> {
         let body = vec![0u8; bytes as usize];
         let start = Instant::now();
-        let url = format!("{}/up", self.base);
         let resp = self
-            .client
-            .post(url)
+            .req(Method::POST, "/up")
             .body(body)
             .send()
             .await?
