@@ -9,7 +9,7 @@ use common::types::{
     DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
     SpeedtestResults, TestConfig, size_label, summarize_direction, summarize_latency,
 };
-use reqwest::{Client, Response};
+use reqwest::{Client, Response, Version};
 
 use crate::Args;
 
@@ -21,9 +21,9 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     };
     let cfg = args.config();
 
-    let meta = runner.meta().await.context("Service unreachable")?;
+    let (meta, version) = runner.meta().await.context("Service unreachable")?;
     eprintln!(
-        "Server: POP {} | Client: {} | AS{} {} | {}, {}",
+        "Server: POP {} ({version:?}) | Client: {} | AS{} {} | {}, {}",
         meta.pop, meta.client_ip, meta.asn, meta.as_org, meta.city, meta.country,
     );
 
@@ -73,13 +73,14 @@ fn server_dur_ms(resp: &Response) -> f64 {
 }
 
 impl Runner {
-    async fn meta(&self) -> Result<MetaResponse> {
+    async fn meta(&self) -> Result<(MetaResponse, Version)> {
         let resp = self
             .client
             .get(format!("{}/meta", self.base))
             .send()
             .await?;
-        Ok(resp.error_for_status()?.json().await?)
+        let version = resp.version();
+        Ok((resp.error_for_status()?.json().await?, version))
     }
 
     async fn ping(&self) -> Result<f64> {
