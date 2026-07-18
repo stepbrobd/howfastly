@@ -58,7 +58,9 @@ pub fn up(req: Request) -> Response {
     }
     // dur starts after the drain
     // receive time belongs to the client's upload measurement
-    base(StatusCode::OK, Instant::now()).with_body(received.to_string())
+    base(StatusCode::OK, Instant::now())
+        .with_header(header::CONTENT_TYPE, "text/plain")
+        .with_body(received.to_string())
 }
 
 pub fn meta(req: &Request, start: Instant) -> Response {
