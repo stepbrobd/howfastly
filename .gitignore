@@ -1,6 +1,6 @@
 bin
-crates/web/dist
-crates/web/style.css
+crates/howfastly-web/dist
+crates/howfastly-web/style.css
 debug
 .direnv
 **/mutants.out*/

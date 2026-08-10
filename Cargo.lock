@@ -1016,6 +1016,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "howfastly-web"
+version = "2026.708.0"
+dependencies = [
+ "console_error_panic_hook",
+ "gloo-timers",
+ "howfastly-common",
+ "js-sys",
+ "leptos",
+ "serde_json",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
 name = "html-escape"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3149,21 +3164,6 @@ dependencies = [
  "quote",
  "sha2 0.10.9",
  "syn 2.0.119",
-]
-
-[[package]]
-name = "web"
-version = "2026.708.0"
-dependencies = [
- "console_error_panic_hook",
- "gloo-timers",
- "howfastly-common",
- "js-sys",
- "leptos",
- "serde_json",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
 ]
 
 [[package]]

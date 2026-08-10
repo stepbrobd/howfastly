@@ -30,7 +30,7 @@
       ];
 
       shellHook = ''
-        export WEB_DIST="$PWD/crates/web/dist"
+        export WEB_DIST="$PWD/crates/howfastly-web/dist"
       '';
     };
   };

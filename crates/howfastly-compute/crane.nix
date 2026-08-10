@@ -12,5 +12,5 @@
 
   env.CARGO_BUILD_TARGET = "wasm32-wasip1";
   # web comes from the flake self overlay
-  env.WEB_DIST = "${pkgs.web}";
+  env.WEB_DIST = "${pkgs.howfastly-web}";
 }

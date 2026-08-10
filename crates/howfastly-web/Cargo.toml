@@ -1,12 +1,12 @@
 [package]
-name    = "web"
+name    = "howfastly-web"
 edition = "2024"
 version = "2026.708.0"
 
 # the bin only builds for wasm32-unknown-unknown, keep it out of host
 # test builds
 [[bin]]
-name = "web"
+name = "howfastly-web"
 path = "src/main.rs"
 test = false
 

@@ -44,7 +44,7 @@ def main [] {
   let url = $"http://($addr)"
 
   # dist must exist before compute is built
-  do { cd $"($root)/crates/web"; trunk build }
+  do { cd $"($root)/crates/howfastly-web"; trunk build }
 
   cargo build -p howfastly-compute --release --target wasm32-wasip1
   let wasm = $"($root)/target/wasm32-wasip1/release/howfastly-compute.wasm"

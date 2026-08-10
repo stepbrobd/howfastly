@@ -9,7 +9,7 @@ let
   crane = lib.crane.mkLib pkgsFinal;
 
   inherit (crane.lib.crateNameFromCargoToml {
-    cargoToml = ../../crates/web/Cargo.toml;
+    cargoToml = ../../crates/howfastly-web/Cargo.toml;
   }) version;
 
   src = lib.fileset.toSource {
@@ -18,36 +18,36 @@ let
       ../../Cargo.lock
       ../../Cargo.toml
       (lib.fileset.difference
-        ../../crates/web
-        (lib.fileset.maybeMissing ../../crates/web/dist))
+        ../../crates/howfastly-web
+        (lib.fileset.maybeMissing ../../crates/howfastly-web/dist))
       (crane.lib.fileset.commonCargoSources ../../crates/howfastly-common)
     ];
   };
 in
 crane.lib.buildTrunkPackage {
-  pname = "web";
+  pname = "howfastly-web";
   inherit src version;
 
   cargoArtifacts = crane.lib.buildDepsOnly {
-    pname = "web";
+    pname = "howfastly-web";
     inherit src version;
     strictDeps = true;
-    cargoExtraArgs = "--package web";
+    cargoExtraArgs = "--package howfastly-web";
     doCheck = false;
     env.CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
   };
 
   strictDeps = true;
-  cargoExtraArgs = "--package web";
+  cargoExtraArgs = "--package howfastly-web";
   inherit wasm-bindgen-cli;
   nativeBuildInputs = [ binaryen tailwindcss_4 ];
 
   # trunk resolves the target crate from cwd
   # the workspace root is a virtual manifest
   buildPhaseCargoCommand = ''
-    (cd crates/web && trunk build --release=true index.html)
+    (cd crates/howfastly-web && trunk build --release=true index.html)
   '';
   installPhaseCommand = ''
-    cp -r crates/web/dist $out
+    cp -r crates/howfastly-web/dist $out
   '';
 }
