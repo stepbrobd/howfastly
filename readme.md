@@ -19,6 +19,13 @@ web UI, built to showcase the flexibility of the Compute platform.
 - Web: <https://speed.edgecompute.app> (or <https://howfastly.edgecompute.app>)
 - CLI: `nix run github:stepbrobd/howfastly#howfastly`
 
+The CLI probes HTTP/3, which reqwest still gates behind an unstable cfg, so a
+crates.io install needs the flag that the flake sets for you:
+
+```sh
+RUSTFLAGS='--cfg reqwest_unstable' cargo install howfastly
+```
+
 For Nix users: [cache.nixos.org](https://cache.nixos.org) and
 [cache.ysun.co](https://cache.ysun.co) are both fronted by Fastly, so these
 numbers are a fairly accurate representation of how fast binary cache fetches
