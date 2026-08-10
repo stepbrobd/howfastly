@@ -327,7 +327,7 @@ version = "2026.709.0"
 dependencies = [
  "anyhow",
  "clap",
- "common",
+ "howfastly-common",
  "reqwest",
  "serde_json",
  "tokio",
@@ -376,20 +376,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "common"
-version = "2026.708.0"
-dependencies = [
- "proptest",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "compute"
 version = "2026.708.0"
 dependencies = [
- "common",
  "fastly",
+ "howfastly-common",
  "include_dir",
  "serde_json",
 ]
@@ -1014,6 +1005,15 @@ name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
+
+[[package]]
+name = "howfastly-common"
+version = "2026.708.0"
+dependencies = [
+ "proptest",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "html-escape"
@@ -3155,9 +3155,9 @@ dependencies = [
 name = "web"
 version = "2026.708.0"
 dependencies = [
- "common",
  "console_error_panic_hook",
  "gloo-timers",
+ "howfastly-common",
  "js-sys",
  "leptos",
  "serde_json",

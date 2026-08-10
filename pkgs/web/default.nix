@@ -20,7 +20,7 @@ let
       (lib.fileset.difference
         ../../crates/web
         (lib.fileset.maybeMissing ../../crates/web/dist))
-      (crane.lib.fileset.commonCargoSources ../../crates/common)
+      (crane.lib.fileset.commonCargoSources ../../crates/howfastly-common)
     ];
   };
 in

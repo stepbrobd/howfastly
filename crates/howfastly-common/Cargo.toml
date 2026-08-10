@@ -1,5 +1,5 @@
 [package]
-name    = "common"
+name    = "howfastly-common"
 edition = "2024"
 version = "2026.708.0"
 

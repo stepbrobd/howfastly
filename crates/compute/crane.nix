@@ -8,7 +8,7 @@
     env.CARGO_BUILD_TARGET = "wasm32-wasip1";
   });
 
-  src = crane.fileSetForCrates [ ../common ../compute ];
+  src = crane.fileSetForCrates [ ../howfastly-common ../compute ];
 
   env.CARGO_BUILD_TARGET = "wasm32-wasip1";
   # web comes from the flake self overlay
