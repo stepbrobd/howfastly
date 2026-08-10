@@ -55,14 +55,21 @@ lib.fix (crane: {
     ] ++ lib.map crane.lib.fileset.commonCargoSources crates);
   };
 
+  # crateNameFromCargoToml parses a manifest literally, so a crate inheriting
+  # version.workspace = true reads back as an attrset and crane falls to 0.0.1
+  # take the literal when there is one and defer to the workspace otherwise
+  versionOf = crate:
+    let version = (lib.importTOML ../../crates/${crate}/Cargo.toml).package.version or null; in
+    if lib.isString version
+    then version
+    else (lib.importTOML ../../Cargo.toml).workspace.package.version;
+
   builder = crate: override: crane.lib.buildPackage (
     crane.individualCrateArgs
     //
     {
       pname = crate;
-      inherit (crane.lib.crateNameFromCargoToml {
-        cargoToml = ../../crates/${crate}/Cargo.toml;
-      }) version;
+      version = crane.versionOf crate;
 
       cargoExtraArgs = "--package ${crate}";
 
