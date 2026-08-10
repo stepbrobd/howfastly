@@ -1,9 +1,9 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use common::http::parse_server_timing;
-use common::stats;
-use common::types::MetaResponse;
+use howfastly::http::parse_server_timing;
+use howfastly::stats;
+use howfastly::types::MetaResponse;
 use js_sys::{Reflect, Uint8Array};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;

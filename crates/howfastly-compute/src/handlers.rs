@@ -21,7 +21,7 @@ pub fn ping(start: Instant) -> Response {
 }
 
 pub fn down(req: Request, start: Instant) {
-    let Some(n) = common::http::parse_bytes(req.get_query_parameter("bytes")) else {
+    let Some(n) = howfastly::http::parse_bytes(req.get_query_parameter("bytes")) else {
         base(StatusCode::BAD_REQUEST, start).send_to_client();
         return;
     };
@@ -67,16 +67,16 @@ pub fn meta(req: &Request, start: Instant) -> Response {
     let ip = req.get_client_ip_addr();
     let geo = ip.and_then(fastly::geo::geo_lookup);
 
-    let meta = common::types::MetaResponse {
+    let meta = howfastly::types::MetaResponse {
         client_ip: ip.map(|ip| ip.to_string()).unwrap_or_default(),
         asn: geo.as_ref().map(|g| g.as_number()).unwrap_or_default(),
         as_org: geo
             .as_ref()
-            .map(|g| common::types::title_case(g.as_name()))
+            .map(|g| howfastly::types::title_case(g.as_name()))
             .unwrap_or_default(),
         city: geo
             .as_ref()
-            .map(|g| common::types::title_case(g.city()))
+            .map(|g| howfastly::types::title_case(g.city()))
             .unwrap_or_default(),
         country: geo
             .as_ref()

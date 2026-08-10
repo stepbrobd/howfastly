@@ -12,10 +12,10 @@ readme     = "readme.md"
 [workspace.dependencies]
 anyhow                   = "1"
 clap                     = { version = "4", features = ["derive", "env"] }
-common                   = { package = "howfastly", path = "crates/howfastly", default-features = false }
 console_error_panic_hook = "0.1"
 fastly                   = "0.13"
 gloo-timers              = { version = "0.4", features = ["futures"] }
+howfastly                = { path = "crates/howfastly", default-features = false }
 include_dir              = "0.7"
 js-sys                   = "0.3"
 leptos                   = { version = "0.8", features = ["csr"] }

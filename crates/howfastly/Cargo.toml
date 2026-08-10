@@ -20,8 +20,8 @@ name              = "howfastly"
 path              = "src/main.rs"
 required-features = ["cli"]
 
-# none of these build for wasm32, keep them optional so a consumer can
-# take this crate without dragging the binary's deps along
+# the compute and web crates take the lib alone, and none of the cli
+# deps build for wasm32, so they stay optional and off for those
 [features]
 default = ["cli"]
 cli     = ["dep:anyhow", "dep:clap", "dep:reqwest", "dep:serde_json", "dep:tokio"]

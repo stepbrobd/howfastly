@@ -1,14 +1,14 @@
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use common::chart::{format_speed, svg_path, throughput_points};
-use common::stats;
-use common::types::{
+use gloo_timers::future::TimeoutFuture;
+use howfastly::chart::{format_speed, svg_path, throughput_points};
+use howfastly::stats;
+use howfastly::types::{
     DOWNLOAD_PLAN, DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse,
     SizePlan, SizeSamples, TestConfig, UPLOAD_PLAN, size_label, summarize_direction,
     summarize_latency,
 };
-use gloo_timers::future::TimeoutFuture;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use wasm_bindgen::JsValue;
