@@ -1,11 +1,7 @@
 [package]
-name    = "cli"
+name    = "howfastly"
 edition = "2024"
 version = "2026.709.0"
-
-[[bin]]
-name = "howfastly"
-path = "src/main.rs"
 
 [dependencies]
 anyhow.workspace     = true
