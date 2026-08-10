@@ -1,7 +1,7 @@
 [package]
 name    = "howfastly-compute"
 edition = "2024"
-version = "2026.708.0"
+version = "2026.810.0"
 
 # the bin only builds for wasm32-wasip1, keep it out of host test builds
 [[bin]]

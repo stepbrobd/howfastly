@@ -1,7 +1,7 @@
 [package]
 name    = "howfastly"
 edition = "2024"
-version = "2026.709.0"
+version = "2026.810.0"
 
 [dependencies]
 anyhow.workspace     = true
