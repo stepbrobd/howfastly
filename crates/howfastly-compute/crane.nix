@@ -2,13 +2,13 @@
 
 {
   cargoArtifacts = crane.lib.buildDepsOnly (crane.commonArgs // {
-    pname = "compute";
-    cargoExtraArgs = "--package compute";
+    pname = "howfastly-compute";
+    cargoExtraArgs = "--package howfastly-compute";
     doCheck = false;
     env.CARGO_BUILD_TARGET = "wasm32-wasip1";
   });
 
-  src = crane.fileSetForCrates [ ../howfastly-common ../compute ];
+  src = crane.fileSetForCrates [ ../howfastly-common ../howfastly-compute ];
 
   env.CARGO_BUILD_TARGET = "wasm32-wasip1";
   # web comes from the flake self overlay

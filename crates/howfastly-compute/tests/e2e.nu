@@ -46,8 +46,8 @@ def main [] {
   # dist must exist before compute is built
   do { cd $"($root)/crates/web"; trunk build }
 
-  cargo build -p compute --release --target wasm32-wasip1
-  let wasm = $"($root)/target/wasm32-wasip1/release/compute.wasm"
+  cargo build -p howfastly-compute --release --target wasm32-wasip1
+  let wasm = $"($root)/target/wasm32-wasip1/release/howfastly-compute.wasm"
   let log = mktemp -t viceroy-e2e-XXXXXX.log
 
   # jobs are not killed when a script dies on an error

@@ -364,16 +364,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "compute"
-version = "2026.708.0"
-dependencies = [
- "fastly",
- "howfastly-common",
- "include_dir",
- "serde_json",
-]
-
-[[package]]
 name = "concurrent-queue"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1012,6 +1002,16 @@ version = "2026.708.0"
 dependencies = [
  "proptest",
  "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "howfastly-compute"
+version = "2026.708.0"
+dependencies = [
+ "fastly",
+ "howfastly-common",
+ "include_dir",
  "serde_json",
 ]
 

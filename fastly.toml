@@ -7,4 +7,4 @@ authors     = ["ysun@stepbrobd.com"]
 language    = "other"
 
 [scripts]
-build = "cargo build --package compute --release --target wasm32-wasip1 && mkdir -p bin && cp target/wasm32-wasip1/release/compute.wasm bin/main.wasm"
+build = "cargo build --package howfastly-compute --release --target wasm32-wasip1 && mkdir -p bin && cp target/wasm32-wasip1/release/howfastly-compute.wasm bin/main.wasm"

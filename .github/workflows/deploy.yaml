@@ -18,13 +18,13 @@ jobs:
             trusted-public-keys = cache.ysun.co-1:WxPYwT5g3kt9XhUhHPpNLZKI9HIOsVVAuqSHpok8Qt4= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
             substituters = https://cache.ysun.co https://cache.nixos.org/
       - name: Build
-        run: nix build -L .#crates.compute
+        run: nix build -L .#crates.howfastly-compute
       - name: Deploy
         if: github.ref == 'refs/heads/master'
         env:
           FASTLY_API_TOKEN: ${{ secrets.FASTLY_API_TOKEN }}
         run: |
           nix shell --inputs-from . nixpkgs#fastly --command \
-            fastly compute pack --wasm-binary result/bin/compute.wasm
+            fastly compute pack --wasm-binary result/bin/howfastly-compute.wasm
           nix shell --inputs-from . nixpkgs#fastly --command \
             fastly compute deploy --non-interactive --no-default-domain --status-check-off

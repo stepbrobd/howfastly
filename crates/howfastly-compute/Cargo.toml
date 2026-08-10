@@ -1,11 +1,11 @@
 [package]
-name    = "compute"
+name    = "howfastly-compute"
 edition = "2024"
 version = "2026.708.0"
 
 # the bin only builds for wasm32-wasip1, keep it out of host test builds
 [[bin]]
-name = "compute"
+name = "howfastly-compute"
 path = "src/main.rs"
 test = false
 
