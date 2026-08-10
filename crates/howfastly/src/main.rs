@@ -2,7 +2,7 @@ mod output;
 mod run;
 
 use clap::{Parser, ValueEnum};
-use common::types::{self, SizePlan, TestConfig};
+use howfastly::types::{self, SizePlan, TestConfig};
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum OutputFormat {

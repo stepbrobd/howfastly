@@ -974,19 +974,11 @@ version = "2026.810.1"
 dependencies = [
  "anyhow",
  "clap",
- "howfastly-common",
- "reqwest",
- "serde_json",
- "tokio",
-]
-
-[[package]]
-name = "howfastly-common"
-version = "2026.810.1"
-dependencies = [
  "proptest",
+ "reqwest",
  "serde",
  "serde_json",
+ "tokio",
 ]
 
 [[package]]
@@ -994,7 +986,7 @@ name = "howfastly-compute"
 version = "2026.810.1"
 dependencies = [
  "fastly",
- "howfastly-common",
+ "howfastly",
  "include_dir",
  "serde_json",
 ]
@@ -1005,7 +997,7 @@ version = "2026.810.1"
 dependencies = [
  "console_error_panic_hook",
  "gloo-timers",
- "howfastly-common",
+ "howfastly",
  "js-sys",
  "leptos",
  "serde_json",

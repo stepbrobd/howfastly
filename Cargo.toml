@@ -12,7 +12,7 @@ readme     = "readme.md"
 [workspace.dependencies]
 anyhow                   = "1"
 clap                     = { version = "4", features = ["derive", "env"] }
-common                   = { package = "howfastly-common", path = "crates/howfastly-common", version = "2026.810.0" }
+common                   = { package = "howfastly", path = "crates/howfastly", default-features = false }
 console_error_panic_hook = "0.1"
 fastly                   = "0.13"
 gloo-timers              = { version = "0.4", features = ["futures"] }

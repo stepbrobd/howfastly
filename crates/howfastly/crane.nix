@@ -1,5 +1,5 @@
 { crane, ... }:
 
 {
-  src = crane.fileSetForCrates [ ../howfastly ../howfastly-common ];
+  src = crane.fileSetForCrates [ ../howfastly ];
 }

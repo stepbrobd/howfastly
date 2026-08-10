@@ -1,5 +1,5 @@
 use anyhow::Result;
-use common::types::{DirectionSummary, SpeedtestResults};
+use howfastly::types::{DirectionSummary, SpeedtestResults};
 
 use crate::OutputFormat;
 
@@ -59,7 +59,7 @@ fn human(r: &SpeedtestResults) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use common::types::*;
+    use howfastly::types::*;
 
     fn results() -> SpeedtestResults {
         SpeedtestResults {

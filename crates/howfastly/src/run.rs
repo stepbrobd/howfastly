@@ -3,9 +3,9 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, ensure};
-use common::http::parse_server_timing;
-use common::stats;
-use common::types::{
+use howfastly::http::parse_server_timing;
+use howfastly::stats;
+use howfastly::types::{
     DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
     SpeedtestResults, TestConfig, size_label, summarize_direction, summarize_latency,
 };

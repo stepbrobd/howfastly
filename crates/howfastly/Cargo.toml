@@ -11,6 +11,10 @@ version.workspace    = true
 categories = ["command-line-utilities", "network-programming"]
 keywords   = ["bandwidth", "fastly", "network", "speedtest"]
 
+[lib]
+name = "howfastly"
+path = "src/lib.rs"
+
 [[bin]]
 name              = "howfastly"
 path              = "src/main.rs"
@@ -23,9 +27,13 @@ default = ["cli"]
 cli     = ["dep:anyhow", "dep:clap", "dep:reqwest", "dep:serde_json", "dep:tokio"]
 
 [dependencies]
-anyhow           = { workspace = true, optional = true }
-clap             = { workspace = true, optional = true }
-common.workspace = true
-reqwest          = { workspace = true, optional = true }
-serde_json       = { workspace = true, optional = true }
-tokio            = { workspace = true, optional = true }
+anyhow     = { workspace = true, optional = true }
+clap       = { workspace = true, optional = true }
+reqwest    = { workspace = true, optional = true }
+serde      = { workspace = true }
+serde_json = { workspace = true, optional = true }
+tokio      = { workspace = true, optional = true }
+
+[dev-dependencies]
+proptest.workspace   = true
+serde_json.workspace = true
