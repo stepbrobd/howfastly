@@ -1,7 +1,12 @@
 [package]
-name    = "howfastly-common"
-edition = "2024"
-version = "2026.810.0"
+name        = "howfastly-common"
+description = "shared types, statistics, and parsing for howfastly"
+
+edition.workspace    = true
+license.workspace    = true
+readme.workspace     = true
+repository.workspace = true
+version.workspace    = true
 
 [dependencies]
 serde.workspace = true

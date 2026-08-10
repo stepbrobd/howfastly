@@ -1,7 +1,15 @@
 [package]
-name    = "howfastly"
-edition = "2024"
-version = "2026.810.0"
+name        = "howfastly"
+description = "measure your connection speed to the fastly network"
+
+edition.workspace    = true
+license.workspace    = true
+readme.workspace     = true
+repository.workspace = true
+version.workspace    = true
+
+categories = ["command-line-utilities", "network-programming"]
+keywords   = ["bandwidth", "fastly", "network", "speedtest"]
 
 [dependencies]
 anyhow.workspace     = true

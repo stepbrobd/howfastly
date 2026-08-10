@@ -8,9 +8,7 @@
 let
   crane = lib.crane.mkLib pkgsFinal;
 
-  inherit (crane.lib.crateNameFromCargoToml {
-    cargoToml = ../../crates/howfastly-web/Cargo.toml;
-  }) version;
+  version = crane.versionOf "howfastly-web";
 
   src = lib.fileset.toSource {
     root = ../..;
