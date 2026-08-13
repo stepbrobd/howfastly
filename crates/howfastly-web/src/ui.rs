@@ -165,15 +165,29 @@ pub fn App() -> impl IntoView {
                 <div class="rounded border border-nord-11 bg-nord-1 p-4 text-nord-11">{e}</div>
             })}
 
-            <p class="text-center"><small>
-                "Not an official Fastly product. Made by "
-                <a href="https://ysun.co" target="_blank" rel="noopener">"Yifei Sun"</a>
-                " aka "
-                <a href="https://github.com/stepbrobd" target="_blank" rel="noopener">"StepBroBD"</a>
-                ", source on "
-                <a href="https://github.com/stepbrobd/howfastly" target="_blank" rel="noopener">"GitHub"</a>
-                "."
-            </small></p>
+            <footer class="text-center">
+                <p><small>
+                    "Not an official Fastly product. Made by "
+                    <a href="https://ysun.co" target="_blank" rel="noopener">"Yifei Sun"</a>
+                    " aka "
+                    <a href="https://github.com/stepbrobd" target="_blank" rel="noopener">"StepBroBD"</a>
+                    ", source on "
+                    <a href="https://github.com/stepbrobd/howfastly" target="_blank" rel="noopener">"GitHub"</a>
+                    "."
+                </small></p>
+                <p><small>
+                    <a
+                        href=concat!(
+                            "https://github.com/stepbrobd/howfastly/releases/tag/",
+                            env!("CARGO_PKG_VERSION"),
+                        )
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        {concat!("HowFastly ", env!("CARGO_PKG_VERSION"))}
+                    </a>
+                </small></p>
+            </footer>
 
             {move || gate.get().then(|| view! {
                 <div class="fixed inset-0 z-10 flex items-center justify-center bg-nord-0/80 p-4">
