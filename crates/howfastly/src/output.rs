@@ -5,8 +5,7 @@ use crate::OutputFormat;
 
 pub fn render(results: &SpeedtestResults, format: OutputFormat) -> Result<String> {
     Ok(match format {
-        OutputFormat::Json => serde_json::to_string(results)? + "\n",
-        OutputFormat::JsonPretty => serde_json::to_string_pretty(results)? + "\n",
+        OutputFormat::Json => serde_json::to_string_pretty(results)? + "\n",
         OutputFormat::Csv => csv(results),
         OutputFormat::Human => human(results),
     })

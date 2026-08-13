@@ -8,7 +8,6 @@ use howfastly::types::{self, SizePlan, TestConfig};
 pub enum OutputFormat {
     Human,
     Json,
-    JsonPretty,
     Csv,
 }
 
@@ -50,29 +49,30 @@ impl PayloadSize {
 pub struct Args {
     #[arg(
         long,
+        short = 'U',
         env = "HOWFASTLY_URL",
         default_value = "https://speed.edgecompute.app"
     )]
     pub url: String,
 
     // flat override for the per size iteration plan
-    #[arg(long)]
+    #[arg(long, short)]
     pub nr_tests: Option<usize>,
 
-    #[arg(long, default_value_t = types::LATENCY_SAMPLES)]
+    #[arg(long, short = 'l', default_value_t = types::LATENCY_SAMPLES)]
     pub nr_latency_tests: usize,
 
-    #[arg(long, value_enum, default_value = "100m")]
+    #[arg(long, short, value_enum, default_value = "100m")]
     pub max_payload_size: PayloadSize,
 
-    #[arg(long, conflicts_with = "upload_only")]
+    #[arg(long, short, conflicts_with = "upload_only")]
     pub download_only: bool,
 
-    #[arg(long)]
+    #[arg(long, short = 'u')]
     pub upload_only: bool,
 
-    #[arg(long, value_enum, default_value = "human")]
-    pub output_format: OutputFormat,
+    #[arg(long, short, value_enum, default_value = "human")]
+    pub format: OutputFormat,
 
     #[arg(long, short)]
     pub verbose: bool,
@@ -104,6 +104,49 @@ impl Args {
 async fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let results = run::run(&args).await?;
-    print!("{}", output::render(&results, args.output_format)?);
+    print!("{}", output::render(&results, args.format)?);
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use clap::CommandFactory;
+
+    use super::*;
+
+    // catches duplicate shorts and malformed arg definitions
+    #[test]
+    fn cli() {
+        Args::command().debug_assert();
+    }
+
+    #[test]
+    fn shorts() {
+        let a = Args::try_parse_from([
+            "howfastly",
+            "-U",
+            "http://x",
+            "-n",
+            "3",
+            "-l",
+            "5",
+            "-m",
+            "1m",
+            "-d",
+            "-f",
+            "json",
+        ])
+        .unwrap();
+        assert_eq!(a.url, "http://x");
+        assert_eq!(a.nr_tests, Some(3));
+        assert_eq!(a.nr_latency_tests, 5);
+        assert!(matches!(a.max_payload_size, PayloadSize::M1));
+        assert!(a.download_only);
+        assert!(matches!(a.format, OutputFormat::Json));
+
+        let a = Args::try_parse_from(["howfastly", "-u"]).unwrap();
+        assert!(a.upload_only);
+        assert!(Args::try_parse_from(["howfastly", "-d", "-u"]).is_err());
+        assert!(Args::try_parse_from(["howfastly", "-f", "json-pretty"]).is_err());
+    }
 }
