@@ -1,6 +1,8 @@
 mod output;
 mod run;
 
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+
 use clap::{Parser, ValueEnum};
 use howfastly::types::{self, SizePlan, TestConfig};
 
@@ -71,6 +73,14 @@ pub struct Args {
     #[arg(long, short = 'u')]
     pub upload_only: bool,
 
+    // bare flag binds the family's unspecified address
+    // the kernel then picks the default outbound address at connect time
+    #[arg(long, value_name = "ADDR", num_args = 0..=1, default_missing_value = "0.0.0.0", conflicts_with = "ipv6")]
+    pub ipv4: Option<Ipv4Addr>,
+
+    #[arg(long, value_name = "ADDR", num_args = 0..=1, default_missing_value = "::")]
+    pub ipv6: Option<Ipv6Addr>,
+
     #[arg(long, short, value_enum, default_value = "human")]
     pub format: OutputFormat,
 
@@ -79,6 +89,10 @@ pub struct Args {
 }
 
 impl Args {
+    pub fn local_addr(&self) -> Option<IpAddr> {
+        self.ipv4.map(IpAddr::V4).or(self.ipv6.map(IpAddr::V6))
+    }
+
     pub fn config(&self) -> TestConfig {
         let cap = self.max_payload_size.bytes();
         let keep = |plan: &[SizePlan]| {
@@ -148,5 +162,28 @@ mod tests {
         assert!(a.upload_only);
         assert!(Args::try_parse_from(["howfastly", "-d", "-u"]).is_err());
         assert!(Args::try_parse_from(["howfastly", "-f", "json-pretty"]).is_err());
+    }
+
+    #[test]
+    fn ip_binding() {
+        let a = Args::try_parse_from(["howfastly"]).unwrap();
+        assert_eq!(a.local_addr(), None);
+
+        let a = Args::try_parse_from(["howfastly", "--ipv4"]).unwrap();
+        assert_eq!(a.local_addr(), Some(IpAddr::V4(Ipv4Addr::UNSPECIFIED)));
+        let a = Args::try_parse_from(["howfastly", "--ipv4", "192.0.2.7"]).unwrap();
+        assert_eq!(
+            a.local_addr(),
+            Some(IpAddr::V4(Ipv4Addr::new(192, 0, 2, 7)))
+        );
+
+        let a = Args::try_parse_from(["howfastly", "--ipv6"]).unwrap();
+        assert_eq!(a.local_addr(), Some(IpAddr::V6(Ipv6Addr::UNSPECIFIED)));
+        let a = Args::try_parse_from(["howfastly", "--ipv6", "2001:db8::1"]).unwrap();
+        assert_eq!(a.local_addr(), Some("2001:db8::1".parse().unwrap()));
+
+        assert!(Args::try_parse_from(["howfastly", "--ipv4", "--ipv6"]).is_err());
+        assert!(Args::try_parse_from(["howfastly", "--ipv4", "::1"]).is_err());
+        assert!(Args::try_parse_from(["howfastly", "--ipv6", "127.0.0.1"]).is_err());
     }
 }

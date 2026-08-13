@@ -1,3 +1,4 @@
+use std::net::IpAddr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
@@ -15,7 +16,7 @@ use crate::Args;
 
 pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     let base = args.url.trim_end_matches('/').to_string();
-    let (client, version) = connect(&base).await;
+    let (client, version) = connect(&base, args.local_addr()).await?;
     let runner = Runner {
         client,
         version,
@@ -61,13 +62,13 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
 }
 
 // transports alpn cannot negotiate get probed explicitly in order
-// everything else is left to the default client
-async fn connect(base: &str) -> (Client, Option<Version>) {
+// everything else is left to a default client with the same local binding
+async fn connect(base: &str, local: Option<IpAddr>) -> Result<(Client, Option<Version>)> {
     let probed: [(Version, fn() -> ClientBuilder); 1] = [(Version::HTTP_3, || {
         Client::builder().http3_prior_knowledge()
     })];
     for (version, builder) in probed {
-        let Ok(client) = builder().build() else {
+        let Ok(client) = builder().local_address(local).build() else {
             continue;
         };
         let probe = client
@@ -77,10 +78,10 @@ async fn connect(base: &str) -> (Client, Option<Version>) {
             .send()
             .await;
         if probe.is_ok() {
-            return (client, Some(version));
+            return Ok((client, Some(version)));
         }
     }
-    (Client::new(), None)
+    Ok((Client::builder().local_address(local).build()?, None))
 }
 
 #[derive(Clone)]
