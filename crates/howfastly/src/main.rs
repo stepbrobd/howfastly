@@ -41,7 +41,11 @@ impl PayloadSize {
 #[derive(Debug, Parser)]
 #[command(
     name = "howfastly",
-    about = "HowFastly: how fast is your connection to the Fastly network?"
+    about = concat!(
+        "HowFastly ",
+        env!("CARGO_PKG_VERSION"),
+        "\nHow fast is your connection to the Fastly network?"
+    )
 )]
 pub struct Args {
     #[arg(
