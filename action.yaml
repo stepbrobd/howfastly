@@ -1,0 +1,159 @@
+name: HowFastly
+description: How fast is this runner's connection to the Fastly network?
+
+branding:
+  icon: zap
+  color: red
+
+inputs:
+  version:
+    description: Release tag to install, for example 2026.814.1. Defaults to the tag this action is pinned at, or the latest release
+    default: ""
+  args:
+    description: Extra CLI arguments for the default `howfastly --format json` run, whitespace-split. Mutually exclusive with command
+    default: ""
+  command:
+    description: Shell command run instead of the default invocation, with howfastly on PATH. Write JSON to $HOWFASTLY_RESULTS to keep outputs and the summary
+    default: ""
+
+outputs:
+  download-mbps:
+    description: 90th-percentile download throughput in Mbps (empty when not measured)
+    value: ${{ steps.results.outputs.download-mbps }}
+  upload-mbps:
+    description: 90th-percentile upload throughput in Mbps (empty when not measured)
+    value: ${{ steps.results.outputs.upload-mbps }}
+  latency-ms:
+    description: Median unloaded latency in milliseconds (empty when not measured)
+    value: ${{ steps.results.outputs.latency-ms }}
+  pop:
+    description: Fastly POP that served the test (empty when not reported)
+    value: ${{ steps.results.outputs.pop }}
+  json:
+    description: Full results as compact JSON
+    value: ${{ steps.results.outputs.json }}
+  results-path:
+    description: Path to the pretty-printed results JSON file (empty when no results were written)
+    value: ${{ steps.results.outputs.results-path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Validate
+      if: ${{ inputs.args != '' && inputs.command != '' }}
+      shell: bash
+      run: |
+        echo "::error::Args and command are mutually exclusive"
+        exit 1
+
+    - name: Install
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+        ACTION_REF: ${{ github.action_ref }}
+        ACTION_REPO: ${{ github.action_repository }}
+      run: |
+        set -euo pipefail
+
+        # no source-build fallback
+        # compiling first would skew what the speed test measures
+        case "${RUNNER_OS}-${RUNNER_ARCH}" in
+          Linux-X64) target=x86_64-unknown-linux-musl ;;
+          Linux-ARM64) target=aarch64-unknown-linux-musl ;;
+          macOS-ARM64) target=aarch64-apple-darwin ;;
+          *)
+            echo "::error::No prebuilt howfastly binary for ${RUNNER_OS}/${RUNNER_ARCH} (supported: Linux x64/arm64, macOS arm64)"
+            exit 1
+            ;;
+        esac
+
+        # a calver-shaped pin doubles as the release selector
+        calver='^[0-9]{4}\.[0-9]{3,4}\.[0-9]+$'
+        if [ -z "${VERSION}" ] && [[ "${ACTION_REF}" =~ ${calver} ]]; then
+          VERSION="${ACTION_REF}"
+        fi
+
+        repo="${ACTION_REPO:-stepbrobd/howfastly}"
+        if [ -n "${VERSION}" ]; then
+          base="https://github.com/${repo}/releases/download/${VERSION}"
+        else
+          base="https://github.com/${repo}/releases/latest/download"
+        fi
+
+        echo "::group::Install howfastly ${VERSION:-latest} (${target})"
+        dir="${RUNNER_TEMP}/howfastly"
+        asset="howfastly-${target}.tar.gz"
+        mkdir -p "${dir}"
+        cd "${dir}"
+        curl -fsSL --retry 3 --fail-early -O "${base}/${asset}" -O "${base}/sha256sums.txt"
+        grep " ${asset}$" sha256sums.txt > "${asset}.sha256"
+        if command -v sha256sum > /dev/null; then
+          sha256sum -c "${asset}.sha256"
+        else
+          shasum -a 256 -c "${asset}.sha256"
+        fi
+        tar -xzf "${asset}" howfastly
+        echo "${dir}" >> "$GITHUB_PATH"
+        echo "::endgroup::"
+
+    - name: Run
+      shell: bash
+      env:
+        ARGS: ${{ inputs.args }}
+        COMMAND: ${{ inputs.command }}
+        HOWFASTLY_RESULTS: ${{ runner.temp }}/howfastly/results.json
+      run: |
+        set -euo pipefail
+
+        if [ -n "${COMMAND}" ]; then
+          # env delivery keeps the command out of the script text
+          bash -c "${COMMAND}"
+        else
+          # unquoted on purpose to word-split user args
+          set -f
+          howfastly --format json ${ARGS} > "${HOWFASTLY_RESULTS}"
+        fi
+
+    - name: Results
+      id: results
+      shell: bash
+      env:
+        HOWFASTLY_RESULTS: ${{ runner.temp }}/howfastly/results.json
+      run: |
+        set -euo pipefail
+
+        # a custom command may handle results itself
+        if [ ! -s "${HOWFASTLY_RESULTS}" ]; then
+          echo "::notice::No results at ${HOWFASTLY_RESULTS}, skipping outputs and summary"
+          exit 0
+        fi
+        if ! jq -e . "${HOWFASTLY_RESULTS}" > /dev/null; then
+          echo "::warning::Cannot parse ${HOWFASTLY_RESULTS}, skipping outputs and summary"
+          exit 0
+        fi
+
+        {
+          echo "download-mbps=$(jq -r '.download.p90_mbps // ""' "${HOWFASTLY_RESULTS}")"
+          echo "upload-mbps=$(jq -r '.upload.p90_mbps // ""' "${HOWFASTLY_RESULTS}")"
+          echo "latency-ms=$(jq -r '.latency.median_ms // ""' "${HOWFASTLY_RESULTS}")"
+          echo "pop=$(jq -r '.meta.pop // ""' "${HOWFASTLY_RESULTS}")"
+          echo "results-path=${HOWFASTLY_RESULTS}"
+          echo 'json<<__HOWFASTLY_JSON__'
+          jq -c . "${HOWFASTLY_RESULTS}"
+          echo '__HOWFASTLY_JSON__'
+        } >> "$GITHUB_OUTPUT"
+
+        jq -r '
+          def n2: if . == null then "-" else ((. * 100 | round) / 100 | tostring) end;
+          def lat: if . == null then "-" else "\(.median_ms | n2) / \(.jitter_ms | n2)" end;
+          def row(name): if . == null then empty else "| \(name) | \(.p90_mbps | n2) | \(.loaded_latency | lat) |" end;
+          ( ["### HowFastly", ""]
+          + (if .meta == null then [] else
+              ["Served by \(.meta.pop) in \(.meta.city), \(.meta.country) via \(.meta.as_org) (AS\(.meta.asn)) over \(.meta.protocol)", ""] end)
+          + ["| Direction | p90 Mbps | Loaded latency (median / jitter ms) |", "| --- | --- | --- |"]
+          + [(.download | row("Download")), (.upload | row("Upload"))]
+          + (if .latency == null then [] else
+              ["", "Unloaded latency median \(.latency.median_ms | n2) ms, jitter \(.latency.jitter_ms | n2) ms"] end)
+          + [""]
+          ) | join("\n")
+        ' "${HOWFASTLY_RESULTS}" >> "$GITHUB_STEP_SUMMARY"
