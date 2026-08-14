@@ -13,6 +13,7 @@ keywords   = ["bandwidth", "fastly", "network", "speedtest"]
 
 [package.metadata.binstall]
 bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
 pkg-url = "{ repo }/releases/download/{ version }/{ name }-{ target }.tar.gz"
 
 [lib]
