@@ -1,0 +1,143 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+    paths: [Cargo.toml, Cargo.lock]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  Version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      release: ${{ steps.check.outputs.release }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check
+        id: check
+        run: |
+          set -euo pipefail
+
+          toml="$(sed -n '/^\[workspace\.package\]$/,/^\[/ s/^version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' Cargo.toml)"
+          lock="$(awk -F '"' 'f && /^version/ { print $2; exit } /^name = "howfastly"$/ { f = 1 }' Cargo.lock)"
+
+          if [ -z "$toml" ] || [ -z "$lock" ]; then
+            echo "::error::failed to read versions (Cargo.toml: '${toml:-none}', Cargo.lock: '${lock:-none}')"
+            exit 1
+          fi
+
+          if [ "$toml" != "$lock" ]; then
+            echo "::error::version mismatch: Cargo.toml has ${toml} but Cargo.lock has ${lock}, run 'cargo update --workspace'"
+            exit 1
+          fi
+
+          if git ls-remote --exit-code origin "refs/tags/${toml}" > /dev/null; then
+            echo "tag ${toml} exists, nothing to release"
+            release=false
+          else
+            release=true
+          fi
+
+          {
+            echo "version=${toml}"
+            echo "release=${release}"
+          } >> "$GITHUB_OUTPUT"
+
+  Build:
+    needs: Version
+    if: needs.Version.outputs.release == 'true'
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-24.04-arm
+          - target: aarch64-apple-darwin
+            runner: macos-latest
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+    env:
+      TARGET: ${{ matrix.target }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Toolchain
+        run: |
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          rustup target add "$TARGET"
+      - name: Build
+        run: cargo build --release --package howfastly --target "$TARGET"
+      - name: Package
+        run: |
+          set -euo pipefail
+
+          mkdir dist
+          cp "target/${TARGET}/release/howfastly" license.txt readme.md dist/
+          tar -czf "howfastly-${TARGET}.tar.gz" -C dist howfastly license.txt readme.md
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: howfastly-${{ matrix.target }}
+          path: howfastly-${{ matrix.target }}.tar.gz
+          if-no-files-found: error
+
+  Release:
+    needs: [Version, Build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.Version.outputs.version }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          cd dist
+          sha256sum howfastly-*.tar.gz > sha256sums.txt
+          gh release create "$VERSION" --target "$COMMIT" --title "$VERSION" --generate-notes \
+            howfastly-*.tar.gz sha256sums.txt
+
+  Publish:
+    needs: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Authenticate
+        id: auth
+        uses: rust-lang/crates-io-auth-action@v1
+      - name: Publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: cargo publish --package howfastly
