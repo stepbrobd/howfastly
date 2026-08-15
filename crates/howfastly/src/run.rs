@@ -16,7 +16,7 @@ use crate::Args;
 
 pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     let base = args.url.trim_end_matches('/').to_string();
-    let (client, version) = connect(&base, args.local_addr()).await?;
+    let (client, version) = connect(&base, args.local_addr(), args.http_version()).await?;
     let runner = Runner {
         client,
         version,
@@ -61,27 +61,62 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     Ok(results)
 }
 
-// transports alpn cannot negotiate get probed explicitly in order
-// everything else is left to a default client with the same local binding
-async fn connect(base: &str, local: Option<IpAddr>) -> Result<(Client, Option<Version>)> {
-    let probed: [(Version, fn() -> ClientBuilder); 1] = [(Version::HTTP_3, || {
-        Client::builder().http3_prior_knowledge()
-    })];
-    for (version, builder) in probed {
-        let Ok(client) = builder().local_address(local).build() else {
-            continue;
-        };
-        let probe = client
-            .get(format!("{base}/ping"))
-            .version(version)
-            .timeout(Duration::from_secs(2))
-            .send()
-            .await;
-        if probe.is_ok() {
-            return Ok((client, Some(version)));
-        }
+// a forced version either connects or fails the run
+// with no flag h3 gets probed first since tcp alpn cannot discover it
+// probe failure falls back to a default client that negotiates h2 or h1
+async fn connect(
+    base: &str,
+    local: Option<IpAddr>,
+    forced: Option<Version>,
+) -> Result<(Client, Option<Version>)> {
+    // quic carries tls itself, so a plaintext url can never speak h3
+    ensure!(
+        forced != Some(Version::HTTP_3) || !base.starts_with("http://"),
+        "HTTP/3 requires an https URL"
+    );
+
+    // only h3 needs per request pinning
+    // alpn settles h2 and h1 at the builder
+    if let Some(version) = forced {
+        let pinned = (version == Version::HTTP_3).then_some(version);
+        let client = builder(version).local_address(local).build()?;
+        probe(&client, base, pinned)
+            .await
+            .with_context(|| format!("{version:?} unreachable at {base}"))?;
+        return Ok((client, pinned));
+    }
+
+    if let Ok(client) = builder(Version::HTTP_3).local_address(local).build()
+        && probe(&client, base, Some(Version::HTTP_3)).await.is_ok()
+    {
+        return Ok((client, Some(Version::HTTP_3)));
     }
     Ok((Client::builder().local_address(local).build()?, None))
+}
+
+fn builder(version: Version) -> ClientBuilder {
+    let b = Client::builder();
+    if version == Version::HTTP_3 {
+        b.http3_prior_knowledge()
+    } else if version == Version::HTTP_2 {
+        b.http2_prior_knowledge()
+    } else {
+        b.http1_only()
+    }
+}
+
+// the short timeout turns a blackholed path into a fast failure
+// instead of a hang inside the quic handshake
+async fn probe(client: &Client, base: &str, pinned: Option<Version>) -> reqwest::Result<Response> {
+    let req = client
+        .get(format!("{base}/ping"))
+        .timeout(Duration::from_secs(2));
+    match pinned {
+        Some(v) => req.version(v),
+        None => req,
+    }
+    .send()
+    .await
 }
 
 #[derive(Clone)]

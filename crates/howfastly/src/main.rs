@@ -5,6 +5,7 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use clap::{Parser, ValueEnum};
 use howfastly::types::{self, SizePlan, TestConfig};
+use reqwest::Version;
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum OutputFormat {
@@ -81,6 +82,17 @@ pub struct Args {
     #[arg(long, value_name = "ADDR", num_args = 0..=1, default_missing_value = "::")]
     pub ipv6: Option<Ipv6Addr>,
 
+    // force one protocol instead of probing h3 then negotiating
+    // an unreachable forced version fails the run rather than falling back
+    #[arg(long, group = "http_version")]
+    pub http1: bool,
+
+    #[arg(long, group = "http_version")]
+    pub http2: bool,
+
+    #[arg(long, group = "http_version")]
+    pub http3: bool,
+
     #[arg(long, short, value_enum, default_value = "human")]
     pub format: OutputFormat,
 
@@ -91,6 +103,19 @@ pub struct Args {
 impl Args {
     pub fn local_addr(&self) -> Option<IpAddr> {
         self.ipv4.map(IpAddr::V4).or(self.ipv6.map(IpAddr::V6))
+    }
+
+    // clap rejects more than one flag in the group
+    pub fn http_version(&self) -> Option<Version> {
+        if self.http1 {
+            Some(Version::HTTP_11)
+        } else if self.http2 {
+            Some(Version::HTTP_2)
+        } else if self.http3 {
+            Some(Version::HTTP_3)
+        } else {
+            None
+        }
     }
 
     pub fn config(&self) -> TestConfig {
@@ -162,6 +187,23 @@ mod tests {
         assert!(a.upload_only);
         assert!(Args::try_parse_from(["howfastly", "-d", "-u"]).is_err());
         assert!(Args::try_parse_from(["howfastly", "-f", "json-pretty"]).is_err());
+    }
+
+    #[test]
+    fn http_flags() {
+        let a = Args::try_parse_from(["howfastly"]).unwrap();
+        assert_eq!(a.http_version(), None);
+
+        let a = Args::try_parse_from(["howfastly", "--http1"]).unwrap();
+        assert_eq!(a.http_version(), Some(Version::HTTP_11));
+        let a = Args::try_parse_from(["howfastly", "--http2"]).unwrap();
+        assert_eq!(a.http_version(), Some(Version::HTTP_2));
+        let a = Args::try_parse_from(["howfastly", "--http3"]).unwrap();
+        assert_eq!(a.http_version(), Some(Version::HTTP_3));
+
+        assert!(Args::try_parse_from(["howfastly", "--http1", "--http2"]).is_err());
+        assert!(Args::try_parse_from(["howfastly", "--http1", "--http3"]).is_err());
+        assert!(Args::try_parse_from(["howfastly", "--http2", "--http3"]).is_err());
     }
 
     #[test]
