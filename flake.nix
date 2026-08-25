@@ -13,8 +13,11 @@
           { crane.mkLib = import ./modules/crane { inherit inputs; }; }
         ];
 
-        nixpkgs.overlays = with inputs; [ self.overlays.default ];
         nixpkgs.instances.pkgs = inputs.nixpkgs;
+        nixpkgs.overlays = with inputs; [
+          rust-overlay.overlays.default
+          self.overlays.default
+        ];
       };
     }
     { systems = import inputs.systems; };
@@ -31,8 +34,8 @@
     autopilot.inputs.systems.follows = "systems";
     # c
     crane.url = "github:ipetkov/crane";
-    # f
-    fenix.url = "github:nix-community/fenix";
-    fenix.inputs.nixpkgs.follows = "nixpkgs";
+    # r
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
 }
