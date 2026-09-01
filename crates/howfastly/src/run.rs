@@ -38,6 +38,7 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
         meta.ip, meta.asn, meta.org, meta.city, meta.country,
     );
 
+    runner.start().await;
     let mut results = SpeedtestResults {
         meta: Some(meta),
         ..Default::default()
@@ -65,6 +66,7 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     if !args.download_only {
         results.upload = Some(runner.direction(true, &cfg).await?);
     }
+    runner.finish(&results).await;
     Ok(results)
 }
 
@@ -171,6 +173,15 @@ impl Runner {
         let version = resp.version();
         let body = resp.error_for_status()?.text().await?;
         Ok((parse_meta(&body)?, version))
+    }
+
+    // run markers for the edge side counting, the outcome is ignored
+    async fn start(&self) {
+        let _ = self.req(Method::POST, "/start").send().await;
+    }
+
+    async fn finish(&self, results: &SpeedtestResults) {
+        let _ = self.req(Method::POST, "/finish").json(results).send().await;
     }
 
     async fn ping(&self) -> Result<f64> {
