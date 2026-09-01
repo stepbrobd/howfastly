@@ -16,7 +16,7 @@ def checks [url: string, log: string] {
   let up = http post --full --allow-errors --content-type application/octet-stream $"($url)/up" (random binary 100_000)
   assert equal ($up | get status) 200
 
-  assert ((http get $"($url)/meta" | get client_ip | str length) > 0)
+  assert ((http get $"($url)/meta" | get ip | str length) > 0)
   assert ((http get $"($url)/" | into string) =~ "HowFastly")
   assert ((fetch $"($url)/ping" | get headers.response | where name == "server-timing" | length) > 0)
 

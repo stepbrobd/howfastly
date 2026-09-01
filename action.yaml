@@ -133,9 +133,9 @@ runs:
         fi
 
         {
-          echo "download-mbps=$(jq -r '.download.p90_mbps // ""' "${HOWFASTLY_RESULTS}")"
-          echo "upload-mbps=$(jq -r '.upload.p90_mbps // ""' "${HOWFASTLY_RESULTS}")"
-          echo "latency-ms=$(jq -r '.latency.median_ms // ""' "${HOWFASTLY_RESULTS}")"
+          echo "download-mbps=$(jq -r '.download.p90 // ""' "${HOWFASTLY_RESULTS}")"
+          echo "upload-mbps=$(jq -r '.upload.p90 // ""' "${HOWFASTLY_RESULTS}")"
+          echo "latency-ms=$(jq -r '.latency.median // ""' "${HOWFASTLY_RESULTS}")"
           echo "pop=$(jq -r '.meta.pop.code // ""' "${HOWFASTLY_RESULTS}")"
           echo "results-path=${HOWFASTLY_RESULTS}"
           echo 'json<<__HOWFASTLY_JSON__'
@@ -145,16 +145,16 @@ runs:
 
         jq -r '
           def n2: if . == null then "-" else ((. * 100 | round) / 100 | tostring) end;
-          def lat: if . == null then "-" else "\(.median_ms | n2) / \(.jitter_ms | n2)" end;
-          def row(name): if . == null then empty else "| \(name) | \(.p90_mbps | n2) | \(.loaded_latency | lat) |" end;
+          def lat: if . == null then "-" else "\(.median | n2) / \(.jitter | n2)" end;
+          def row(name): if . == null then empty else "| \(name) | \(.p90 | n2) | \(.loaded | lat) |" end;
           def pop: ([.name, .group] | map(select(. != "")) | join(", ")) as $d | .code + (if $d == "" then "" else " (\($d))" end);
           ( ["### HowFastly", ""]
           + (if .meta == null then [] else
-              ["From \(.meta.city), \(.meta.country) (\(.meta.as_org), AS\(.meta.asn)) to \(.meta.pop | pop) over \(.meta.protocol)", ""] end)
+              ["From \(.meta.city), \(.meta.country) (\(.meta.org), AS\(.meta.asn)) to \(.meta.pop | pop) over \(.meta.protocol)", ""] end)
           + ["| Direction | p90 Mbps | Loaded latency (median / jitter ms) |", "| --- | --- | --- |"]
           + [(.download | row("Download")), (.upload | row("Upload"))]
           + (if .latency == null then [] else
-              ["", "Unloaded latency median \(.latency.median_ms | n2) ms, jitter \(.latency.jitter_ms | n2) ms"] end)
+              ["", "Unloaded latency median \(.latency.median | n2) ms, jitter \(.latency.jitter | n2) ms"] end)
           + [""]
           ) | join("\n")
         ' "${HOWFASTLY_RESULTS}" >> "$GITHUB_STEP_SUMMARY"

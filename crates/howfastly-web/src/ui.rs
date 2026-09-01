@@ -101,8 +101,8 @@ pub fn App() -> impl IntoView {
                 <div class="mx-auto w-max whitespace-nowrap font-mono">
                     {move || match meta.get() {
                         Some(m) => view! {
-                            <a href=format!("https://bgp.tools/prefix/{}", m.client_ip)
-                                target="_blank" rel="noopener">{m.client_ip.clone()}</a>
+                            <a href=format!("https://bgp.tools/prefix/{}", m.ip)
+                                target="_blank" rel="noopener">{m.ip.clone()}</a>
                             " ("
                             <a href=format!("https://bgp.tools/as/{}", m.asn)
                                 target="_blank" rel="noopener">{format!("AS{}", m.asn)}</a>
@@ -154,13 +154,13 @@ pub fn App() -> impl IntoView {
                     <LatencyCard
                         label="Download loaded"
                         summary=Signal::derive(move || {
-                            state.down.summary.get().and_then(|d| d.loaded_latency)
+                            state.down.summary.get().and_then(|d| d.loaded)
                         })
                     />
                     <LatencyCard
                         label="Upload loaded"
                         summary=Signal::derive(move || {
-                            state.up.summary.get().and_then(|d| d.loaded_latency)
+                            state.up.summary.get().and_then(|d| d.loaded)
                         })
                     />
                 </div>
@@ -278,7 +278,7 @@ fn Headline(label: &'static str, dir: Direction, state: State) -> impl IntoView 
         } else {
             dir.summary
                 .get()
-                .and_then(|d| d.p90_mbps)
+                .and_then(|d| d.p90)
                 .map(|p90| p90 * 1e6)
                 .or(live)
         };
@@ -356,9 +356,9 @@ fn LatencyCard(label: &'static str, summary: Signal<Option<LatencySummary>>) -> 
             {move || match summary.get() {
                 Some(s) => view! {
                     <div class="text-nord-6">
-                        {format!("Median {:.1} ms / Jitter {:.1} ms", s.median_ms, s.jitter_ms)}
+                        {format!("Median {:.1} ms / Jitter {:.1} ms", s.median, s.jitter)}
                     </div>
-                    <div><small>{format!("Min {:.1} / Avg {:.1}", s.min_ms, s.avg_ms)}</small></div>
+                    <div><small>{format!("Min {:.1} / Avg {:.1}", s.min, s.avg)}</small></div>
                 }
                     .into_any(),
                 None => view! {

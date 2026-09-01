@@ -108,9 +108,9 @@ pub fn meta(req: &Request, start: Instant) -> Response {
     });
 
     let meta = howfastly::types::MetaResponse {
-        client_ip: ip.map(|ip| ip.to_string()).unwrap_or_default(),
+        ip: ip.map(|ip| ip.to_string()).unwrap_or_default(),
         asn: geo.as_ref().map(|g| g.as_number()).unwrap_or_default(),
-        as_org: geo
+        org: geo
             .as_ref()
             .map(|g| howfastly::types::title_case(g.as_name()))
             .unwrap_or_default(),

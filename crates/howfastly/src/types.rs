@@ -35,9 +35,9 @@ impl SizePlan {
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct MetaResponse {
-    pub client_ip: String,
+    pub ip: String,
     pub asn: u32,
-    pub as_org: String,
+    pub org: String,
     pub city: String,
     pub country: String,
     pub pop: Pop,
@@ -81,25 +81,25 @@ pub struct SizeSamples {
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct LatencySummary {
-    pub min_ms: f64,
-    pub avg_ms: f64,
-    pub median_ms: f64,
-    pub jitter_ms: f64,
+    pub min: f64,
+    pub avg: f64,
+    pub median: f64,
+    pub jitter: f64,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct SizeSummary {
     pub bytes: u64,
     pub samples: usize,
-    pub median_mbps: Option<f64>,
+    pub median: Option<f64>,
     pub skipped: bool,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct DirectionSummary {
-    pub p90_mbps: Option<f64>,
+    pub p90: Option<f64>,
     pub sizes: Vec<SizeSummary>,
-    pub loaded_latency: Option<LatencySummary>,
+    pub loaded: Option<LatencySummary>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -135,29 +135,29 @@ pub fn size_label(bytes: u64) -> String {
 }
 
 pub fn summarize_latency(samples_ms: &[f64]) -> Option<LatencySummary> {
-    let median_ms = stats::median(samples_ms)?;
+    let median = stats::median(samples_ms)?;
     Some(LatencySummary {
-        min_ms: samples_ms.iter().copied().fold(f64::INFINITY, f64::min),
-        avg_ms: samples_ms.iter().sum::<f64>() / samples_ms.len() as f64,
-        median_ms,
-        jitter_ms: stats::jitter(samples_ms).unwrap_or(0.0),
+        min: samples_ms.iter().copied().fold(f64::INFINITY, f64::min),
+        avg: samples_ms.iter().sum::<f64>() / samples_ms.len() as f64,
+        median,
+        jitter: stats::jitter(samples_ms).unwrap_or(0.0),
     })
 }
 
 pub fn summarize_direction(sizes: &[SizeSamples], loaded_ms: &[f64]) -> DirectionSummary {
     let all: Vec<f64> = sizes.iter().flat_map(|s| s.mbps.iter().copied()).collect();
     DirectionSummary {
-        p90_mbps: stats::percentile(&all, 90.0),
+        p90: stats::percentile(&all, 90.0),
         sizes: sizes
             .iter()
             .map(|s| SizeSummary {
                 bytes: s.bytes,
                 samples: s.mbps.len(),
-                median_mbps: stats::median(&s.mbps),
+                median: stats::median(&s.mbps),
                 skipped: s.skipped,
             })
             .collect(),
-        loaded_latency: summarize_latency(loaded_ms),
+        loaded: summarize_latency(loaded_ms),
     }
 }
 
@@ -169,10 +169,10 @@ mod tests {
     fn latency_summary() {
         assert!(summarize_latency(&[]).is_none());
         let s = summarize_latency(&[2.0, 4.0, 3.0]).unwrap();
-        assert_eq!(s.min_ms, 2.0);
-        assert_eq!(s.avg_ms, 3.0);
-        assert_eq!(s.median_ms, 3.0);
-        assert_eq!(s.jitter_ms, 1.5);
+        assert_eq!(s.min, 2.0);
+        assert_eq!(s.avg, 3.0);
+        assert_eq!(s.median, 3.0);
+        assert_eq!(s.jitter, 1.5);
     }
 
     #[test]
@@ -190,11 +190,11 @@ mod tests {
             },
         ];
         let d = summarize_direction(&sizes, &[]);
-        assert!(d.p90_mbps.unwrap() > 10.0);
+        assert!(d.p90.unwrap() > 10.0);
         assert_eq!(d.sizes.len(), 2);
-        assert_eq!(d.sizes[0].median_mbps, Some(15.0));
+        assert_eq!(d.sizes[0].median, Some(15.0));
         assert!(d.sizes[1].skipped);
-        assert!(d.loaded_latency.is_none());
+        assert!(d.loaded.is_none());
     }
 
     #[test]
@@ -223,7 +223,7 @@ mod tests {
         };
         let json = serde_json::to_string(&r).unwrap();
         let back: SpeedtestResults = serde_json::from_str(&json).unwrap();
-        assert_eq!(back.latency.unwrap().min_ms, 1.0);
+        assert_eq!(back.latency.unwrap().min, 1.0);
         assert!(back.upload.is_none());
     }
 }

@@ -32,7 +32,7 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     };
     eprintln!(
         "Server: POP {pop} ({version:?}) | Client: {} | AS{} {} | {}, {}",
-        meta.client_ip, meta.asn, meta.as_org, meta.city, meta.country,
+        meta.ip, meta.asn, meta.org, meta.city, meta.country,
     );
 
     let mut results = SpeedtestResults {
@@ -52,7 +52,7 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     if let Some(l) = &results.latency {
         eprintln!(
             "Latency: Min {:.1} / Median {:.1} / Avg {:.1} / Jitter {:.1} ms",
-            l.min_ms, l.median_ms, l.avg_ms, l.jitter_ms,
+            l.min, l.median, l.avg, l.jitter,
         );
     }
 
