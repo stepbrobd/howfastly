@@ -186,7 +186,12 @@ pub fn App() -> impl IntoView {
 
             <footer class="text-center">
                 <p><small>
-                    "Not an official Fastly product. Made by "
+                    "Not an official "
+                    <a href="https://www.fastly.com/" target="_blank" rel="noopener" referrerpolicy="origin">"Fastly"</a>
+                    " product."
+                </small></p>
+                <p><small>
+                    "Made by "
                     <a href="https://ysun.co" target="_blank" rel="noopener">"Yifei Sun"</a>
                     " aka "
                     <a href="https://github.com/stepbrobd" target="_blank" rel="noopener">"StepBroBD"</a>
