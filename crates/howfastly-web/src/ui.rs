@@ -51,6 +51,7 @@ struct State {
     running: RwSignal<bool>,
     error: RwSignal<Option<String>>,
     notice: RwSignal<Option<String>>,
+    meta: RwSignal<Option<MetaResponse>>,
     latency: RwSignal<Option<LatencySummary>>,
     down: Direction,
     up: Direction,
@@ -58,11 +59,11 @@ struct State {
 
 #[component]
 pub fn App() -> impl IntoView {
-    let meta = RwSignal::new(None::<MetaResponse>);
     let state = State {
         running: RwSignal::new(false),
         error: RwSignal::new(None),
         notice: RwSignal::new(None),
+        meta: RwSignal::new(None),
         latency: RwSignal::new(None),
         down: Direction::new(false),
         up: Direction::new(true),
@@ -74,7 +75,7 @@ pub fn App() -> impl IntoView {
                 state
                     .notice
                     .set(m.mismatch().map(|w| format!("{w}, reload to update")));
-                meta.set(Some(m));
+                state.meta.set(Some(m));
             }
             Err(e) => state
                 .notice
@@ -82,45 +83,22 @@ pub fn App() -> impl IntoView {
         }
     });
 
-    let launch = move || {
-        state.running.set(true);
-        spawn_local(async move {
-            engine::start().await;
-            let outcome = run_all(state).await;
-            state.down.running.set(false);
-            state.up.running.set(false);
-            state.running.set(false);
-            match outcome {
-                Ok(()) => {
-                    engine::finish(&SpeedtestResults {
-                        meta: meta.get_untracked(),
-                        latency: state.latency.get_untracked(),
-                        download: state.down.summary.get_untracked(),
-                        upload: state.up.summary.get_untracked(),
-                    })
-                    .await
-                }
-                Err(e) => state.error.set(Some(format!("{e:?}"))),
-            }
-        });
-    };
-
     // first visit gates behind the popup, later visits start right away
     let gate = RwSignal::new(!engine::autostart_saved());
     if !gate.get_untracked() {
-        launch();
+        launch(state);
     }
     let begin = move |_| {
         engine::save_autostart();
         gate.set(false);
-        launch();
+        launch(state);
     };
 
     view! {
         <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4 lg:max-w-6xl">
             <section class="overflow-x-auto rounded bg-nord-1 p-4">
                 <div class="mx-auto w-max whitespace-nowrap font-mono">
-                    {move || match meta.get() {
+                    {move || match state.meta.get() {
                         Some(m) => view! {
                             <a href=format!("https://bgp.tools/prefix/{}", m.ip)
                                 target="_blank" rel="noopener">{m.ip.clone()}</a>
@@ -233,7 +211,7 @@ pub fn App() -> impl IntoView {
                         <p class="mt-2">
                             "Tests run automatically and transfer up to ~640 MB in total. "
                             "Close the page early to spend less. "
-                            "Tap a speed card to run that test again."
+                            "Tap a speed card to run the test again."
                         </p>
                         <button
                             class="mt-4 w-full cursor-pointer rounded bg-nord-10 px-8 py-3 text-nord-6 hover:bg-nord-9"
@@ -316,21 +294,7 @@ fn Headline(label: &'static str, dir: Direction, state: State) -> impl IntoView 
         };
         bps.map(format_speed)
     };
-    let rerun = move |_| {
-        if state.running.get() {
-            return;
-        }
-        state.running.set(true);
-        state.error.set(None);
-        dir.reset();
-        spawn_local(async move {
-            if let Err(e) = run_one(dir).await {
-                state.error.set(Some(format!("{e:?}")));
-            }
-            dir.running.set(false);
-            state.running.set(false);
-        });
-    };
+    let rerun = move |_| launch(state);
     view! {
         <div
             class=move || {
@@ -341,7 +305,7 @@ fn Headline(label: &'static str, dir: Direction, state: State) -> impl IntoView 
                 };
                 format!("flex-1 rounded bg-nord-1 p-4 {cursor}")
             }
-            title="Run this test again"
+            title="Run the test again"
             on:click=rerun
         >
             <div class="font-mono text-4xl text-nord-6">
@@ -568,6 +532,38 @@ impl DirRun {
     }
 }
 
+// one full run bracketed by the start and finish markers
+// a click during a run is ignored
+fn launch(state: State) {
+    if state.running.get_untracked() {
+        return;
+    }
+    state.running.set(true);
+    state.error.set(None);
+    state.latency.set(None);
+    state.down.reset();
+    state.up.reset();
+    spawn_local(async move {
+        engine::start().await;
+        let outcome = run_all(state).await;
+        state.down.running.set(false);
+        state.up.running.set(false);
+        state.running.set(false);
+        match outcome {
+            Ok(()) => {
+                engine::finish(&SpeedtestResults {
+                    meta: state.meta.get_untracked(),
+                    latency: state.latency.get_untracked(),
+                    download: state.down.summary.get_untracked(),
+                    upload: state.up.summary.get_untracked(),
+                })
+                .await
+            }
+            Err(e) => state.error.set(Some(format!("{e:?}"))),
+        }
+    });
+}
+
 async fn run_all(state: State) -> Result<(), JsValue> {
     let cfg = TestConfig::default();
 
@@ -586,16 +582,6 @@ async fn run_all(state: State) -> Result<(), JsValue> {
                 segment(run, plan, cfg.time_budget_secs).await?;
             }
         }
-    }
-    Ok(())
-}
-
-async fn run_one(dir: Direction) -> Result<(), JsValue> {
-    let cfg = TestConfig::default();
-    let plans = if dir.upload { cfg.upload } else { cfg.download };
-    let mut run = DirRun::new(dir, plans.clone());
-    for plan in plans {
-        segment(&mut run, plan, cfg.time_budget_secs).await?;
     }
     Ok(())
 }
