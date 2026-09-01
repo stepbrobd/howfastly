@@ -121,8 +121,13 @@ pub fn App() -> impl IntoView {
                                 <path d="M2.5 8h11M9.5 4l4 4-4 4"/>
                             </svg>
                             " "
-                            <a href=format!("https://www.fastly.com/documentation/guides/getting-started/concepts/using-fastlys-global-pop-network/#complete-list-of-pops:~:text={}", m.pop)
-                                target="_blank" rel="noopener">{m.pop.clone()}</a>
+                            {m.pop.code.clone()}
+                            {(!m.pop.name.is_empty()).then(|| {
+                                match m.pop.group.is_empty() {
+                                    true => format!(" ({})", m.pop.name),
+                                    false => format!(" ({}, {})", m.pop.name, m.pop.group),
+                                }
+                            })}
                             {(!m.protocol.is_empty()).then(|| format!(" via {}", m.protocol))}
                         }
                             .into_any(),

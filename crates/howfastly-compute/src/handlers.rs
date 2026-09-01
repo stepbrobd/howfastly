@@ -1,10 +1,45 @@
 use std::io::{Read, Write};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
+use fastly::cache::simple::{self, CacheEntry};
 use fastly::http::{StatusCode, header};
 use fastly::{Request, Response};
 
 static CHUNK: [u8; 64 * 1024] = [0x55; 64 * 1024];
+
+const SECRET_STORE: &str = "howfastly";
+const API_KEY: &str = "fastly-api-key";
+const API_BACKEND: &str = "fastly";
+
+// resolve the serving pop against the datacenters api
+// the simple cache keeps the response body in this pop for a day
+// any failure (missing store or token, api error) degrades to None
+fn pop_info(code: &str) -> Option<howfastly::types::Pop> {
+    if code.is_empty() {
+        return None;
+    }
+    let store = fastly::secret_store::SecretStore::open(SECRET_STORE).ok()?;
+    let plaintext = store.try_get(API_KEY).ok()??.try_plaintext().ok()?;
+    let api_key = std::str::from_utf8(&plaintext).ok()?.trim().to_string();
+
+    let body = simple::get_or_set_with("datacenters", || {
+        let resp = Request::get("https://api.fastly.com/datacenters")
+            .with_header("fastly-key", api_key)
+            .send(API_BACKEND)?;
+        if resp.get_status() != StatusCode::OK {
+            return Err(fastly::Error::msg("datacenters request failed"));
+        }
+        Ok(CacheEntry {
+            value: resp.into_body(),
+            ttl: Duration::from_secs(86_400),
+        })
+    })
+    .ok()??;
+
+    let pops: Vec<howfastly::types::Pop> = serde_json::from_reader(body).ok()?;
+    pops.into_iter()
+        .find(|pop| pop.code.eq_ignore_ascii_case(code))
+}
 
 fn base(status: StatusCode, start: Instant) -> Response {
     let dur = start.elapsed().as_secs_f64() * 1e3;
@@ -66,6 +101,11 @@ pub fn up(req: Request) -> Response {
 pub fn meta(req: &Request, start: Instant) -> Response {
     let ip = req.get_client_ip_addr();
     let geo = ip.and_then(fastly::geo::geo_lookup);
+    let code = fastly::compute_runtime::pop();
+    let pop = pop_info(code).unwrap_or_else(|| howfastly::types::Pop {
+        code: code.to_string(),
+        ..Default::default()
+    });
 
     let meta = howfastly::types::MetaResponse {
         client_ip: ip.map(|ip| ip.to_string()).unwrap_or_default(),
@@ -82,11 +122,11 @@ pub fn meta(req: &Request, start: Instant) -> Response {
             .as_ref()
             .map(|g| g.country_code().to_string())
             .unwrap_or_default(),
-        pop: std::env::var("FASTLY_POP").unwrap_or_default(),
+        pop,
         protocol: format!("{:?}", req.get_version())
             .trim_end_matches(".0")
             .to_string(),
-        service_version: std::env::var("FASTLY_SERVICE_VERSION").unwrap_or_default(),
+        version: std::env::var("FASTLY_SERVICE_VERSION").unwrap_or_default(),
     };
 
     base(StatusCode::OK, start)

@@ -40,10 +40,17 @@ pub struct MetaResponse {
     pub as_org: String,
     pub city: String,
     pub country: String,
-    pub pop: String,
-    #[serde(default)]
+    pub pop: Pop,
     pub protocol: String,
-    pub service_version: String,
+    pub version: String,
+}
+
+// also one entry of the fastly datacenters api response
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct Pop {
+    pub code: String,
+    pub name: String,
+    pub group: String,
 }
 
 #[derive(Clone, Debug)]

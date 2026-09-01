@@ -26,9 +26,13 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     let cfg = args.config();
 
     let (meta, version) = runner.meta().await.context("Service unreachable")?;
+    let pop = match meta.pop.name.is_empty() {
+        true => meta.pop.code.clone(),
+        false => format!("{} {}", meta.pop.code, meta.pop.name),
+    };
     eprintln!(
-        "Server: POP {} ({version:?}) | Client: {} | AS{} {} | {}, {}",
-        meta.pop, meta.client_ip, meta.asn, meta.as_org, meta.city, meta.country,
+        "Server: POP {pop} ({version:?}) | Client: {} | AS{} {} | {}, {}",
+        meta.client_ip, meta.asn, meta.as_org, meta.city, meta.country,
     );
 
     let mut results = SpeedtestResults {
