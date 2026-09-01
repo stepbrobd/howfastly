@@ -10,7 +10,7 @@ authors     = ["ysun@stepbrobd.com"]
 build = "cargo build --package howfastly-compute --bin howfastly-compute --release --target wasm32-wasip1"
 
 [local_server.backends.plausible]
-url           = "http://stats.ysun.co/"
+url           = "https://stats.ysun.co/"
 override_host = "stats.ysun.co"
 
 [local_server.backends.fastly]
