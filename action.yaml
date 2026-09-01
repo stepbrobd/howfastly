@@ -17,24 +17,24 @@ inputs:
     default: ""
 
 outputs:
-  download-mbps:
+  download:
     description: 90th-percentile download throughput in Mbps (empty when not measured)
-    value: ${{ steps.results.outputs.download-mbps }}
-  upload-mbps:
+    value: ${{ steps.results.outputs.download }}
+  upload:
     description: 90th-percentile upload throughput in Mbps (empty when not measured)
-    value: ${{ steps.results.outputs.upload-mbps }}
-  latency-ms:
+    value: ${{ steps.results.outputs.upload }}
+  latency:
     description: Median unloaded latency in milliseconds (empty when not measured)
-    value: ${{ steps.results.outputs.latency-ms }}
+    value: ${{ steps.results.outputs.latency }}
   pop:
-    description: Fastly POP that served the test (empty when not reported)
+    description: Three letter code of the Fastly POP that served the test (empty when not reported)
     value: ${{ steps.results.outputs.pop }}
   json:
     description: Full results as compact JSON
     value: ${{ steps.results.outputs.json }}
-  results-path:
+  results:
     description: Path to the pretty-printed results JSON file (empty when no results were written)
-    value: ${{ steps.results.outputs.results-path }}
+    value: ${{ steps.results.outputs.results }}
 
 runs:
   using: composite
@@ -133,11 +133,11 @@ runs:
         fi
 
         {
-          echo "download-mbps=$(jq -r '.download.p90 // ""' "${HOWFASTLY_RESULTS}")"
-          echo "upload-mbps=$(jq -r '.upload.p90 // ""' "${HOWFASTLY_RESULTS}")"
-          echo "latency-ms=$(jq -r '.latency.median // ""' "${HOWFASTLY_RESULTS}")"
+          echo "download=$(jq -r '.download.p90 // ""' "${HOWFASTLY_RESULTS}")"
+          echo "upload=$(jq -r '.upload.p90 // ""' "${HOWFASTLY_RESULTS}")"
+          echo "latency=$(jq -r '.latency.median // ""' "${HOWFASTLY_RESULTS}")"
           echo "pop=$(jq -r '.meta.pop.code // ""' "${HOWFASTLY_RESULTS}")"
-          echo "results-path=${HOWFASTLY_RESULTS}"
+          echo "results=${HOWFASTLY_RESULTS}"
           echo 'json<<__HOWFASTLY_JSON__'
           jq -c . "${HOWFASTLY_RESULTS}"
           echo '__HOWFASTLY_JSON__'

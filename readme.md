@@ -49,7 +49,9 @@ Methodology:
 - 30s time budget per direction (roughly 640 MB transferred worst case)
 - Reports p90 speed with loaded latency per direction (bufferbloat)
 - Server processing time calculated from samples using `Server-Timing` header
-- No packet loss measurement (this would requires raw UDP probes, which
+- Reports the serving POP with its name and region, resolved on the edge from
+  the Fastly datacenters API
+- No packet loss measurement (this would require raw UDP probes, which
   [speed.cloudflare.com](https://speed.cloudflare.com) sends through a WebRTC
   TURN server native to the Cloudflare network, Fastly Compute cannot emit raw
   L3 frames, and Fastly does not have freely usable TURN server)
@@ -82,18 +84,19 @@ jobs:
           # write JSON to $HOWFASTLY_RESULTS to keep outputs and the summary
           # command: howfastly --format json > "$HOWFASTLY_RESULTS"
       - env:
-          DOWNLOAD: ${{ steps.howfastly.outputs.download-mbps }}
+          DOWNLOAD: ${{ steps.howfastly.outputs.download }}
         run: echo "download p90 ${DOWNLOAD} Mbps"
 ```
 
 Outputs:
 
-- `download-mbps`, `upload-mbps`: 90th-percentile throughput
-- `latency-ms`: Median unloaded latency
-- `pop`: Fastly POP that served the test
+- `download`, `upload`: 90th-percentile throughput in Mbps
+- `latency`: Median unloaded latency in ms
+- `pop`: Three letter code of the Fastly POP that served the test (name and
+  region are in `json` under `meta.pop`)
 - `json`: Full results as compact JSON
-- `results-path`: Pretty-printed results file, point `actions/upload-artifact`
-  at it to keep an artifact
+- `results`: Pretty-printed results file, point `actions/upload-artifact` at it
+  to keep an artifact
 
 Each run also writes a human-readable summary to the workflow run page.
 

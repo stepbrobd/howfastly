@@ -26,12 +26,12 @@ jobs:
         uses: ./
       - name: Outputs
         env:
-          DOWNLOAD: ${{ steps.speedtest.outputs.download-mbps }}
-          UPLOAD: ${{ steps.speedtest.outputs.upload-mbps }}
-          LATENCY: ${{ steps.speedtest.outputs.latency-ms }}
+          DOWNLOAD: ${{ steps.speedtest.outputs.download }}
+          UPLOAD: ${{ steps.speedtest.outputs.upload }}
+          LATENCY: ${{ steps.speedtest.outputs.latency }}
           POP: ${{ steps.speedtest.outputs.pop }}
           JSON: ${{ steps.speedtest.outputs.json }}
-          RESULTS: ${{ steps.speedtest.outputs.results-path }}
+          RESULTS: ${{ steps.speedtest.outputs.results }}
         run: |
           set -euo pipefail
 
