@@ -51,8 +51,28 @@ fn base(status: StatusCode, start: Instant) -> Response {
         .with_header("server-timing", format!("app;dur={dur:.3}"))
 }
 
-pub fn ping(start: Instant) -> Response {
+pub fn ack(start: Instant) -> Response {
     base(StatusCode::NO_CONTENT, start)
+}
+
+// a finish report is analytics only
+// anything unparsable or oversized is a bad request and counts nothing
+pub fn finish(
+    req: &mut Request,
+    start: Instant,
+) -> (Response, Option<howfastly::types::SpeedtestResults>) {
+    let mut buf = Vec::new();
+    let read = req
+        .take_body()
+        .take(64 * 1024)
+        .read_to_end(&mut buf)
+        .is_ok();
+    let results = read.then(|| serde_json::from_slice(&buf).ok()).flatten();
+    let status = match results {
+        Some(_) => StatusCode::NO_CONTENT,
+        None => StatusCode::BAD_REQUEST,
+    };
+    (base(status, start), results)
 }
 
 pub fn down(req: &Request, start: Instant) {

@@ -17,6 +17,9 @@ def checks [url: string, log: string] {
   assert equal ($up | get status) 200
 
   assert ((http get $"($url)/meta" | get ip | str length) > 0)
+  assert equal (http post --full --allow-errors $"($url)/start" "" | get status) 204
+  assert equal (http post --full --allow-errors --content-type application/json $"($url)/finish" {meta: null, latency: null, download: null, upload: null} | get status) 204
+  assert equal (http post --full --allow-errors --content-type application/json $"($url)/finish" "nope" | get status) 400
   assert ((http get $"($url)/" | into string) =~ "HowFastly")
   assert ((fetch $"($url)/ping" | get headers.response | where name == "server-timing" | length) > 0)
 
