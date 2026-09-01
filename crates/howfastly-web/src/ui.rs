@@ -195,6 +195,8 @@ pub fn App() -> impl IntoView {
                     "."
                 </small></p>
                 <p><small>
+                    <a href="https://crates.io/crates/howfastly" target="_blank" rel="noopener">"HowFastly"</a>
+                    " "
                     <a
                         href=concat!(
                             "https://github.com/stepbrobd/howfastly/releases/tag/",
@@ -203,7 +205,7 @@ pub fn App() -> impl IntoView {
                         target="_blank"
                         rel="noopener"
                     >
-                        {concat!("HowFastly ", env!("CARGO_PKG_VERSION"))}
+                        {env!("CARGO_PKG_VERSION")}
                     </a>
                 </small></p>
             </footer>
