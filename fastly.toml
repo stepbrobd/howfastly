@@ -1,10 +1,10 @@
 manifest_version = 3
 service_id       = "ZaPiGtAev5CKoDO3c7W4jZ"
 
+language    = "rust"
 name        = "howfastly"
-description = "how fast is your connection to the Fastly network?"
+description = "How fast is your connection to the Fastly network?"
 authors     = ["ysun@stepbrobd.com"]
-language    = "other"
 
 [scripts]
-build = "cargo build --package howfastly-compute --release --target wasm32-wasip1 && mkdir -p bin && cp target/wasm32-wasip1/release/howfastly-compute.wasm bin/main.wasm"
+build = "cargo build --package howfastly-compute --bin howfastly-compute --release --target wasm32-wasip1"
