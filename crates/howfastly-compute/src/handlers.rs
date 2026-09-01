@@ -127,6 +127,7 @@ pub fn meta(req: &Request, start: Instant) -> Response {
             .trim_end_matches(".0")
             .to_string(),
         version: std::env::var("FASTLY_SERVICE_VERSION").unwrap_or_default(),
+        cargo: howfastly::VERSION.to_string(),
     };
 
     base(StatusCode::OK, start)

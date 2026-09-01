@@ -8,7 +8,7 @@ use howfastly::http::parse_server_timing;
 use howfastly::stats;
 use howfastly::types::{
     DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
-    SpeedtestResults, TestConfig, size_label, summarize_direction, summarize_latency,
+    SpeedtestResults, TestConfig, parse_meta, size_label, summarize_direction, summarize_latency,
 };
 use reqwest::{Client, ClientBuilder, Method, RequestBuilder, Response, Version};
 
@@ -25,7 +25,10 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     };
     let cfg = args.config();
 
-    let (meta, version) = runner.meta().await.context("Service unreachable")?;
+    let (meta, version) = runner.meta().await?;
+    if let Some(warning) = meta.mismatch() {
+        eprintln!("Warning: {warning}");
+    }
     let pop = match meta.pop.name.is_empty() {
         true => meta.pop.code.clone(),
         false => format!("{} {}", meta.pop.code, meta.pop.name),
@@ -149,9 +152,14 @@ impl Runner {
     }
 
     async fn meta(&self) -> Result<(MetaResponse, Version)> {
-        let resp = self.req(Method::GET, "/meta").send().await?;
+        let resp = self
+            .req(Method::GET, "/meta")
+            .send()
+            .await
+            .context("Service unreachable")?;
         let version = resp.version();
-        Ok((resp.error_for_status()?.json().await?, version))
+        let body = resp.error_for_status()?.text().await?;
+        Ok((parse_meta(&body)?, version))
     }
 
     async fn ping(&self) -> Result<f64> {

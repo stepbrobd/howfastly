@@ -50,6 +50,7 @@ impl Direction {
 struct State {
     running: RwSignal<bool>,
     error: RwSignal<Option<String>>,
+    notice: RwSignal<Option<String>>,
     latency: RwSignal<Option<LatencySummary>>,
     down: Direction,
     up: Direction,
@@ -61,14 +62,23 @@ pub fn App() -> impl IntoView {
     let state = State {
         running: RwSignal::new(false),
         error: RwSignal::new(None),
+        notice: RwSignal::new(None),
         latency: RwSignal::new(None),
         down: Direction::new(false),
         up: Direction::new(true),
     };
 
     spawn_local(async move {
-        if let Ok(m) = engine::meta().await {
-            meta.set(Some(m));
+        match engine::meta().await {
+            Ok(m) => {
+                state
+                    .notice
+                    .set(m.mismatch().map(|w| format!("{w}, reload to update")));
+                meta.set(Some(m));
+            }
+            Err(e) => state
+                .notice
+                .set(Some(e.as_string().unwrap_or_else(|| format!("{e:?}")))),
         }
     });
 
@@ -135,6 +145,10 @@ pub fn App() -> impl IntoView {
                     }}
                 </div>
             </section>
+
+            {move || state.notice.get().map(|n| view! {
+                <div class="rounded border border-nord-13 bg-nord-1 p-4 text-nord-13">{n}</div>
+            })}
 
             <div class="grid gap-8 lg:grid-cols-2">
                 <section class="flex flex-col gap-4">

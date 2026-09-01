@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use howfastly::http::parse_server_timing;
 use howfastly::stats;
-use howfastly::types::MetaResponse;
+use howfastly::types::{MetaResponse, parse_meta};
 use js_sys::{Reflect, Uint8Array};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
@@ -136,6 +136,5 @@ pub async fn upload(
 pub async fn meta() -> Result<MetaResponse, JsValue> {
     let resp = fetch("GET", "/meta", None).await?;
     let text = JsFuture::from(resp.text()?).await?;
-    serde_json::from_str(&text.as_string().unwrap_or_default())
-        .map_err(|e| JsValue::from_str(&e.to_string()))
+    parse_meta(&text.as_string().unwrap_or_default()).map_err(|e| JsValue::from_str(&e.to_string()))
 }

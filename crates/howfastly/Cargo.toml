@@ -29,14 +29,14 @@ required-features = ["cli"]
 # deps build for wasm32, so they stay optional and off for those
 [features]
 default = ["cli"]
-cli     = ["dep:anyhow", "dep:clap", "dep:reqwest", "dep:serde_json", "dep:tokio"]
+cli     = ["dep:anyhow", "dep:clap", "dep:reqwest", "dep:tokio"]
 
 [dependencies]
 anyhow     = { workspace = true, optional = true }
 clap       = { workspace = true, optional = true }
 reqwest    = { workspace = true, optional = true }
 serde      = { workspace = true }
-serde_json = { workspace = true, optional = true }
+serde_json = { workspace = true }
 tokio      = { workspace = true, optional = true }
 
 [dev-dependencies]

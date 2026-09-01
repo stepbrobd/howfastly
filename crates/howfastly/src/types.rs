@@ -43,6 +43,58 @@ pub struct MetaResponse {
     pub pop: Pop,
     pub protocol: String,
     pub version: String,
+    pub cargo: String,
+}
+
+impl MetaResponse {
+    // a differing build that still decodes is a warning, not a failure
+    pub fn mismatch(&self) -> Option<MetaError> {
+        (self.cargo != crate::VERSION).then(|| MetaError::Mismatch(self.cargo.clone()))
+    }
+}
+
+#[derive(Debug)]
+pub enum MetaError {
+    Mismatch(String),
+    Missing,
+    Invalid(serde_json::Error),
+}
+
+impl std::fmt::Display for MetaError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let build = crate::VERSION;
+        match self {
+            Self::Mismatch(server) => {
+                write!(
+                    f,
+                    "Server runs HowFastly {server} but this build is {build}"
+                )
+            }
+            Self::Missing => write!(
+                f,
+                "Server predates version reporting, this build is {build}"
+            ),
+            Self::Invalid(e) => write!(f, "Invalid meta response: {e}"),
+        }
+    }
+}
+
+impl std::error::Error for MetaError {}
+
+// a shape mismatch names the server version so an old build knows to upgrade
+pub fn parse_meta(body: &str) -> Result<MetaResponse, MetaError> {
+    let err = match serde_json::from_str(body) {
+        Ok(meta) => return Ok(meta),
+        Err(e) => e,
+    };
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(body) else {
+        return Err(MetaError::Invalid(err));
+    };
+    Err(match value.get("cargo").and_then(|c| c.as_str()) {
+        Some(server) if server != crate::VERSION => MetaError::Mismatch(server.to_string()),
+        Some(_) => MetaError::Invalid(err),
+        None => MetaError::Missing,
+    })
 }
 
 // also one entry of the fastly datacenters api response
@@ -164,6 +216,25 @@ pub fn summarize_direction(sizes: &[SizeSamples], loaded_ms: &[f64]) -> Directio
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn meta_fallback() {
+        let ok = serde_json::to_string(&MetaResponse {
+            cargo: crate::VERSION.to_string(),
+            ..Default::default()
+        })
+        .unwrap();
+        assert!(parse_meta(&ok).unwrap().mismatch().is_none());
+        assert!(matches!(
+            parse_meta(r#"{"cargo":"0.0.0","pop":"BRU"}"#),
+            Err(MetaError::Mismatch(v)) if v == "0.0.0"
+        ));
+        assert!(matches!(
+            parse_meta(r#"{"pop":"BRU"}"#),
+            Err(MetaError::Missing)
+        ));
+        assert!(matches!(parse_meta("nope"), Err(MetaError::Invalid(_))));
+    }
 
     #[test]
     fn latency_summary() {
