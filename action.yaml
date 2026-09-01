@@ -136,7 +136,7 @@ runs:
           echo "download-mbps=$(jq -r '.download.p90_mbps // ""' "${HOWFASTLY_RESULTS}")"
           echo "upload-mbps=$(jq -r '.upload.p90_mbps // ""' "${HOWFASTLY_RESULTS}")"
           echo "latency-ms=$(jq -r '.latency.median_ms // ""' "${HOWFASTLY_RESULTS}")"
-          echo "pop=$(jq -r '.meta.pop // ""' "${HOWFASTLY_RESULTS}")"
+          echo "pop=$(jq -r '.meta.pop.code // ""' "${HOWFASTLY_RESULTS}")"
           echo "results-path=${HOWFASTLY_RESULTS}"
           echo 'json<<__HOWFASTLY_JSON__'
           jq -c . "${HOWFASTLY_RESULTS}"
@@ -147,9 +147,10 @@ runs:
           def n2: if . == null then "-" else ((. * 100 | round) / 100 | tostring) end;
           def lat: if . == null then "-" else "\(.median_ms | n2) / \(.jitter_ms | n2)" end;
           def row(name): if . == null then empty else "| \(name) | \(.p90_mbps | n2) | \(.loaded_latency | lat) |" end;
+          def pop: ([.name, .group] | map(select(. != "")) | join(", ")) as $d | .code + (if $d == "" then "" else " (\($d))" end);
           ( ["### HowFastly", ""]
           + (if .meta == null then [] else
-              ["Served by \(.meta.pop) in \(.meta.city), \(.meta.country) via \(.meta.as_org) (AS\(.meta.asn)) over \(.meta.protocol)", ""] end)
+              ["From \(.meta.city), \(.meta.country) (\(.meta.as_org), AS\(.meta.asn)) to \(.meta.pop | pop) over \(.meta.protocol)", ""] end)
           + ["| Direction | p90 Mbps | Loaded latency (median / jitter ms) |", "| --- | --- | --- |"]
           + [(.download | row("Download")), (.upload | row("Upload"))]
           + (if .latency == null then [] else
