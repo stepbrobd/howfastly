@@ -28,10 +28,67 @@ pub fn jitter(samples: &[f64]) -> Option<f64> {
     Some(sum / (samples.len() - 1) as f64)
 }
 
+// plausible breaks props down per distinct value
+// measurements reach it as coarse buckets
+const SPEED_BUCKETS: [(f64, &str); 7] = [
+    (10.0, "< 10 Mbps"),
+    (50.0, "10-50 Mbps"),
+    (100.0, "50-100 Mbps"),
+    (250.0, "100-250 Mbps"),
+    (500.0, "250-500 Mbps"),
+    (1000.0, "500-1000 Mbps"),
+    (f64::INFINITY, "1+ Gbps"),
+];
+const LATENCY_BUCKETS: [(f64, &str); 5] = [
+    (10.0, "< 10 ms"),
+    (25.0, "10-25 ms"),
+    (50.0, "25-50 ms"),
+    (100.0, "50-100 ms"),
+    (f64::INFINITY, "100+ ms"),
+];
+
+fn bucket(value: f64, buckets: &[(f64, &'static str)]) -> &'static str {
+    buckets
+        .iter()
+        .find(|(limit, _)| value < *limit)
+        .map_or(buckets[buckets.len() - 1].1, |(_, name)| name)
+}
+
+pub fn speed_bucket(mbps: f64) -> &'static str {
+    bucket(mbps, &SPEED_BUCKETS)
+}
+
+pub fn latency_bucket(ms: f64) -> &'static str {
+    bucket(ms, &LATENCY_BUCKETS)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use proptest::prelude::*;
+
+    fn index(buckets: &[(f64, &str)], name: &str) -> usize {
+        buckets.iter().position(|(_, n)| *n == name).unwrap()
+    }
+
+    proptest! {
+        #[test]
+        fn buckets_monotone(a in 0.0f64..5000.0, b in 0.0f64..5000.0) {
+            let (lo, hi) = if a <= b { (a, b) } else { (b, a) };
+            prop_assert!(index(&SPEED_BUCKETS, speed_bucket(lo)) <= index(&SPEED_BUCKETS, speed_bucket(hi)));
+            prop_assert!(index(&LATENCY_BUCKETS, latency_bucket(lo)) <= index(&LATENCY_BUCKETS, latency_bucket(hi)));
+        }
+    }
+
+    #[test]
+    fn bucket_edges() {
+        assert_eq!(speed_bucket(9.99), "< 10 Mbps");
+        assert_eq!(speed_bucket(10.0), "10-50 Mbps");
+        assert_eq!(speed_bucket(1000.0), "1+ Gbps");
+        assert_eq!(latency_bucket(0.0), "< 10 ms");
+        assert_eq!(latency_bucket(100.0), "100+ ms");
+        assert_eq!(latency_bucket(f64::NAN), "100+ ms");
+    }
 
     proptest! {
         #[test]
