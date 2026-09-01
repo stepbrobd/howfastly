@@ -55,7 +55,7 @@ pub fn ping(start: Instant) -> Response {
     base(StatusCode::NO_CONTENT, start)
 }
 
-pub fn down(req: Request, start: Instant) {
+pub fn down(req: &Request, start: Instant) {
     let Some(n) = howfastly::http::parse_bytes(req.get_query_parameter("bytes")) else {
         base(StatusCode::BAD_REQUEST, start).send_to_client();
         return;
@@ -78,11 +78,11 @@ pub fn down(req: Request, start: Instant) {
     let _ = body.finish();
 }
 
-pub fn up(req: Request) -> Response {
+pub fn up(req: &mut Request) -> Response {
     // drain with large reads
     // viceroy rebuffers the unread remainder on every read
     // small buffers therefore make big uploads quadratic
-    let mut body = req.into_body();
+    let mut body = req.take_body();
     let mut buf = vec![0u8; 2 * 1024 * 1024];
     let mut received: u64 = 0;
     loop {
@@ -96,6 +96,13 @@ pub fn up(req: Request) -> Response {
     base(StatusCode::OK, Instant::now())
         .with_header(header::CONTENT_TYPE, "text/plain")
         .with_body(received.to_string())
+}
+
+// the debug form reads HTTP/2.0, the trailing .0 is noise
+pub fn protocol(req: &Request) -> String {
+    format!("{:?}", req.get_version())
+        .trim_end_matches(".0")
+        .to_string()
 }
 
 pub fn meta(req: &Request, start: Instant) -> Response {
@@ -123,9 +130,7 @@ pub fn meta(req: &Request, start: Instant) -> Response {
             .map(|g| g.country_code().to_string())
             .unwrap_or_default(),
         pop,
-        protocol: format!("{:?}", req.get_version())
-            .trim_end_matches(".0")
-            .to_string(),
+        protocol: protocol(req),
         version: std::env::var("FASTLY_SERVICE_VERSION").unwrap_or_default(),
         cargo: howfastly::VERSION.to_string(),
     };
