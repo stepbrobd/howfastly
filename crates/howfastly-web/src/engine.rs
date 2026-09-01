@@ -3,12 +3,13 @@ use std::rc::Rc;
 
 use howfastly::http::parse_server_timing;
 use howfastly::stats;
-use howfastly::types::{MetaResponse, parse_meta};
+use howfastly::types::{MetaResponse, SpeedtestResults, parse_meta};
 use js_sys::{Reflect, Uint8Array};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{
-    ProgressEvent, ReadableStreamDefaultReader, RequestInit, Response, Window, XmlHttpRequest,
+    Headers, ProgressEvent, ReadableStreamDefaultReader, RequestInit, Response, Window,
+    XmlHttpRequest,
 };
 
 fn window() -> Window {
@@ -36,14 +37,30 @@ pub fn save_autostart() {
     }
 }
 
-async fn fetch(method: &str, url: &str, body: Option<Uint8Array>) -> Result<Response, JsValue> {
+async fn fetch(method: &str, url: &str, json: Option<&str>) -> Result<Response, JsValue> {
     let init = RequestInit::new();
     init.set_method(method);
-    if let Some(body) = body {
-        init.set_body(&JsValue::from(body));
+    if let Some(json) = json {
+        let headers = Headers::new()?;
+        headers.set("content-type", "application/json")?;
+        init.set_headers_headers(&headers);
+        init.set_body_opt_str(Some(json));
+        // a closing tab must still deliver the report
+        let _ = Reflect::set(&init, &"keepalive".into(), &JsValue::TRUE);
     }
     let resp = JsFuture::from(window().fetch_with_str_and_init(url, &init)).await?;
     resp.dyn_into()
+}
+
+// run markers for the edge side counting, the outcome is ignored
+pub async fn start() {
+    let _ = fetch("POST", "/start", None).await;
+}
+
+pub async fn finish(results: &SpeedtestResults) {
+    if let Ok(json) = serde_json::to_string(results) {
+        let _ = fetch("POST", "/finish", Some(&json)).await;
+    }
 }
 
 fn server_dur_ms(resp: &Response) -> f64 {

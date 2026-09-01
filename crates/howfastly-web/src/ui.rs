@@ -6,8 +6,8 @@ use howfastly::chart::{format_speed, svg_path, throughput_points};
 use howfastly::stats;
 use howfastly::types::{
     DOWNLOAD_PLAN, DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse,
-    SizePlan, SizeSamples, TestConfig, UPLOAD_PLAN, size_label, summarize_direction,
-    summarize_latency,
+    SizePlan, SizeSamples, SpeedtestResults, TestConfig, UPLOAD_PLAN, size_label,
+    summarize_direction, summarize_latency,
 };
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -85,12 +85,23 @@ pub fn App() -> impl IntoView {
     let launch = move || {
         state.running.set(true);
         spawn_local(async move {
-            if let Err(e) = run_all(state).await {
-                state.error.set(Some(format!("{e:?}")));
-            }
+            engine::start().await;
+            let outcome = run_all(state).await;
             state.down.running.set(false);
             state.up.running.set(false);
             state.running.set(false);
+            match outcome {
+                Ok(()) => {
+                    engine::finish(&SpeedtestResults {
+                        meta: meta.get_untracked(),
+                        latency: state.latency.get_untracked(),
+                        download: state.down.summary.get_untracked(),
+                        upload: state.up.summary.get_untracked(),
+                    })
+                    .await
+                }
+                Err(e) => state.error.set(Some(format!("{e:?}"))),
+            }
         });
     };
 
