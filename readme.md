@@ -21,6 +21,14 @@ To install with `cargo`:
 RUSTFLAGS='--cfg reqwest_unstable' cargo install howfastly
 ```
 
+Or fetch a prebuilt release binary with
+[`cargo binstall`](https://github.com/cargo-bins/cargo-binstall) (Linux
+x64/arm64 and macOS arm64):
+
+```sh
+cargo binstall howfastly
+```
+
 Or run without installing:
 
 ```sh
