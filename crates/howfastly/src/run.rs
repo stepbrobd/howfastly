@@ -98,11 +98,22 @@ async fn connect(
     {
         return Ok((client, Some(Version::HTTP_3)));
     }
-    Ok((Client::builder().local_address(local).build()?, None))
+    Ok((
+        Client::builder()
+            .user_agent(agent())
+            .local_address(local)
+            .build()?,
+        None,
+    ))
+}
+
+// the server tells cli runs apart from browsers by this string
+fn agent() -> String {
+    format!("HowFastly/{}", howfastly::VERSION)
 }
 
 fn builder(version: Version) -> ClientBuilder {
-    let b = Client::builder();
+    let b = Client::builder().user_agent(agent());
     if version == Version::HTTP_3 {
         b.http3_prior_knowledge()
     } else if version == Version::HTTP_2 {
