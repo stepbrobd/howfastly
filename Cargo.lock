@@ -992,12 +992,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "howfastly-map"
+version = "2026.901.3"
+dependencies = [
+ "proptest",
+]
+
+[[package]]
 name = "howfastly-web"
 version = "2026.901.3"
 dependencies = [
  "console_error_panic_hook",
  "gloo-timers",
  "howfastly",
+ "howfastly-map",
  "js-sys",
  "leptos",
  "serde_json",

@@ -2,12 +2,12 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use gloo_timers::future::TimeoutFuture;
-use howfastly::chart::{chart_y, format_speed, peak, svg_path, throughput_points};
 use howfastly::stats;
 use howfastly::types::{
     Direction, DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse, SizePlan,
     SizeSamples, SpeedtestResults, TestConfig, size_label, summarize_direction, summarize_latency,
 };
+use howfastly_map::chart::{chart_y, format_speed, peak, svg_path, throughput_points};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use wasm_bindgen::JsValue;

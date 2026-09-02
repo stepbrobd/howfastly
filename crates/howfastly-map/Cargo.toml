@@ -1,0 +1,13 @@
+[package]
+name    = "howfastly-map"
+publish = false
+
+edition.workspace = true
+version.workspace = true
+
+[lib]
+name = "howfastly_map"
+path = "src/lib.rs"
+
+[dev-dependencies]
+proptest.workspace = true

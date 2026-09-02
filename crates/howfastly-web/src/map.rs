@@ -1,6 +1,6 @@
 use gloo_timers::future::TimeoutFuture;
-use howfastly::map::{self, View};
 use howfastly::types::{Coordinates, MetaResponse};
+use howfastly_map::map::{self, View};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 
