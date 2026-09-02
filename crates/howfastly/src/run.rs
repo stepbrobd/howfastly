@@ -1,6 +1,4 @@
 use std::net::IpAddr;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, ensure};
@@ -11,6 +9,7 @@ use howfastly::types::{
     SpeedtestResults, TestConfig, parse_meta, size_label, summarize_direction, summarize_latency,
 };
 use reqwest::{Client, ClientBuilder, Method, RequestBuilder, Response, Version};
+use tokio::sync::mpsc;
 
 pub struct Options {
     pub base: String,
@@ -238,17 +237,17 @@ impl Runner {
 
     async fn direction(&self, dir: Direction, cfg: &TestConfig) -> Result<DirectionSummary> {
         let name = dir.name();
-        let stop = Arc::new(AtomicBool::new(false));
-        let loaded = Arc::new(Mutex::new(Vec::new()));
 
+        // the pinger sends every sample over a channel until it is aborted
+        let (tx, mut rx) = mpsc::unbounded_channel();
         let pinger = tokio::spawn({
             let runner = self.clone();
-            let stop = stop.clone();
-            let loaded = loaded.clone();
             async move {
-                while !stop.load(Ordering::Relaxed) {
-                    if let Ok(ms) = runner.ping().await {
-                        loaded.lock().unwrap().push(ms);
+                loop {
+                    if let Ok(ms) = runner.ping().await
+                        && tx.send(ms).is_err()
+                    {
+                        return;
                     }
                     tokio::time::sleep(Duration::from_millis(u64::from(LOADED_PING_INTERVAL_MS)))
                         .await;
@@ -291,9 +290,11 @@ impl Runner {
             out.push(s);
         }
 
-        stop.store(true, Ordering::Relaxed);
-        let _ = pinger.await;
-        let loaded_ms = loaded.lock().unwrap().clone();
+        pinger.abort();
+        let mut loaded_ms = Vec::new();
+        while let Ok(ms) = rx.try_recv() {
+            loaded_ms.push(ms);
+        }
 
         ensure!(
             out.iter().any(|s| !s.mbps.is_empty()),
