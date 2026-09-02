@@ -19,7 +19,7 @@ pub const UPLOAD_PLAN: [SizePlan; 5] = [
 ];
 pub const LATENCY_SAMPLES: usize = 25;
 pub const TIME_BUDGET_SECS: f64 = 30.0;
-pub const LOADED_PING_INTERVAL_MS: u64 = 400;
+pub const LOADED_PING_INTERVAL_MS: u32 = 400;
 
 #[derive(Clone, Copy, Debug)]
 pub struct SizePlan {

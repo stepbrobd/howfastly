@@ -241,7 +241,8 @@ impl Runner {
                     if let Ok(ms) = runner.ping().await {
                         loaded.lock().unwrap().push(ms);
                     }
-                    tokio::time::sleep(Duration::from_millis(LOADED_PING_INTERVAL_MS)).await;
+                    tokio::time::sleep(Duration::from_millis(u64::from(LOADED_PING_INTERVAL_MS)))
+                        .await;
                 }
             }
         });

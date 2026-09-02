@@ -627,7 +627,7 @@ async fn segment(run: &mut DirRun, plan: SizePlan, budget_secs: f64) -> Result<(
                 if let Ok(ms) = engine::ping().await {
                     seg_loaded.borrow_mut().push(ms);
                 }
-                TimeoutFuture::new(LOADED_PING_INTERVAL_MS as u32).await;
+                TimeoutFuture::new(LOADED_PING_INTERVAL_MS).await;
             }
         }
     });
