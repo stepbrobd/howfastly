@@ -44,17 +44,24 @@ def checks [url: string, log: string] {
   assert ($elapsed < 10sec) $"50mb upload took ($elapsed)"
 }
 
+# a prebuilt wasm in HOWFASTLY_WASM skips the builds, the nix check hands one in
+def wasm []: nothing -> string {
+  if "HOWFASTLY_WASM" in $env {
+    return $env.HOWFASTLY_WASM
+  }
+  let root = $env.FILE_PWD | path join .. .. .. | path expand
+  # dist must exist before compute is built
+  do { cd $"($root)/crates/howfastly-web"; trunk build }
+  cargo build -p howfastly-compute --release --target wasm32-wasip1
+  $"($root)/target/wasm32-wasip1/release/howfastly-compute.wasm"
+}
+
 def main [] {
-  let root = git rev-parse --show-toplevel | str trim
   # avoid viceroy's default port since a dev serve session may be running
   let addr = "127.0.0.1:17676"
   let url = $"http://($addr)"
 
-  # dist must exist before compute is built
-  do { cd $"($root)/crates/howfastly-web"; trunk build }
-
-  cargo build -p howfastly-compute --release --target wasm32-wasip1
-  let wasm = $"($root)/target/wasm32-wasip1/release/howfastly-compute.wasm"
+  let wasm = wasm
   let log = mktemp -t viceroy-e2e-XXXXXX.log
 
   # jobs are not killed when a script dies on an error
