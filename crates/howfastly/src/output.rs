@@ -1,5 +1,5 @@
 use anyhow::Result;
-use howfastly::types::{DirectionSummary, SpeedtestResults};
+use howfastly::types::{Direction, DirectionSummary, SpeedtestResults};
 
 use crate::OutputFormat;
 
@@ -17,8 +17,9 @@ fn fmt_opt(v: Option<f64>) -> String {
 
 fn csv(r: &SpeedtestResults) -> String {
     let mut out = String::from("direction,bytes,samples,median,p90\n");
-    for (name, dir) in [("download", &r.download), ("upload", &r.upload)] {
-        let Some(d) = dir else { continue };
+    for dir in Direction::ALL {
+        let Some(d) = r.direction(dir) else { continue };
+        let name = dir.name().to_lowercase();
         for s in &d.sizes {
             out += &format!(
                 "{name},{},{},{},{}\n",
@@ -47,9 +48,9 @@ fn direction_block(name: &str, d: &DirectionSummary) -> String {
 
 fn human(r: &SpeedtestResults) -> String {
     let mut out = String::from("\n");
-    for (name, dir) in [("Download", &r.download), ("Upload", &r.upload)] {
-        if let Some(d) = dir {
-            out += &direction_block(name, d);
+    for dir in Direction::ALL {
+        if let Some(d) = r.direction(dir) {
+            out += &direction_block(dir.name(), d);
         }
     }
     out

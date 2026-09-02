@@ -21,6 +21,30 @@ pub const LATENCY_SAMPLES: usize = 25;
 pub const TIME_BUDGET_SECS: f64 = 30.0;
 pub const LOADED_PING_INTERVAL_MS: u32 = 400;
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Direction {
+    Download,
+    Upload,
+}
+
+impl Direction {
+    pub const ALL: [Direction; 2] = [Direction::Download, Direction::Upload];
+
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Download => "Download",
+            Self::Upload => "Upload",
+        }
+    }
+
+    pub fn plan(self) -> &'static [SizePlan] {
+        match self {
+            Self::Download => &DOWNLOAD_PLAN,
+            Self::Upload => &UPLOAD_PLAN,
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct SizePlan {
     pub bytes: u64,
@@ -122,6 +146,15 @@ pub struct TestConfig {
     pub time_budget_secs: f64,
 }
 
+impl TestConfig {
+    pub fn plans(&self, dir: Direction) -> &[SizePlan] {
+        match dir {
+            Direction::Download => &self.download,
+            Direction::Upload => &self.upload,
+        }
+    }
+}
+
 impl Default for TestConfig {
     fn default() -> Self {
         Self {
@@ -169,6 +202,22 @@ pub struct SpeedtestResults {
     pub latency: Option<LatencySummary>,
     pub download: Option<DirectionSummary>,
     pub upload: Option<DirectionSummary>,
+}
+
+impl SpeedtestResults {
+    pub fn direction(&self, dir: Direction) -> Option<&DirectionSummary> {
+        match dir {
+            Direction::Download => self.download.as_ref(),
+            Direction::Upload => self.upload.as_ref(),
+        }
+    }
+
+    pub fn record(&mut self, dir: Direction, summary: DirectionSummary) {
+        match dir {
+            Direction::Download => self.download = Some(summary),
+            Direction::Upload => self.upload = Some(summary),
+        }
+    }
 }
 
 // fastly geo data arrives lowercased
@@ -407,6 +456,20 @@ mod tests {
         assert_eq!(size_label(100_000), "100 kB");
         assert_eq!(size_label(1_000_000), "1 MB");
         assert_eq!(size_label(25_000_000), "25 MB");
+    }
+
+    #[test]
+    fn directions() {
+        assert_eq!(Direction::Download.plan()[0].bytes, DOWNLOAD_PLAN[0].bytes);
+        assert_eq!(Direction::Upload.plan().len(), UPLOAD_PLAN.len());
+        let cfg = TestConfig::default();
+        assert_eq!(cfg.plans(Direction::Upload).len(), cfg.upload.len());
+        let mut r = SpeedtestResults::default();
+        assert!(r.direction(Direction::Upload).is_none());
+        r.record(Direction::Upload, summarize_direction(&[], &[]));
+        assert!(r.direction(Direction::Upload).is_some());
+        assert!(r.direction(Direction::Download).is_none());
+        assert_eq!(Direction::ALL.map(Direction::name), ["Download", "Upload"]);
     }
 
     #[test]

@@ -4,7 +4,7 @@ mod run;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use clap::{Parser, ValueEnum};
-use howfastly::types::{self, SizePlan, TestConfig};
+use howfastly::types::{self, Direction, SizePlan, TestConfig};
 use reqwest::Version;
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
@@ -105,6 +105,28 @@ impl Args {
         self.ipv4.map(IpAddr::V4).or(self.ipv6.map(IpAddr::V6))
     }
 
+    // clap rejects both flags together
+    pub fn only(&self) -> Option<Direction> {
+        if self.download_only {
+            Some(Direction::Download)
+        } else if self.upload_only {
+            Some(Direction::Upload)
+        } else {
+            None
+        }
+    }
+
+    pub fn options(&self) -> run::Options {
+        run::Options {
+            base: self.url.trim_end_matches('/').to_string(),
+            local: self.local_addr(),
+            forced: self.http_version(),
+            only: self.only(),
+            verbose: self.verbose,
+            cfg: self.config(),
+        }
+    }
+
     // clap rejects more than one flag in the group
     pub fn http_version(&self) -> Option<Version> {
         if self.http1 {
@@ -142,7 +164,7 @@ impl Args {
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
     let args = Args::parse();
-    let results = run::run(&args).await?;
+    let results = run::run(&args.options()).await?;
     print!("{}", output::render(&results, args.format)?);
     Ok(())
 }
@@ -180,11 +202,12 @@ mod tests {
         assert_eq!(a.nr_tests, Some(3));
         assert_eq!(a.nr_latency_tests, 5);
         assert!(matches!(a.max_payload_size, PayloadSize::M1));
-        assert!(a.download_only);
+        assert_eq!(a.only(), Some(Direction::Download));
         assert!(matches!(a.format, OutputFormat::Json));
 
         let a = Args::try_parse_from(["howfastly", "-u"]).unwrap();
-        assert!(a.upload_only);
+        assert_eq!(a.only(), Some(Direction::Upload));
+        assert_eq!(Args::try_parse_from(["howfastly"]).unwrap().only(), None);
         assert!(Args::try_parse_from(["howfastly", "-d", "-u"]).is_err());
         assert!(Args::try_parse_from(["howfastly", "-f", "json-pretty"]).is_err());
     }

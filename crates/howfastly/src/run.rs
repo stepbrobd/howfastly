@@ -7,23 +7,29 @@ use anyhow::{Context, Result, ensure};
 use howfastly::http;
 use howfastly::stats;
 use howfastly::types::{
-    DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
+    Direction, DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
     SpeedtestResults, TestConfig, parse_meta, size_label, summarize_direction, summarize_latency,
 };
 use reqwest::{Client, ClientBuilder, Method, RequestBuilder, Response, Version};
 
-use crate::Args;
+pub struct Options {
+    pub base: String,
+    pub local: Option<IpAddr>,
+    pub forced: Option<Version>,
+    // one direction alone, or both in order
+    pub only: Option<Direction>,
+    pub verbose: bool,
+    pub cfg: TestConfig,
+}
 
-pub async fn run(args: &Args) -> Result<SpeedtestResults> {
-    let base = args.url.trim_end_matches('/').to_string();
-    let (client, version) = connect(&base, args.local_addr(), args.http_version()).await?;
+pub async fn run(opts: &Options) -> Result<SpeedtestResults> {
+    let (client, pinned) = connect(&opts.base, opts.local, opts.forced).await?;
     let runner = Runner {
         client,
-        version,
-        base,
-        verbose: args.verbose,
+        pinned,
+        base: opts.base.clone(),
+        verbose: opts.verbose,
     };
-    let cfg = args.config();
 
     let (meta, version) = runner.meta().await?;
     if let Some(warning) = meta.mismatch() {
@@ -46,7 +52,7 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     };
 
     let mut pings = Vec::new();
-    for i in 0..cfg.latency_samples {
+    for i in 0..opts.cfg.latency_samples {
         match runner.ping().await {
             Ok(ms) => pings.push(ms),
             Err(e) => eprintln!("Warning: latency sample {i}: {e}"),
@@ -61,11 +67,13 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
         );
     }
 
-    if !args.upload_only {
-        results.download = Some(runner.direction(false, &cfg).await?);
-    }
-    if !args.download_only {
-        results.upload = Some(runner.direction(true, &cfg).await?);
+    let dirs: &[Direction] = match &opts.only {
+        Some(dir) => std::slice::from_ref(dir),
+        None => &Direction::ALL,
+    };
+    for &dir in dirs {
+        let summary = runner.direction(dir, &opts.cfg).await?;
+        results.record(dir, summary);
     }
     runner.finish(&results).await;
     Ok(results)
@@ -143,7 +151,8 @@ async fn probe(client: &Client, base: &str, pinned: Option<Version>) -> reqwest:
 #[derive(Clone)]
 struct Runner {
     client: Client,
-    version: Option<Version>,
+    // h3 needs every request pinned, alpn settles the rest
+    pinned: Option<Version>,
     base: String,
     verbose: bool,
 }
@@ -159,7 +168,7 @@ fn server_dur_ms(resp: &Response) -> f64 {
 impl Runner {
     fn req(&self, method: Method, path: &str) -> RequestBuilder {
         let req = self.client.request(method, format!("{}{path}", self.base));
-        match self.version {
+        match self.pinned {
             Some(v) => req.version(v),
             None => req,
         }
@@ -220,16 +229,15 @@ impl Runner {
         Ok(stats::mbps(bytes, secs))
     }
 
-    async fn sample(&self, upload: bool, bytes: u64) -> Result<f64> {
-        if upload {
-            self.upload(bytes).await
-        } else {
-            self.download(bytes).await
+    async fn sample(&self, dir: Direction, bytes: u64) -> Result<f64> {
+        match dir {
+            Direction::Download => self.download(bytes).await,
+            Direction::Upload => self.upload(bytes).await,
         }
     }
 
-    async fn direction(&self, upload: bool, cfg: &TestConfig) -> Result<DirectionSummary> {
-        let name = if upload { "Upload" } else { "Download" };
+    async fn direction(&self, dir: Direction, cfg: &TestConfig) -> Result<DirectionSummary> {
+        let name = dir.name();
         let stop = Arc::new(AtomicBool::new(false));
         let loaded = Arc::new(Mutex::new(Vec::new()));
 
@@ -249,9 +257,8 @@ impl Runner {
         });
 
         let phase_start = Instant::now();
-        let plans = if upload { &cfg.upload } else { &cfg.download };
         let mut out = Vec::new();
-        for &SizePlan { bytes, iterations } in plans {
+        for &SizePlan { bytes, iterations } in cfg.plans(dir) {
             let mut s = SizeSamples {
                 bytes,
                 mbps: Vec::new(),
@@ -262,7 +269,7 @@ impl Runner {
                     s.skipped = true;
                     break;
                 }
-                match self.sample(upload, bytes).await {
+                match self.sample(dir, bytes).await {
                     Ok(mbps) => {
                         if self.verbose {
                             eprintln!("{name} {} sample {i}: {mbps:.2} Mbps", size_label(bytes));
