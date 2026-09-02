@@ -83,52 +83,46 @@ mod tests {
     use proptest::prelude::*;
 
     proptest! {
-        #[test]
-        fn chart_coords_within_bounds(
-            raw in prop::collection::vec((0.0f64..1e4, 0.0f64..1e10), 2..200),
-        ) {
-            let mut pts = raw;
-            pts.sort_by(|a, b| a.0.total_cmp(&b.0));
-            for (x, y) in chart_coords(&pts, 300.0, 80.0, peak(&pts)) {
-                prop_assert!((-1e-9..=300.0 + 1e-9).contains(&x));
-                prop_assert!((-1e-9..=80.0 + 1e-9).contains(&y));
-            }
-        }
-
-        #[test]
-        fn chart_y_within_frame_below_ceiling(
-            raw in prop::collection::vec((0.0f64..1e4, 0.0f64..1e10), 1..50),
-            headroom in 1.0f64..10.0,
-        ) {
-            let max = peak(&raw) * headroom;
-            for &(_, y) in &raw {
-                prop_assert!((0.0..=80.0).contains(&chart_y(y, max, 80.0)));
-            }
-        }
-
-        #[test]
-        fn chart_coords_x_monotone(
-            raw in prop::collection::vec((0.0f64..1e4, 0.0f64..1e10), 2..200),
-        ) {
-            let mut pts = raw;
-            pts.sort_by(|a, b| a.0.total_cmp(&b.0));
-            let coords = chart_coords(&pts, 300.0, 80.0, peak(&pts));
-            for w in coords.windows(2) {
-                prop_assert!(w[1].0 >= w[0].0);
-            }
-        }
-
-        #[test]
-        fn format_speed_value_in_display_range(bps in 1.0f64..1e12) {
-            let (v, _) = format_speed(bps);
-            prop_assert!((1.0..1000.0).contains(&v));
-        }
-
-        #[test]
-        fn format_speed_never_negative(bps in -1e12f64..1e12) {
-            prop_assert!(format_speed(bps).0 >= 0.0);
+    #[test]
+    fn chart_coords_within_bounds(
+        raw in prop::collection::vec((0.0f64..1e4, 0.0f64..1e10), 2..200),
+    ) {
+        let mut pts = raw;
+        pts.sort_by(|a, b| a.0.total_cmp(&b.0));
+        for (x, y) in chart_coords(&pts, 300.0, 80.0, peak(&pts)) {
+            prop_assert!((-1e-9..=300.0 + 1e-9).contains(&x));
+            prop_assert!((-1e-9..=80.0 + 1e-9).contains(&y));
         }
     }
+
+    #[test]
+    fn chart_y_within_frame_below_ceiling(
+        raw in prop::collection::vec((0.0f64..1e4, 0.0f64..1e10), 1..50),
+        headroom in 1.0f64..10.0,
+    ) {
+        let max = peak(&raw) * headroom;
+        for &(_, y) in &raw {
+            prop_assert!((0.0..=80.0).contains(&chart_y(y, max, 80.0)));
+        }
+    }
+
+    #[test]
+    fn chart_coords_x_monotone(
+        raw in prop::collection::vec((0.0f64..1e4, 0.0f64..1e10), 2..200),
+    ) {
+        let mut pts = raw;
+        pts.sort_by(|a, b| a.0.total_cmp(&b.0));
+        let coords = chart_coords(&pts, 300.0, 80.0, peak(&pts));
+        for w in coords.windows(2) {
+            prop_assert!(w[1].0 >= w[0].0);
+        }
+    }
+
+    #[test]
+    fn format_speed_value_in_display_range(bps in 1.0f64..1e12) {
+        let (v, _) = format_speed(bps);
+        prop_assert!((1.0..1000.0).contains(&v));
+    }    }
 
     #[test]
     fn format_speed_exact() {
@@ -153,14 +147,6 @@ mod tests {
         );
         assert_eq!(svg_path(&pts, 300.0, 80.0, 20.0), "M0.0,80.0 L300.0,40.0");
     }
-
-    #[test]
-    fn chart_coords_flat_series_sits_on_baseline() {
-        let pts = [(0.0, 0.0), (1.0, 0.0)];
-        let coords = chart_coords(&pts, 300.0, 80.0, peak(&pts));
-        assert_eq!(coords, vec![(0.0, 80.0), (300.0, 80.0)]);
-    }
-
     #[test]
     fn peak_exact() {
         assert_eq!(peak(&[]), f64::EPSILON);

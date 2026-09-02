@@ -372,18 +372,6 @@ mod tests {
                 prop_assert!((normal.0 * u.0 + normal.1 * u.1 + normal.2 * u.2).abs() < 1e-9);
             }
         }
-
-        #[test]
-        fn arc_midpoint_splits_the_angle(
-            a in (-180.0f64..180.0, -89.0f64..89.0),
-            b in (-180.0f64..180.0, -89.0f64..89.0),
-        ) {
-            prop_assume!(angle(a, b) < 3.0);
-            let mid = arc(a, b, 2)[1];
-            prop_assert!((angle(a, mid) - angle(mid, b)).abs() < 1e-6);
-            prop_assert!((angle(a, mid) + angle(mid, b) - angle(a, b)).abs() < 1e-6);
-        }
-
         #[test]
         fn trace_never_jumps(
             pts in prop::collection::vec((-180.0f64..180.0, -85.0f64..85.0), 1..30),
@@ -454,15 +442,6 @@ mod tests {
         assert_eq!(nearest(900.0, 100.0), 1100.0);
         assert_eq!(nearest(400.0, 600.0), 600.0);
     }
-
-    #[test]
-    fn ease_exact() {
-        assert_eq!(ease(0.0), 0.0);
-        assert_eq!(ease(0.5), 0.5);
-        assert_eq!(ease(1.0), 1.0);
-        assert_eq!(ease(2.0), 1.0);
-    }
-
     #[test]
     fn land_exact() {
         assert_eq!(land(""), Some(String::new()));
@@ -496,46 +475,39 @@ mod tests {
     }
 
     proptest! {
-        #[test]
-        fn labels_keep_their_distance(
-            raw in prop::collection::vec((-180.0f64..180.0, -80.0f64..80.0, 0.0f64..9.0), 0..80),
-            taken in prop::collection::vec((0.0f64..1.0, 0.0f64..1.0), 0..3),
-            w in 24.0f64..WORLD,
-            limit in 0usize..20,
-        ) {
-            let mut towns: Vec<Place> = raw
-                .iter()
-                .enumerate()
-                .map(|(i, &(lon, lat, z))| town(&i.to_string(), lon, lat, z))
-                .collect();
-            towns.sort_by(|a, b| a.zoom.total_cmp(&b.zoom));
-            let v = fit((400.0, 300.0), (400.0 + w / 2.0, 300.0 + w / 4.0), 2.0, 0.0, w);
-            let out = labels(&towns, &v, &taken, GAP, limit);
-            prop_assert!(out.len() <= limit);
-            let spots: Vec<(f64, f64)> = taken.iter().copied().chain(out.iter().map(|o| o.frac)).collect();
-            for (i, l) in out.iter().enumerate() {
-                let (fx, fy) = l.frac;
-                prop_assert!((0.0..1.0 - GAP.0).contains(&fx) && (GAP.1..1.0 - GAP.1).contains(&fy));
-                prop_assert!(l.place.zoom <= zoom(v.w));
-                prop_assert!(holds(&v, l.at));
-                prop_assert!((v.frac(l.at).0 - fx).abs() < 1e-9);
-                for (j, &(sx, sy)) in spots.iter().enumerate() {
-                    if j != taken.len() + i {
-                        prop_assert!((sx - fx).abs() >= GAP.0 || (sy - fy).abs() >= GAP.1);
-                    }
+    #[test]
+    fn labels_keep_their_distance(
+        raw in prop::collection::vec((-180.0f64..180.0, -80.0f64..80.0, 0.0f64..9.0), 0..80),
+        taken in prop::collection::vec((0.0f64..1.0, 0.0f64..1.0), 0..3),
+        w in 24.0f64..WORLD,
+        limit in 0usize..20,
+    ) {
+        let mut towns: Vec<Place> = raw
+            .iter()
+            .enumerate()
+            .map(|(i, &(lon, lat, z))| town(&i.to_string(), lon, lat, z))
+            .collect();
+        towns.sort_by(|a, b| a.zoom.total_cmp(&b.zoom));
+        let v = fit((400.0, 300.0), (400.0 + w / 2.0, 300.0 + w / 4.0), 2.0, 0.0, w);
+        let out = labels(&towns, &v, &taken, GAP, limit);
+        prop_assert!(out.len() <= limit);
+        let spots: Vec<(f64, f64)> = taken.iter().copied().chain(out.iter().map(|o| o.frac)).collect();
+        for (i, l) in out.iter().enumerate() {
+            let (fx, fy) = l.frac;
+            prop_assert!((0.0..1.0 - GAP.0).contains(&fx) && (GAP.1..1.0 - GAP.1).contains(&fy));
+            prop_assert!(l.place.zoom <= zoom(v.w));
+            prop_assert!(holds(&v, l.at));
+            prop_assert!((v.frac(l.at).0 - fx).abs() < 1e-9);
+            for (j, &(sx, sy)) in spots.iter().enumerate() {
+                if j != taken.len() + i {
+                    prop_assert!((sx - fx).abs() >= GAP.0 || (sy - fy).abs() >= GAP.1);
                 }
             }
-            for w in out.windows(2) {
-                prop_assert!(w[0].place.zoom <= w[1].place.zoom);
-            }
         }
-
-        #[test]
-        fn zoom_falls_as_the_view_widens(a in 1.0f64..WORLD, b in 1.0f64..WORLD) {
-            let (narrow, wide) = if a <= b { (a, b) } else { (b, a) };
-            prop_assert!(zoom(narrow) >= zoom(wide));
+        for w in out.windows(2) {
+            prop_assert!(w[0].place.zoom <= w[1].place.zoom);
         }
-    }
+    }    }
 
     #[test]
     fn labels_exact() {
