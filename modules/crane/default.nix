@@ -37,11 +37,13 @@ lib.fix (crane: {
   fileSetForCrates = crates: lib.fileset.toSource {
     root = ../..;
 
+    # assets hold what the sources embed with include_str
     fileset = lib.fileset.unions ([
       ../../.cargo/config.toml
       ../../Cargo.toml
       ../../Cargo.lock
-    ] ++ lib.map crane.lib.fileset.commonCargoSources crates);
+    ] ++ lib.map crane.lib.fileset.commonCargoSources crates
+    ++ lib.map (crate: lib.fileset.maybeMissing (crate + "/assets")) crates);
   };
 
   # crateNameFromCargoToml parses a manifest literally, so a crate inheriting

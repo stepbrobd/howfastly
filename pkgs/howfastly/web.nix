@@ -19,6 +19,7 @@ let
         ../../crates/howfastly-web
         (lib.fileset.maybeMissing ../../crates/howfastly-web/dist))
       (crane.lib.fileset.commonCargoSources ../../crates/howfastly)
+      ../../crates/howfastly/assets
     ];
   };
 in

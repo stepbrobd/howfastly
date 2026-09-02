@@ -4,6 +4,11 @@ use std::f64::consts::PI;
 pub const WORLD: f64 = 1000.0;
 // web mercator cuts off before the poles
 const MAX_LAT: f64 = 85.051_129;
+// natural earth land rings, country borders and populated places
+// regenerate with assets/gen.nu
+pub const LAND: &str = include_str!("../assets/land.txt");
+pub const BORDERS: &str = include_str!("../assets/borders.txt");
+pub const PLACES: &str = include_str!("../assets/places.txt");
 // labels this close in viewport fractions would overlap
 pub const GAP: (f64, f64) = (0.12, 0.05);
 
@@ -474,6 +479,14 @@ mod tests {
         assert_eq!(borders("1,1 x"), None);
     }
 
+    #[test]
+    fn borders_parse() {
+        let d = borders(BORDERS).unwrap();
+        assert!(d.starts_with('M') && !d.contains('Z'));
+        assert_eq!(d.matches('M').count(), BORDERS.lines().count());
+        assert!(BORDERS.lines().count() > 100);
+    }
+
     fn town(name: &str, lon: f64, lat: f64, zoom: f64) -> Place {
         Place {
             name: name.to_string(),
@@ -580,5 +593,21 @@ mod tests {
         assert_eq!(places("1.7\t139.69\tTokyo\n"), None);
         assert_eq!(places("x\t1\t2\tName\n"), None);
         assert_eq!(places(""), Some(Vec::new()));
+    }
+
+    #[test]
+    fn places_parse_sorted() {
+        let p = places(PLACES).unwrap();
+        assert!(p.len() > 1000);
+        assert!(p.windows(2).all(|w| w[0].zoom <= w[1].zoom));
+        assert!(p.iter().any(|t| t.name == "Grenoble"));
+    }
+
+    #[test]
+    fn land_outline_parses() {
+        let d = land(LAND).unwrap();
+        assert!(d.starts_with('M') && d.ends_with('Z'));
+        assert_eq!(d.matches('M').count(), LAND.lines().count());
+        assert!(LAND.lines().count() > 100);
     }
 }

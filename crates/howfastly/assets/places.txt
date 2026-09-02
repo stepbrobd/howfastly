@@ -1,0 +1,3162 @@
+1.7	-74.0	40.72	New York
+1.7	-0.12	51.5	London
+1.7	18.43	-33.92	Cape Town
+1.7	37.61	55.75	Moscow
+1.7	116.39	39.9	Beijing
+1.7	31.25	30.05	Cairo
+1.7	139.75	35.69	Tokyo
+1.7	72.88	19.07	Mumbai
+1.7	2.35	48.86	Paris
+1.7	-43.21	-22.91	Rio de Janeiro
+1.7	151.21	-33.87	Sydney
+2.0	-118.23	34.05	Los Angeles
+2.0	3.39	6.45	Lagos
+2.0	36.81	-1.28	Nairobi
+2.0	121.43	31.22	Shanghai
+2.0	-70.65	-33.44	Santiago
+2.1	-80.23	25.79	Miami
+2.1	77.2	28.6	New Delhi
+2.1	-123.12	49.28	Vancouver
+2.1	-79.39	43.66	Toronto
+2.1	-58.43	-34.61	Buenos Aires
+2.1	-77.01	38.9	Washington,  D.C.
+2.1	-99.13	19.44	Mexico City
+2.1	106.83	-6.17	Jakarta
+2.1	-74.09	4.6	Bogota
+2.1	103.85	1.29	Singapore
+2.7	-122.4	37.78	San Francisco
+2.7	120.98	14.61	Manila
+2.7	13.4	52.52	Berlin
+2.7	12.48	41.9	Rome
+3.0	166.87	-77.73	McMurdo Station
+3.0	93.01	-66.58	Mirny Station
+3.0	110.54	-66.29	Casey Station
+3.0	-57.03	-63.38	Esperanza Base
+3.0	-70.94	-53.16	Punta Arenas
+3.0	-75.7	45.42	Ottawa
+3.0	-149.89	61.21	Anchorage
+3.0	-95.35	29.74	Houston
+3.0	-84.37	33.74	Atlanta
+3.0	-87.64	41.85	Chicago
+3.0	-66.92	10.5	Caracas
+3.0	-3.69	40.4	Madrid
+3.0	18.07	59.32	Stockholm
+3.0	100.51	13.75	Bangkok
+3.0	-77.05	-12.05	Lima
+3.0	-17.48	14.72	Dakar
+3.0	28.03	-26.17	Johannesburg
+3.0	127.0	37.57	Seoul
+3.0	104.07	30.67	Chengdu
+3.0	135.5	34.69	Ōsaka
+3.0	15.31	-4.33	Kinshasa
+3.0	38.7	9.04	Addis Ababa
+3.0	51.42	35.67	Tehran
+3.0	144.97	-37.82	Melbourne
+3.0	174.76	-36.85	Auckland
+3.0	28.97	41.02	Istanbul
+3.0	-46.63	-23.56	São Paulo
+3.0	114.18	22.31	Hong Kong
+3.7	73.4	54.99	Omsk
+3.7	-148.67	70.29	Prudhoe Bay
+3.7	-21.94	64.14	Reykjavík
+3.7	18.99	69.64	Tromsø
+3.7	33.1	68.97	Murmansk
+3.7	50.15	53.2	Samara
+3.7	104.28	52.28	Irkutsk
+3.7	150.81	59.57	Magadan
+3.7	130.85	-12.43	Darwin
+3.7	138.6	-34.93	Adelaide
+3.7	35.21	31.78	Jerusalem
+3.7	39.82	21.43	Makkah
+3.7	30.31	59.94	St.  Petersburg
+3.7	108.89	34.28	Xian
+3.7	126.65	45.75	Harbin
+3.7	-47.92	-15.78	Brasília
+3.7	-38.48	-12.97	Salvador
+3.7	-34.91	-8.06	Recife
+3.7	115.84	-31.95	Perth
+3.7	-104.99	39.74	Denver
+3.7	30.51	50.44	Kyiv
+3.7	55.29	25.21	Dubai
+3.7	69.27	41.3	Tashkent
+3.7	6.14	46.21	Geneva
+3.7	4.91	52.35	Amsterdam
+3.7	-7.62	33.6	Casablanca
+3.7	-100.33	25.67	Monterrey
+3.7	87.57	43.81	Ürümqi
+3.7	77.56	12.97	Bengaluru
+3.7	23.73	37.99	Athens
+3.7	44.39	33.34	Baghdad
+3.7	69.18	34.52	Kabul
+3.7	16.36	48.2	Vienna
+3.7	121.57	25.04	Taipei
+3.7	46.72	24.63	Riyadh
+3.7	88.37	22.57	Kolkata
+4.0	-68.12	-67.56	Rothera Station
+4.0	-64.05	-64.76	Palmer Station
+4.0	139.96	-66.78	Dumont d'Urville Station
+4.0	-56.19	-34.91	Montevideo
+4.0	-122.68	45.52	Portland
+4.0	-111.93	40.78	Salt Lake City
+4.0	-165.41	64.51	Nome
+4.0	-134.4	58.3	Juneau
+4.0	-147.71	64.84	Fairbanks
+4.0	33.52	44.6	Sevastopol
+4.0	28.28	-15.41	Lusaka
+4.0	31.04	-17.82	Harare
+4.0	168.32	-17.73	Port Vila
+4.0	-58.17	6.8	Georgetown
+4.0	-4.24	55.86	Glasgow
+4.0	-71.97	-13.53	Cusco
+4.0	-79.02	-8.12	Trujillo
+4.0	-57.63	-25.29	Asunción
+4.0	10.42	63.42	Trondheim
+4.0	147.19	-9.46	Port Moresby
+4.0	84.98	56.49	Tomsk
+4.0	40.55	64.57	Archangel
+4.0	44.5	48.71	Volgograd
+4.0	73.43	61.26	Surgut
+4.0	45.36	2.07	Mogadishu
+4.0	123.9	10.32	Cebu
+4.0	129.74	62.03	Yakutsk
+4.0	128.83	71.63	Tiksi
+4.0	-106.09	28.65	Chihuahua
+4.0	-86.83	21.17	Cancún
+4.0	56.25	58.0	Perm
+4.0	106.91	47.92	Ulaanbaatar
+4.0	7.49	9.05	Abuja
+4.0	24.1	56.95	Riga
+4.0	-78.5	-0.21	Quito
+4.0	91.1	29.65	Lhasa
+4.0	79.93	37.1	Hotan
+4.0	123.99	47.35	Qiqihar
+4.0	-52.33	4.93	Cayenne
+4.0	-70.4	-23.65	Antofagasta
+4.0	-73.23	-39.82	Valdivia
+4.0	-51.73	64.2	Nuuk
+4.0	-8.0	12.65	Bamako
+4.0	71.43	51.18	Nur-Sultan
+4.0	-60.0	-3.1	Manaus
+4.0	-97.17	49.88	Winnipeg
+4.0	-94.17	58.77	Churchill
+4.0	-114.08	51.08	Calgary
+4.0	-130.33	54.32	Prince Rupert
+4.0	-86.28	66.53	Naujaat
+4.0	-114.4	62.44	Yellowknife
+4.0	-135.05	60.72	Whitehorse
+4.0	-71.25	46.84	Québec
+4.0	-63.6	44.65	Halifax
+4.0	-52.68	47.58	St. John's
+4.0	-64.18	-31.4	Córdoba
+4.0	-68.15	-16.5	La Paz
+4.0	149.13	-35.28	Canberra
+4.0	153.03	-27.45	Brisbane
+4.0	174.78	-41.29	Wellington
+4.0	172.63	-43.54	Christchurch
+4.0	-93.25	44.98	Minneapolis
+4.0	-157.86	21.3	Honolulu
+4.0	-122.32	47.6	Seattle
+4.0	-112.07	33.45	Phoenix
+4.0	-117.15	32.72	San Diego
+4.0	-90.24	38.64	St. Louis
+4.0	-90.09	29.97	New Orleans
+4.0	-96.79	32.77	Dallas
+4.0	-71.66	10.73	Maracaibo
+4.0	-71.07	42.33	Boston
+4.0	-83.05	42.33	Detroit
+4.0	105.85	21.04	Hanoi
+4.0	106.7	10.76	Ho Chi Minh City
+4.0	32.86	39.93	Ankara
+4.0	44.2	15.36	Sanaa
+4.0	2.18	41.39	Barcelona
+4.0	26.1	44.44	Bucharest
+4.0	-9.15	38.72	Lisbon
+4.0	32.53	15.59	Khartoum
+4.0	39.22	21.52	Jeddah
+4.0	10.75	59.92	Oslo
+4.0	74.35	31.56	Lahore
+4.0	66.99	24.87	Karachi
+4.0	31.01	-29.86	Durban
+4.0	-103.33	20.67	Guadalajara
+4.0	-98.2	19.03	Puebla
+4.0	21.01	52.23	Warsaw
+4.0	39.27	-6.8	Dar es Salaam
+4.0	98.65	3.58	Medan
+4.0	-6.26	53.35	Dublin
+4.0	-10.8	6.31	Monrovia
+4.0	101.69	3.14	Kuala Lumpur
+4.0	103.79	36.06	Lanzhou
+4.0	108.32	22.82	Nanning
+4.0	106.59	29.57	Chongqing
+4.0	113.26	23.12	Guangzhou
+4.0	112.75	-7.25	Surabaya
+4.0	-75.58	6.28	Medellín
+4.0	-76.5	3.4	Cali
+4.0	-82.37	23.13	Havana
+4.0	29.95	31.2	Alexandria
+4.0	8.68	50.1	Frankfurt
+4.0	47.98	29.37	Kuwait City
+4.0	112.54	37.88	Taiyuan
+4.0	114.27	30.58	Wuhan
+4.0	102.7	25.04	Kunming
+4.0	113.66	34.76	Zhengzhou
+4.0	123.45	41.81	Shenyeng
+4.0	116.99	36.68	Jinan
+4.0	117.2	39.08	Tianjin
+4.0	118.78	32.05	Nanjing
+4.0	120.17	30.25	Hangzhou
+4.0	132.44	34.39	Hiroshima
+4.0	125.34	43.87	Changchun
+4.0	109.82	40.65	Baotou
+4.0	141.34	43.08	Sapporo
+4.0	-69.93	18.47	Santo Domingo
+4.0	-0.22	5.55	Accra
+4.0	77.23	28.67	Delhi
+4.0	78.48	17.4	Hyderabad
+4.0	73.85	18.52	Pune
+4.0	79.09	21.17	Nagpur
+4.0	13.18	32.89	Tripoli
+4.0	34.77	32.08	Tel Aviv
+4.0	24.93	60.16	Helsinki
+4.0	59.57	36.27	Mashhad
+4.0	75.81	26.92	Jaipur
+4.0	80.32	26.46	Kanpur
+4.0	80.28	13.09	Chennai
+4.0	72.84	21.2	Surat
+4.0	12.56	55.68	København
+4.0	-4.02	5.32	Abidjan
+4.0	-48.48	-1.45	Belém
+4.0	-51.2	-30.05	Porto Alegre
+4.0	-49.32	-25.42	Curitiba
+4.0	-38.58	-3.75	Fortaleza
+4.0	-113.5	53.55	Edmonton
+4.0	-73.59	45.5	Montréal
+4.0	90.41	23.73	Dhaka
+4.0	13.23	-8.84	Luanda
+4.0	3.05	36.77	Algiers
+4.0	91.8	22.33	Chattogram
+4.0	96.16	16.79	Yangon
+4.7	-0.4	39.49	Valencia
+4.7	101.77	36.62	Xining
+4.7	4.83	45.77	Lyon
+4.7	20.06	32.12	Banghazi
+4.7	-65.26	-19.04	Sucre
+4.7	114.06	22.55	Shenzhen
+4.7	118.0	36.82	Zibo
+4.7	19.08	47.5	Budapest
+4.7	37.17	36.23	Aleppo
+4.7	36.3	33.5	Damascus
+4.7	8.55	47.38	Zürich
+4.7	8.52	12.0	Kano
+4.7	125.75	39.02	Pyongyang
+4.7	14.24	40.84	Naples
+4.7	9.2	45.47	Milan
+4.7	106.72	26.58	Guiyang
+4.7	119.3	26.08	Fuzhou
+4.7	107.57	-6.95	Bandung
+4.7	-79.92	-2.22	Guayaquil
+4.7	11.57	48.13	Munich
+4.7	14.42	50.09	Prague
+4.7	112.97	28.2	Changsha
+4.7	115.88	28.68	Nanchang
+4.7	85.13	25.63	Patna
+4.7	72.58	23.03	Ahmedabad
+4.7	-49.3	-16.72	Goiânia
+4.7	4.33	50.84	Brussels
+5.0	7.45	51.53	Dortmund
+5.0	-56.65	-64.23	Marambio Base
+5.0	-58.91	-62.18	Base Presidente Montalva
+5.0	-58.97	-62.22	Great Wall Station
+5.0	176.99	-90.0	Amundsen–Scott South Pole Station
+5.0	-84.55	42.73	Lansing
+5.0	6.95	50.93	Cologne
+5.0	-122.77	53.92	Prince George
+5.0	-2.25	53.48	Manchester
+5.0	-124.15	40.79	Eureka
+5.0	-77.45	37.55	Richmond
+5.0	37.83	48.0	Donetsk
+5.0	-1.92	52.48	Birmingham
+5.0	-5.93	54.59	Belfast
+5.0	-2.93	43.25	Bilbao
+5.0	20.5	54.7	Kaliningrad
+5.0	45.7	43.32	Grozny
+5.0	18.64	54.36	Gdańsk
+5.0	94.66	40.14	Dunhuang
+5.0	94.88	36.42	Golmud
+5.0	13.75	51.05	Dresden
+5.0	88.88	29.25	Xigaze
+5.0	102.3	27.88	Xichang
+5.0	120.33	36.09	Qingdao
+5.0	-0.6	44.85	Bordeaux
+5.0	5.37	43.29	Marseille
+5.0	0.1	49.5	Le Havre
+5.0	51.92	47.11	Atyrau
+5.0	122.23	-17.96	Broome
+5.0	117.89	-35.02	Albany
+5.0	114.6	-28.77	Geraldton
+5.0	146.04	-34.29	Griffith
+5.0	148.6	-32.26	Dubbo
+5.0	137.56	-33.03	Whyalla
+5.0	141.59	-38.34	Portland
+5.0	142.65	-25.43	Windorah
+5.0	145.76	-16.89	Cairns
+5.0	153.45	-28.08	Gold Coast
+5.0	176.93	-39.49	Napier
+5.0	175.29	-37.78	Hamilton
+5.0	173.95	-41.51	Blenheim
+5.0	170.49	-45.89	Dunedin
+5.0	75.77	11.25	Kozhikode
+5.0	85.83	20.27	Bhubaneswar
+5.0	86.2	22.79	Jamshedpur
+5.0	-112.04	46.59	Helena
+5.0	-100.78	46.81	Bismarck
+5.0	-116.23	43.61	Boise
+5.0	-121.89	37.33	San Jose
+5.0	-121.47	38.58	Sacramento
+5.0	-115.15	36.16	Las Vegas
+5.0	-105.94	35.69	Santa Fe
+5.0	-104.82	41.14	Cheyenne
+5.0	-93.62	41.58	Des Moines
+5.0	-96.01	41.24	Omaha
+5.0	-97.52	35.47	Oklahoma City
+5.0	-100.35	44.37	Pierre
+5.0	-98.49	29.42	San Antonio
+5.0	-72.25	7.77	San Cristóbal
+5.0	-67.98	10.23	Valencia
+5.0	-90.18	32.3	Jackson
+5.0	-78.65	35.77	Raleigh
+5.0	-81.7	41.47	Cleveland
+5.0	-84.46	39.16	Cincinnati
+5.0	-86.78	36.17	Nashville
+5.0	-90.03	35.14	Memphis
+5.0	-87.92	43.03	Milwaukee
+5.0	-78.88	42.88	Buffalo
+5.0	-80.0	40.43	Pittsburgh
+5.0	-62.62	8.37	Ciudad Guayana
+5.0	1.22	6.13	Lomé
+5.0	10.18	36.8	Tunis
+5.0	-152.41	57.79	Kodiak
+5.0	-162.72	55.2	Cold Bay
+5.0	-161.76	60.79	Bethel
+5.0	-166.81	68.35	Point Hope
+5.0	-156.79	71.29	Utqiaġvik
+5.0	-146.35	61.14	Valdez
+5.0	54.37	24.47	Abu Dhabi
+5.0	58.38	37.95	Ashgabat
+5.0	66.94	39.67	Samarkand
+5.0	28.58	-20.17	Bulawayo
+5.0	125.58	-8.56	Dili
+5.0	-87.22	14.1	Tegucigalpa
+5.0	-72.34	18.54	Port-au-Prince
+5.0	32.58	0.32	Kampala
+5.0	45.01	12.78	Aden
+5.0	-55.17	5.84	Paramaribo
+5.0	-5.98	37.41	Seville
+5.0	8.98	13.8	Zinder
+5.0	2.11	13.52	Niamey
+5.0	37.22	19.62	Port Sudan
+5.0	68.77	38.56	Dushanbe
+5.0	-70.25	-18.0	Tacna
+5.0	-75.73	-14.07	Ica
+5.0	-86.27	12.15	Managua
+5.0	-13.24	8.47	Freetown
+5.0	7.98	17.0	Agadez
+5.0	24.89	12.06	Nyala
+5.0	27.99	7.7	Wau
+5.0	30.48	19.17	Dongola
+5.0	36.39	15.46	Kassala
+5.0	5.32	60.39	Bergen
+5.0	73.08	33.69	Islamabad
+5.0	71.45	30.2	Multan
+5.0	68.37	25.38	Hyderabad
+5.0	71.53	34.01	Peshawar
+5.0	85.31	27.72	Kathmandu
+5.0	40.72	-14.52	Nacala
+5.0	26.23	-29.12	Bloemfontein
+5.0	28.23	-25.7	Pretoria
+5.0	159.95	-9.44	Honiara
+5.0	-79.53	8.97	Panama City
+5.0	-5.0	34.06	Fez
+5.0	-6.84	34.03	Rabat
+5.0	-8.0	31.63	Marrakesh
+5.0	28.86	47.01	Chișinău
+5.0	34.87	-19.82	Beira
+5.0	25.6	-33.97	Port Elizabeth
+5.0	32.59	-25.95	Maputo
+5.0	177.47	64.74	Anadyr
+5.0	44.0	56.33	Nizhny Novgorod
+5.0	56.04	54.79	Ufa
+5.0	60.6	56.85	Yekaterinburg
+5.0	49.12	55.75	Kazan
+5.0	83.75	53.35	Barnaul
+5.0	82.96	55.03	Novosibirsk
+5.0	58.38	23.59	Muscat
+5.0	79.86	6.93	Colombo
+5.0	122.55	10.71	Iloilo
+5.0	125.63	7.11	Davao
+5.0	101.62	56.16	Bratsk
+5.0	92.86	56.02	Krasnoyarsk
+5.0	80.55	73.51	Dikson
+5.0	113.47	52.06	Chita
+5.0	131.91	43.13	Vladivostok
+5.0	136.07	71.43	Nizhneyansk
+5.0	-117.08	32.5	Tijuana
+5.0	-106.42	23.22	Mazatlán
+5.0	-97.87	22.3	Tampico
+5.0	-99.92	16.85	Acapulco
+5.0	-96.16	19.18	Veracruz
+5.0	-93.15	16.75	Tuxtla Gutiérrez
+5.0	-89.62	20.97	Mérida
+5.0	7.5	6.45	Enugu
+5.0	5.24	13.06	Sokoto
+5.0	104.12	49.05	Erdenet
+5.0	33.43	-8.89	Mbeya
+5.0	17.08	-22.57	Windhoek
+5.0	18.12	-19.57	Grootfontein
+5.0	39.2	-6.16	Zanzibar
+5.0	159.95	59.08	Palana
+5.0	158.62	53.06	Petropavlovsk-Kamchatsky
+5.0	100.36	-0.96	Padang
+5.0	-15.6	11.87	Bissau
+5.0	13.35	38.13	Palermo
+5.0	35.93	31.95	Amman
+5.0	25.32	54.68	Vilnius
+5.0	74.58	42.88	Bishkek
+5.0	98.3	39.82	Jiayuguan
+5.0	110.28	25.28	Guilin
+5.0	116.98	32.63	Huainan
+5.0	116.67	23.37	Shantou
+5.0	117.63	3.3	Tarakan
+5.0	39.69	-4.04	Mombasa
+5.0	27.48	-29.32	Maseru
+5.0	47.51	-18.91	Antananarivo
+5.0	110.42	-6.96	Semarang
+5.0	104.75	-2.98	Palembang
+5.0	114.58	-3.33	Bandjarmasin
+5.0	119.43	-5.14	Makassar
+5.0	-84.08	9.93	San José
+5.0	-89.22	13.7	San Salvador
+5.0	-76.77	17.98	Kingston
+5.0	-75.52	10.4	Cartagena
+5.0	-70.17	1.2	Mitú
+5.0	22.46	2.19	Bumba
+5.0	15.05	12.12	N'Djamena
+5.0	20.83	13.84	Abéché
+5.0	8.78	3.75	Malabo
+5.0	32.65	25.7	Luxor
+5.0	38.93	15.33	Asmara
+5.0	16.0	45.8	Zagreb
+5.0	24.73	59.43	Tallinn
+5.0	93.52	42.83	Hami
+5.0	75.97	39.48	Kashgar
+5.0	106.27	38.47	Yinchuan
+5.0	113.85	27.62	Pingxiang
+5.0	129.89	32.76	Nagasaki
+5.0	18.85	-5.03	Kikwit
+5.0	13.45	-5.82	Matadi
+5.0	25.47	-10.72	Kolwezi
+5.0	27.48	-11.68	Lubumbashi
+5.0	33.78	-13.98	Lilongwe
+5.0	-90.53	14.62	Guatemala City
+5.0	9.46	0.39	Libreville
+5.0	83.22	17.68	Vishakhapatnam
+5.0	178.44	-18.13	Suva
+5.0	8.78	-0.72	Port-Gentil
+5.0	-3.02	16.77	Timbuktu
+5.0	-70.13	-20.25	Iquique
+5.0	-71.62	-33.05	Valparaíso
+5.0	-73.05	-36.83	Concepción
+5.0	-72.93	-41.47	Puerto Montt
+5.0	-15.98	18.09	Nouakchott
+5.0	-13.05	20.52	Atar
+5.0	-4.55	13.9	Djenné
+5.0	14.43	27.03	Sabha
+5.0	22.88	40.7	Thessaloniki
+5.0	35.51	33.87	Beirut
+5.0	44.79	41.73	Tbilisi
+5.0	37.46	12.61	Gondar
+5.0	73.12	49.88	Qaraghandy
+5.0	76.91	43.33	Almaty
+5.0	51.7	32.7	Isfahan
+5.0	52.57	29.63	Shiraz
+5.0	74.87	31.64	Amritsar
+5.0	83.0	25.33	Varanasi
+5.0	86.98	23.69	Asansol
+5.0	81.37	21.21	Bhilai
+5.0	77.41	23.25	Bhopal
+5.0	78.12	9.92	Madurai
+5.0	76.95	11.0	Coimbatore
+5.0	102.6	17.97	Vientiane
+5.0	15.28	-4.26	Brazzaville
+5.0	-13.68	9.53	Conakry
+5.0	-5.28	6.82	Yamoussoukro
+5.0	-72.67	-7.63	Cruzeiro do Sul
+5.0	-69.96	-4.2	Leticia
+5.0	-43.35	-4.83	Caxias
+5.0	-54.7	-2.43	Santarém
+5.0	-49.12	-5.35	Marabá
+5.0	-60.12	-12.72	Vilhena
+5.0	-61.97	-10.83	Ji-Paraná
+5.0	-54.62	-20.45	Campo Grande
+5.0	-48.52	-27.58	Florianópolis
+5.0	-38.97	-12.25	Feira de Santana
+5.0	-104.62	50.45	Regina
+5.0	-106.67	52.17	Saskatoon
+5.0	-123.35	48.43	Victoria
+5.0	-85.17	73.03	Arctic Bay
+5.0	-94.9	74.68	Resolute
+5.0	-128.63	66.27	Fort Good Hope
+5.0	-60.67	2.82	Boa Vista
+5.0	-51.05	0.03	Macapá
+5.0	-87.65	55.98	Fort Severn
+5.0	-89.27	48.45	Thunder Bay
+5.0	-61.69	56.55	Nain
+5.0	-63.13	46.25	Charlottetown
+5.0	20.65	8.41	N'Délé
+5.0	20.47	44.82	Belgrade
+5.0	26.5	5.4	Obo
+5.0	114.93	4.88	Bandar Seri Begawan
+5.0	-65.9	-47.75	Puerto Deseado
+5.0	-69.22	-51.63	Río Gallegos
+5.0	-67.5	-45.87	Comodoro Rivadavia
+5.0	-68.82	-32.88	Mendoza
+5.0	-66.1	-10.98	Riberalta
+5.0	-62.27	-38.74	Bahía Blanca
+5.0	-57.58	-38.0	Mar del Plata
+5.0	-55.89	-27.36	Posadas
+5.0	-88.77	17.25	Belmopan
+5.0	18.56	4.37	Bangui
+5.0	14.32	10.6	Maroua
+5.0	11.51	3.87	Yaoundé
+5.0	19.82	41.33	Tirana
+5.0	44.51	40.18	Yerevan
+5.0	49.86	40.4	Baku
+5.0	65.69	31.61	Kandahar
+5.0	104.91	11.55	Phnom Penh
+5.0	17.7	-14.67	Menongue
+5.0	15.76	-12.75	Huambo
+5.0	-63.23	-17.75	Santa Cruz
+5.0	-0.62	35.71	Oran
+5.0	2.4	6.36	Cotonou
+5.0	5.52	22.79	Tamanrasset
+5.0	3.67	32.49	Ghardaia
+5.0	23.31	42.69	Sofia
+5.0	27.56	53.9	Minsk
+5.0	89.64	27.47	Thimphu
+5.0	25.91	-24.65	Gaborone
+5.0	133.88	-23.7	Alice Springs
+5.0	151.77	-32.93	Newcastle
+5.0	146.77	-19.25	Townsville
+5.0	147.3	-42.85	Hobart
+5.0	-1.53	12.37	Ouagadougou
+5.0	18.38	43.85	Sarajevo
+5.0	96.12	19.77	Naypyidaw
+5.0	-66.13	18.44	San Juan
+5.0	-57.85	-51.7	Stanley
+5.0	-64.78	32.29	Hamilton
+5.0	-175.22	-21.14	Nuku'alofa
+5.0	44.07	9.56	Hargeisa
+5.0	55.45	-4.62	Victoria
+5.0	6.73	0.34	São Tomé
+5.0	-171.77	-13.84	Apia
+5.0	14.51	35.9	Valletta
+5.0	73.51	4.17	Malé
+5.0	-23.52	14.92	Praia
+5.0	-77.35	25.08	Nassau
+5.0	33.37	35.17	Nicosia
+5.0	120.27	22.63	Kaohsiung
+5.0	-82.46	27.95	Tampa
+5.0	-75.18	39.95	Philadelphia
+5.0	10.0	53.55	Hamburg
+5.1	12.86	56.67	Halmstad
+5.1	-3.53	50.7	Exeter
+5.1	-1.17	52.94	Nottingham
+5.1	5.12	52.1	Utrecht
+5.1	37.84	51.3	Starsy Oskol
+5.1	64.75	60.14	Uray
+5.1	16.9	52.41	Poznań
+5.1	18.67	50.33	Gliwice
+5.1	16.87	41.11	Bari
+5.1	9.72	52.37	Hanover
+5.1	18.25	49.83	Ostrava
+5.1	-1.59	47.21	Nantes
+5.1	6.2	48.68	Nancy
+5.1	-92.33	34.74	Little Rock
+5.1	-86.82	33.53	Birmingham
+5.1	-5.35	36.13	Gibraltar
+5.1	14.17	57.77	Jönköping
+5.1	-3.22	55.95	Edinburgh
+5.1	-1.61	54.99	Newcastle
+5.1	-3.17	51.48	Cardiff
+5.1	30.42	40.8	Adapazarı
+5.1	-8.62	41.15	Porto
+5.1	69.0	61.0	Khanty Mansiysk
+5.1	76.58	60.93	Nizhenvartovsk
+5.1	68.26	58.2	Tobolsk
+5.1	7.26	43.72	Nice
+5.1	-85.75	38.23	Louisville
+5.1	-80.83	35.21	Charlotte
+5.1	-82.99	39.98	Columbus
+5.1	-73.76	42.65	Albany
+5.1	-70.25	43.67	Portland
+5.1	15.63	58.41	Linköping
+5.1	17.64	59.86	Uppsala
+5.1	10.5	61.13	Lillehammer
+5.1	39.64	52.62	Lipetsk
+5.1	11.98	57.71	Göteborg
+5.1	8.93	44.41	Genoa
+5.1	49.63	37.3	Rasht
+5.1	7.41	43.74	Monaco
+5.1	-77.62	43.17	Rochester
+5.1	117.57	34.88	Zaozhuang
+5.1	-96.79	46.88	Fargo
+5.1	-155.08	19.71	Hilo
+5.1	-117.42	47.67	Spokane
+5.1	-111.65	35.2	Flagstaff
+5.1	-110.89	32.21	Tucson
+5.1	-119.77	36.75	Fresno
+5.1	-119.82	39.53	Reno
+5.1	-106.64	35.1	Albuquerque
+5.1	-95.67	39.05	Topeka
+5.1	-94.61	39.11	Kansas City
+5.1	-97.34	32.74	Ft.  Worth
+5.1	-97.74	30.27	Austin
+5.1	-106.51	31.78	El Paso
+5.1	-81.38	28.51	Orlando
+5.1	-81.67	30.33	Jacksonville
+5.1	-81.11	32.02	Savannah
+5.1	-86.17	39.75	Indianapolis
+5.1	-77.95	34.23	Wilmington
+5.1	-81.63	38.35	Charleston
+5.1	-61.52	10.65	Port-of-Spain
+5.1	-84.35	46.5	Sault Ste. Marie
+5.1	44.04	13.61	Taizz
+5.1	-135.33	57.06	Sitka
+5.1	24.03	49.83	Lviv
+5.1	30.71	46.49	Odessa
+5.1	35.0	48.48	Dnipro
+5.1	36.25	50.0	Kharkiv
+5.1	64.43	39.78	Bukhara
+5.1	61.83	37.6	Mary
+5.1	72.34	40.79	Andijan
+5.1	27.15	38.44	İzmir
+5.1	29.07	40.2	Bursa
+5.1	35.32	37.0	Adana
+5.1	30.06	-1.95	Kigali
+5.1	22.16	65.6	Luleå
+5.1	17.32	62.4	Sundsvall
+5.1	-74.53	-8.37	Pucallpa
+5.1	-73.25	-3.75	Iquitos
+5.1	39.58	24.5	Medina
+5.1	31.58	4.83	Juba
+5.1	17.12	48.15	Bratislava
+5.1	23.69	70.66	Hammerfest
+5.1	26.73	-27.97	Welkom
+5.1	25.01	-31.5	Middelburg
+5.1	28.33	57.83	Pskov
+5.1	34.43	53.26	Bryansk
+5.1	32.05	54.78	Smolensk
+5.1	34.36	61.78	Petrozavodsk
+5.1	39.92	59.21	Vologda
+5.1	39.87	57.62	Yaroslavl
+5.1	39.71	47.24	Rostov
+5.1	39.73	43.59	Sochi
+5.1	39.0	45.02	Krasnodar
+5.1	45.0	53.18	Penza
+5.1	39.19	51.67	Voronezh
+5.1	58.98	53.42	Magnitogorsk
+5.1	61.44	55.16	Chelyabinsk
+5.1	49.67	58.59	Kirov
+5.1	59.97	57.92	Nizhny Tagil
+5.1	48.05	46.35	Astrakhan
+5.1	55.11	51.78	Orenburg
+5.1	46.03	51.58	Saratov
+5.1	87.11	53.75	Novokuznetsk
+5.1	86.09	55.34	Kemerovo
+5.1	127.42	36.34	Daejeon
+5.1	113.96	62.54	Mirny
+5.1	123.37	66.77	Zhigansk
+5.1	143.22	59.38	Okhotsk
+5.1	142.74	46.96	Yuzhno Sakhalinsk
+5.1	-96.67	17.08	Oaxaca
+5.1	3.93	7.38	Ibadan
+5.1	19.96	50.06	Kraków
+5.1	13.02	55.6	Malmö
+5.1	100.33	5.41	George Town
+5.1	113.58	24.8	Shaoguan
+5.1	43.69	-23.36	Toliara
+5.1	-75.82	20.03	Santiago de Cuba
+5.1	-61.39	15.3	Roseau
+5.1	81.35	43.9	Yining
+5.1	111.21	35.62	Houma
+5.1	103.15	23.38	Gejiu
+5.1	114.48	36.58	Handan
+5.1	121.63	38.92	Dalian
+5.1	120.65	28.02	Wenzhou
+5.1	121.55	29.88	Ningbo
+5.1	127.67	26.21	Naha
+5.1	111.66	40.82	Hohhot
+5.1	130.35	46.83	Jiamusi
+5.1	125.0	46.58	Daqing
+5.1	136.91	35.16	Nagoya
+5.1	144.37	42.97	Kushiro
+5.1	135.75	35.03	Kyoto
+5.1	140.87	38.27	Sendai
+5.1	29.22	-1.68	Goma
+5.1	74.22	16.7	Kolhapur
+5.1	-0.05	16.27	Gao
+5.1	-45.42	61.17	Narsarsuaq
+5.1	-53.67	66.95	Sisimiut
+5.1	-56.14	72.71	Upernavik
+5.1	44.39	35.47	Kirkuk
+5.1	25.72	66.5	Rovaniemi
+5.1	21.6	63.1	Vaasa
+5.1	23.75	61.5	Tampere
+5.1	48.72	31.28	Ahvaz
+5.1	47.81	30.52	Basra
+5.1	46.3	38.09	Tabriz
+5.1	79.83	11.93	Puducherry
+5.1	-9.31	10.39	Kankan
+5.1	-8.83	7.76	Nzérékoré
+5.1	-63.9	-8.75	Porto Velho
+5.1	-43.92	-19.91	Belo Horizonte
+5.1	-56.09	-15.57	Cuiabá
+5.1	-111.88	60.0	Fort Smith
+5.1	-120.83	56.25	Fort St. John
+5.1	-68.5	63.75	Iqaluit
+5.1	-139.42	64.07	Dawson City
+5.1	12.33	45.44	Venice
+5.1	-65.1	-43.3	Rawson
+5.1	-68.06	-38.95	Neuquén
+5.1	-64.3	-36.62	Santa Rosa
+5.1	-60.67	-32.95	Rosario
+5.1	62.17	34.33	Herat
+5.1	67.1	36.7	Mazar-i-Sharif
+5.1	23.7	52.1	Brest
+5.1	121.46	-30.74	Kalgoorlie
+5.1	118.61	-20.31	Port Hedland
+5.1	141.43	-31.95	Broken Hill
+5.1	139.49	-20.72	Mount Isa
+5.1	-61.22	13.16	Kingstown
+5.1	-15.43	28.1	Las Palmas
+5.1	-61.74	12.05	Saint George's
+5.1	-61.85	17.12	Saint John's
+5.6	14.13	56.03	Kristianstad
+5.6	115.18	-8.72	Kuta
+5.6	6.78	51.22	Düsseldorf
+5.6	-1.55	53.79	Leeds
+5.6	-117.3	34.12	San Bernardino
+5.6	-73.2	41.18	Bridgeport
+5.6	74.18	32.16	Gujranwala
+5.6	126.64	37.48	Incheon
+5.6	5.62	6.34	Benin City
+5.6	118.08	24.45	Xiamen
+5.6	106.13	30.78	Nanchong
+5.6	105.05	29.58	Neijiang
+5.6	112.53	33.0	Nanyang
+5.6	120.83	40.75	Jinxi
+5.6	121.4	37.53	Yantai
+5.6	120.62	31.3	Suzhou
+5.6	117.18	34.28	Xuzhou
+5.6	120.3	31.58	Wuxi
+5.6	126.55	43.85	Jilin
+5.6	76.78	30.72	Chandigarh
+5.6	74.84	32.71	Jammu
+5.6	75.9	17.67	Sholapur
+5.6	75.33	19.86	Aurangabad
+5.6	73.78	20.0	Nasik
+5.6	91.77	26.14	Dispur
+5.6	75.57	31.34	Jullundur
+5.6	81.84	25.46	Allahabad
+5.6	78.75	28.84	Moradabad
+5.6	77.41	28.66	Ghaziabad
+5.6	78.01	27.17	Agra
+5.6	78.06	27.89	Aligarh
+5.6	77.7	29.0	Meerut
+5.6	86.42	23.8	Dhanbad
+5.6	78.17	26.2	Gwalior
+5.6	73.18	22.31	Vadodara
+5.6	70.8	22.31	Rajkot
+5.6	-56.51	-33.41	Durazno
+5.6	-93.41	48.6	International Falls
+5.6	-93.08	44.94	St.  Paul
+5.6	-108.54	45.79	Billings
+5.6	-111.3	47.5	Great Falls
+5.6	-113.99	46.87	Missoula
+5.6	-101.3	48.23	Minot
+5.6	-122.9	47.04	Olympia
+5.6	-122.64	45.63	Vancouver
+5.6	-119.72	34.41	Santa Barbara
+5.6	-104.79	38.86	Colorado Springs
+5.6	-115.76	40.83	Elko
+5.6	-123.02	44.93	Salem
+5.6	-106.32	42.85	Casper
+5.6	-95.93	36.12	Tulsa
+5.6	-96.73	43.55	Sioux Falls
+5.6	-93.77	32.5	Shreveport
+5.6	-91.14	30.46	Baton Rouge
+5.6	-97.4	27.74	Corpus Christi
+5.6	-101.83	35.23	Amarillo
+5.6	-99.51	27.51	Laredo
+5.6	-71.18	8.57	Mérida
+5.6	-73.21	44.48	Burlington
+5.6	-86.28	32.36	Montgomery
+5.6	-84.28	30.45	Tallahassee
+5.6	-81.03	34.0	Columbia
+5.6	-83.92	35.97	Knoxville
+5.6	-76.61	39.28	Baltimore
+5.6	-76.15	43.05	Syracuse
+5.6	-67.62	5.66	Puerto Ayacucho
+5.6	-69.78	44.31	Augusta
+5.6	1.12	7.53	Atakpamé
+5.6	10.63	35.83	Sousse
+5.6	28.66	50.25	Zhytomyr
+5.6	52.97	40.02	Türkmenbaşy
+5.6	59.62	42.47	Nukus
+5.6	63.58	39.11	Türkmenabat
+5.6	106.68	20.83	Haiphong
+5.6	108.25	16.06	Da Nang
+5.6	28.45	-14.44	Kabwe
+5.6	28.26	-12.55	Mufulira
+5.6	28.22	-12.81	Kitwe
+5.6	25.86	-17.86	Livingstone
+5.6	31.1	-18.0	Chitungwiza
+5.6	9.71	4.06	Douala
+5.6	36.34	41.28	Samsun
+5.6	32.47	37.88	Konya
+5.6	32.28	2.78	Gulu
+5.6	-54.23	3.85	Cottica
+5.6	-4.77	37.88	Córdoba
+5.6	7.1	13.49	Niamey
+5.6	5.26	14.9	Tahoua
+5.6	28.61	44.2	Constanța
+5.6	27.57	47.17	Iași
+5.6	99.34	9.15	Surat Thani
+5.6	98.98	18.8	Chiang Mai
+5.6	102.1	15.0	Nakhon Ratchasima
+5.6	31.13	-26.32	Mbabane
+5.6	-80.63	-5.21	Piura
+5.6	-71.53	-16.42	Arequipa
+5.6	-78.57	-9.07	Chimbote
+5.6	-75.2	-12.08	Huancayo
+5.6	-54.62	-25.52	Ciudad del Este
+5.6	-25.67	37.75	Ponta Delgada
+5.6	-8.73	42.22	Vigo
+5.6	-16.1	14.15	Kaolack
+5.6	-13.5	16.15	Kaédi
+5.6	22.44	13.45	Geneina
+5.6	36.55	28.38	Tabuk
+5.6	31.66	9.54	Malakal
+5.6	32.48	15.62	Omdurman
+5.6	30.22	13.18	Al-Ubayyid
+5.6	4.27	52.08	The Hague
+5.6	7.97	58.15	Kristiansand
+5.6	14.51	46.06	Ljubljana
+5.6	51.53	25.29	Doha
+5.6	67.02	30.22	Quetta
+5.6	68.21	27.56	Larkana
+5.6	17.88	-29.67	Springbok
+5.6	21.23	-28.46	Upington
+5.6	19.44	-33.64	Worcester
+5.6	22.45	-33.95	George
+5.6	33.58	-16.17	Tete
+5.6	40.53	-12.98	Pemba
+5.6	39.29	-15.14	Nampula
+5.6	33.64	-25.04	Xai-Xai
+5.6	145.39	-6.08	Goroka
+5.6	144.22	-5.86	Mt.  Hagen
+5.6	152.14	-4.21	Rabaul
+5.6	146.99	-6.73	Lae
+5.6	-82.43	8.43	David
+5.6	-1.91	34.69	Oujda
+5.6	-9.24	32.32	Safi
+5.6	19.27	42.47	Podgorica
+5.6	36.89	-17.88	Quelimane
+5.6	27.87	-32.97	East London
+5.6	43.62	43.5	Nalchik
+5.6	41.98	45.05	Stavropol
+5.6	177.7	64.73	Ugolnye Kopi
+5.6	35.89	56.86	Tver
+5.6	39.72	54.62	Ryazan
+5.6	64.01	67.5	Vorkuta
+5.6	48.41	54.33	Ulyanovsk
+5.6	65.53	57.14	Tyumen
+5.6	80.67	7.28	Kandy
+5.6	79.95	6.9	Sri Jayawardenepura Kotte
+5.6	126.91	35.17	Gwangju
+5.6	129.01	35.1	Busan
+5.6	122.08	6.92	Zamboanga
+5.6	120.59	18.2	Laoag
+5.6	120.57	16.43	Baguio
+5.6	125.17	6.11	General Santos
+5.6	102.63	57.99	Ust-Ilimsk
+5.6	103.92	52.56	Angarsk
+5.6	91.45	53.7	Abakan
+5.6	88.22	69.34	Norilsk
+5.6	102.47	72.04	Khatanga
+5.6	94.38	51.71	Kyzyl
+5.6	107.62	51.82	Ulan-Ude
+5.6	127.53	50.27	Blagoveshchensk
+5.6	116.92	52.98	Bukachacha
+5.6	135.52	44.54	Dalnegorsk
+5.6	162.33	69.65	Ambarchik
+5.6	134.64	67.66	Batagay
+5.6	147.89	70.62	Chokurdakh
+5.6	143.2	64.57	Ust-Nera
+5.6	114.95	60.73	Lensk
+5.6	125.39	58.6	Aldan
+5.6	135.12	48.45	Khabarovsk
+5.6	142.95	53.57	Okha
+5.6	-115.48	32.65	Mexicali
+5.6	-110.32	24.14	La Paz
+5.6	-103.42	25.57	Torreón
+5.6	-107.38	24.83	Culiacán
+5.6	-110.94	31.31	Nogales
+5.6	-110.95	29.1	Hermosillo
+5.6	-110.89	27.93	Guaymas
+5.6	-101.0	22.17	San Luis Potosí
+5.6	-97.5	25.88	Matamoros
+5.6	-99.55	27.5	Nuevo Laredo
+5.6	-103.72	19.23	Colima
+5.6	-90.5	19.83	Campeche
+5.6	-101.7	21.15	León
+5.6	13.16	11.85	Maiduguri
+5.6	7.01	4.81	Port Harcourt
+5.6	8.53	7.73	Makurdi
+5.6	4.24	8.13	Ogbomosho
+5.6	5.76	5.52	Warri
+5.6	7.44	10.52	Kaduna
+5.6	104.44	43.58	Dalandzadgad
+5.6	127.43	39.16	Wonsan
+5.6	124.42	40.09	Sinuiju
+5.6	91.63	48.02	Dund-Us
+5.6	114.51	48.07	Choibalsan
+5.6	15.16	-26.65	Lüderitz
+5.6	14.51	-22.96	Walvis Bay
+5.6	32.93	-2.52	Mwanza
+5.6	37.66	-6.82	Morogoro
+5.6	35.75	-6.18	Dodoma
+5.6	36.67	-3.36	Arusha
+5.6	7.47	46.92	Bern
+5.6	-13.2	27.15	Laayoune
+5.6	127.36	0.79	Ternate
+5.6	128.2	-3.72	Ambon
+5.6	118.77	-8.45	Raba
+5.6	140.7	-2.53	Jayapura
+5.6	11.25	43.78	Florence
+5.6	15.08	37.5	Catania
+5.6	21.17	42.67	Pristina
+5.6	37.64	0.06	Meru
+5.6	35.27	0.52	Eldoret
+5.6	95.32	5.55	Banda Aceh
+5.6	100.45	38.93	Zhangye
+5.6	102.64	37.93	Wuwei
+5.6	105.92	34.6	Tianshui
+5.6	98.27	36.17	Dulan
+5.6	110.15	22.63	Yulin
+5.6	106.61	23.9	Bose
+5.6	111.32	23.48	Wuzhou
+5.6	104.83	26.6	Liupanshui
+5.6	118.58	24.9	Quanzhou
+5.6	117.28	31.85	Hefei
+5.6	116.98	33.64	Suzhou
+5.6	110.38	21.2	Zhanjiang
+5.6	116.83	-1.25	Balikpapan
+5.6	110.33	1.53	Kuching
+5.6	49.31	-12.28	Antsiranana
+5.6	47.08	-21.43	Fianarantsoa
+5.6	46.35	-15.67	Mahajanga
+5.6	110.83	-7.56	Surakarta
+5.6	105.27	-5.43	Bandar Lampung
+5.6	107.65	-2.75	Tanjung Pandan
+5.6	112.61	-7.98	Malang
+5.6	123.58	-10.18	Kupang
+5.6	119.63	-4.02	Parepare
+5.6	-79.0	-2.9	Cuenca
+5.6	-90.35	-0.53	Santa Cruz
+5.6	-83.03	10.0	Limón
+5.6	-70.67	19.5	Santiago
+5.6	-75.52	5.06	Manizales
+5.6	-77.28	1.21	Pasto
+5.6	-74.8	10.96	Barranquilla
+5.6	18.26	0.04	Mbandaka
+5.6	16.09	8.55	Moundou
+5.6	32.55	30.0	Suez
+5.6	32.29	31.26	Bur Said
+5.6	30.84	29.31	El Faiyum
+5.6	32.9	24.09	Aswan
+5.6	31.18	27.19	Asyut
+5.6	25.22	0.52	Kisangani
+5.6	42.73	13.01	Assab
+5.6	43.15	11.6	Djibouti
+5.6	77.25	38.43	Shache
+5.6	88.12	47.87	Altay
+5.6	101.7	2.93	Putrajaya
+5.6	106.77	39.23	Shizuishan
+5.6	109.73	38.28	Yulin
+5.6	109.02	32.68	Ankang
+5.6	113.1	29.38	Yueyang
+5.6	112.59	26.88	Hengyang
+5.6	104.69	31.46	Mianyang
+5.6	99.15	25.12	Baoshan
+5.6	114.48	38.05	Shijiazhuang
+5.6	122.94	41.12	Anshan
+5.6	118.33	35.08	Linyi
+5.6	119.07	33.59	Huaiyin
+5.6	130.41	33.6	Fukuoka
+5.6	131.42	31.92	Miyazaki
+5.6	133.54	33.56	Kōchi
+5.6	123.07	0.55	Gorontalo
+5.6	122.27	43.62	Tongliao
+5.6	118.95	42.27	Chifeng
+5.6	122.08	46.08	Ulan Hot
+5.6	119.7	49.2	Hailar
+5.6	126.53	48.25	Bei'an
+5.6	130.97	45.3	Jixi
+5.6	138.17	36.65	Nagano
+5.6	140.74	41.79	Hakodate
+5.6	139.85	38.92	Sakata
+5.6	17.38	-3.31	Bandundu
+5.6	22.4	-5.89	Kananga
+5.6	26.66	-4.45	Kasongo
+5.6	23.6	-6.15	Mbuji-Mayi
+5.6	29.2	-5.93	Kalemie
+5.6	29.28	0.13	Butembo
+5.6	34.02	-11.46	Mzuzu
+5.6	34.99	-15.79	Blantyre
+5.6	-91.52	14.83	Quetzaltenango
+5.6	-16.59	13.45	Banjul
+5.6	77.31	28.44	Faridabad
+5.6	74.83	34.07	Srinagar
+5.6	80.63	16.52	Vijayawada
+5.6	76.93	8.52	Thiruvananthapuram
+5.6	76.22	10.02	Kochi
+5.6	85.89	20.47	Cuttack
+5.6	75.12	15.36	Hubballi
+5.6	74.85	12.9	Mangaluru
+5.6	76.66	12.31	Mysuru
+5.6	76.82	17.35	Kalaburagi
+5.6	77.31	19.2	Nanded
+5.6	77.01	20.71	Akola
+5.6	91.77	26.16	Guwahati
+5.6	13.28	-4.18	Kayes
+5.6	13.58	-1.63	Franceville
+5.6	-72.07	-45.57	Coihaique
+5.6	-70.29	-18.5	Arica
+5.6	-70.33	-27.37	Copiapó
+5.6	-71.25	-29.9	La Serena
+5.6	-72.35	-37.48	Los Angeles
+5.6	-69.23	77.47	Qaanaaq
+5.6	-17.06	20.9	Nouadhibou
+5.6	-11.44	14.45	Kayes
+5.6	-9.62	16.67	Ayoun el Atrous
+5.6	-6.26	13.44	Ségou
+5.6	21.43	42.0	Skopje
+5.6	23.29	24.2	Al Jawf
+5.6	15.8	26.37	Tmassa
+5.6	15.1	32.38	Misrata
+5.6	12.08	32.93	Zuwara
+5.6	43.14	36.35	Mosul
+5.6	44.34	32.0	Najaf
+5.6	37.38	11.6	Bahir Dar
+5.6	39.47	13.5	Mekele
+5.6	41.86	9.59	Dire Dawa
+5.6	57.17	50.28	Aqtobe
+5.6	63.13	52.95	Rudniy
+5.6	65.46	44.8	Qyzylorda
+5.6	75.32	51.73	Ekibastuz
+5.6	76.95	52.3	Pavlodar
+5.6	80.28	50.43	Semey
+5.6	82.61	49.99	Oskemen
+5.6	54.37	31.92	Yazd
+5.6	56.27	27.2	Bandar-e-Abbas
+5.6	48.52	34.8	Hamadan
+5.6	75.87	30.93	Ludhiana
+5.6	75.83	25.18	Kota
+5.6	73.01	26.29	Jodhpur
+5.6	69.6	42.32	Shymkent
+5.6	71.36	42.9	Taraz
+5.6	80.91	26.86	Lucknow
+5.6	77.55	29.97	Saharanpur
+5.6	85.33	23.37	Ranchi
+5.6	86.98	25.23	Bhagalpur
+5.6	81.63	21.24	Raipur
+5.6	79.95	23.18	Jabalpur
+5.6	75.86	22.72	Indore
+5.6	78.18	11.67	Salem
+5.6	78.69	10.8	Tiruchirappalli
+5.6	11.88	-4.77	Pointe-Noire
+5.6	-5.03	7.69	Bouaké
+5.6	55.45	-20.88	St.-Denis
+5.6	-67.8	-9.97	Rio Branco
+5.6	-44.27	-2.51	São Luís
+5.6	-49.08	-12.47	Alvorada
+5.6	-57.65	-19.02	Corumbá
+5.6	-43.86	-16.72	Montes Claros
+5.6	-48.28	-18.9	Uberlândia
+5.6	-55.45	-10.82	Colíder
+5.6	-55.91	-9.9	Alta Floresta
+5.6	-52.33	-31.75	Pelotas
+5.6	-51.17	-29.18	Caxias do Sul
+5.6	-50.16	-25.09	Ponta Grossa
+5.6	-42.78	-5.09	Teresina
+5.6	-35.73	-9.62	Maceió
+5.6	-40.84	-14.85	Vitória da Conquista
+5.6	-45.0	-12.14	Barreiras
+5.6	-40.29	-20.34	Vila Velha
+5.6	-35.24	-5.78	Natal
+5.6	-97.87	55.75	Thompson
+5.6	-99.95	49.83	Brandon
+5.6	-111.38	56.73	Fort McMurray
+5.6	-117.28	56.23	Peace River
+5.6	-105.03	69.12	Cambridge Bay
+5.6	-115.13	67.8	Kugluktuk
+5.6	-90.7	63.34	Chesterfield Inlet
+5.6	-94.06	61.11	Arviat
+5.6	-93.53	69.53	Taloyoak
+5.6	-81.79	69.26	Igloolik
+5.6	-81.33	48.47	Timmins
+5.6	-79.45	46.3	North Bay
+5.6	-77.77	55.28	Kuujjuarapik
+5.6	-68.4	58.1	Kuujjuaq
+5.6	-60.18	46.07	Sydney
+5.6	-66.92	52.94	Labrador City
+5.6	11.15	2.9	Ebolowa
+5.6	20.67	5.76	Bambari
+5.6	-72.3	-50.33	El Calafate
+5.6	-68.52	-31.55	San Juan
+5.6	-64.9	-14.83	Trinidad
+5.6	-71.3	-41.15	Bariloche
+5.6	-65.42	-24.78	Salta
+5.6	-65.22	-26.81	Tucumán
+5.6	-58.18	-26.17	Formosa
+5.6	-60.69	-31.62	Santa Fe
+5.6	-47.06	-22.91	Campinas
+5.6	-47.47	-23.49	Sorocaba
+5.6	-47.83	-21.17	Ribeirão Preto
+5.6	-40.51	-9.38	Petrolina
+5.6	10.15	5.96	Bamenda
+5.6	13.39	9.3	Garoua
+5.6	103.2	13.1	Battambang
+5.6	103.85	13.37	Siem Reap
+5.6	16.34	-9.54	Malanje
+5.6	13.41	-12.58	Benguela
+5.6	13.49	-14.91	Lubango
+5.6	12.16	-15.19	Moçâmedes
+5.6	-64.75	-21.52	Tarija
+5.6	-59.62	13.1	Bridgetown
+5.6	7.76	36.92	Annaba
+5.6	2.62	9.34	Parakou
+5.6	2.62	6.48	Porto-Novo
+5.6	6.6	36.36	Constantine
+5.6	89.56	22.84	Khulna
+5.6	27.5	-21.17	Francistown
+5.6	26.82	-23.1	Mahalapye
+5.6	26.71	-22.39	Serowe
+5.6	132.27	-14.47	Katherine
+5.6	115.35	-33.66	Busselton
+5.6	115.75	-32.52	Mandurah
+5.6	116.87	-20.73	Karratha
+5.6	149.1	-33.28	Orange
+5.6	151.67	-30.51	Armidale
+5.6	135.87	-34.73	Port Lincoln
+5.6	144.28	-36.76	Bendigo
+5.6	146.3	-36.36	Wangaratta
+5.6	150.52	-23.36	Rockhampton
+5.6	146.33	-41.19	Devonport
+5.6	-4.29	11.18	Bobo Dioulasso
+5.6	88.6	24.38	Rajshahi
+5.6	96.08	21.97	Mandalay
+5.6	92.88	20.14	Sittwe
+5.6	29.36	-3.38	Bujumbura
+5.6	-170.71	-14.28	Pago Pago
+5.6	-60.99	14.01	Castries
+5.6	-62.72	17.3	Basseterre
+5.6	45.02	10.44	Berbera
+5.6	57.5	-20.17	Port Louis
+5.6	34.45	31.53	Gaza City
+5.6	-149.57	-17.53	Papeete
+5.6	50.58	26.24	Manama
+5.6	-78.7	26.53	Freeport
+5.6	120.68	24.15	Taichung
+5.6	174.88	-37.0	Manukau
+5.6	77.57	34.16	Leh
+5.6	80.52	16.53	Amaravati
+5.6	113.75	23.02	Dongguan
+5.7	121.47	25.01	New Taipei
+5.7	119.58	23.57	Magong
+5.7	-76.28	36.85	Norfolk
+6.0	36.56	40.31	Tokat
+6.0	22.89	47.79	Satu Mare
+6.0	25.42	41.13	Komatini
+6.0	43.0	36.87	Duhok
+6.0	50.85	32.32	Shahrekord
+6.0	35.78	35.54	Latakia
+6.0	40.75	36.48	Al Hasakah
+6.0	56.28	38.98	Serdar
+6.0	60.5	37.38	Tejen
+6.0	27.85	37.85	Aydın
+6.0	39.23	38.68	Elâzığ
+6.0	34.62	36.8	Icel
+6.0	42.28	38.51	Tatvan
+6.0	32.6	41.2	Karabük
+6.0	41.22	37.07	Nusaybin
+6.0	19.7	46.9	Kecskemét
+6.0	26.81	45.16	Buzău
+6.0	28.05	45.46	Galați
+6.0	3.08	45.78	Clermont-Ferrand
+6.0	51.65	35.32	Varamin
+6.0	49.3	31.98	Masjed Soleyman
+6.0	46.18	31.42	Ash Shatrah
+6.0	48.85	34.32	Malayer
+6.0	45.0	37.53	Urmia
+6.0	47.02	35.3	Sanandaj
+6.0	58.82	36.22	Neyshabur
+6.0	55.73	29.47	Sirjan
+6.0	20.92	44.02	Kragujevac
+6.0	46.35	40.68	Ganca
+6.0	17.92	44.22	Zenica
+6.0	5.03	47.33	Dijon
+6.0	0.7	47.38	Tours
+6.0	1.08	49.43	Rouen
+6.0	7.35	47.75	Mulhouse
+6.0	6.18	49.12	Metz
+6.0	120.98	24.82	Hsinchu
+6.0	120.82	24.57	Miaoli
+6.0	-56.71	-34.35	San José de Mayo
+6.0	-54.33	-34.48	Rocha
+6.0	-112.53	46.0	Butte
+6.0	-97.03	47.93	Grand Forks
+6.0	-112.44	42.87	Pocatello
+6.0	-122.45	47.24	Tacoma
+6.0	-114.62	32.69	Yuma
+6.0	-112.45	34.59	Prescott
+6.0	-118.2	33.78	Long Beach
+6.0	-108.55	39.09	Grand Junction
+6.0	-114.89	39.25	Ely
+6.0	-119.77	39.16	Carson City
+6.0	-104.23	32.42	Carlsbad
+6.0	-105.96	32.9	Alamogordo
+6.0	-122.87	42.33	Medford
+6.0	-121.78	42.23	Klamath Falls
+6.0	-113.58	37.1	St. George
+6.0	-111.64	40.25	Provo
+6.0	-105.59	41.31	Laramie
+6.0	-97.33	37.68	Wichita
+6.0	-92.17	38.58	Jefferson City
+6.0	-103.23	44.08	Rapid City
+6.0	-92.02	30.2	Lafayette
+6.0	-94.8	29.3	Galveston
+6.0	-95.36	28.96	Freeport
+6.0	-97.0	28.8	Victoria
+6.0	-102.37	31.85	Odessa
+6.0	-98.49	33.91	Wichita Falls
+6.0	-97.15	31.55	Waco
+6.0	-101.88	33.58	Lubbock
+6.0	-67.47	7.9	San Fernando de Apure
+6.0	-69.3	10.05	Barquisimeto
+6.0	-72.68	41.77	Hartford
+6.0	-71.42	41.82	Providence
+6.0	-88.05	30.68	Mobile
+6.0	-87.22	30.42	Pensacola
+6.0	-82.68	27.77	St. Petersburg
+6.0	-88.89	30.4	Biloxi
+6.0	-89.64	39.79	Springfield
+6.0	-84.87	38.2	Frankfort
+6.0	-79.8	36.07	Greensboro
+6.0	-84.2	39.75	Dayton
+6.0	-89.4	43.07	Madison
+6.0	-88.0	44.53	Green Bay
+6.0	-74.74	40.22	Trenton
+6.0	-63.17	9.75	Maturín
+6.0	-64.18	10.45	Cumaná
+6.0	-6.29	36.52	Cádiz
+6.0	-3.59	37.16	Granada‎
+6.0	-171.73	63.78	Gambell
+6.0	-149.11	61.6	Palmer
+6.0	-149.47	60.13	Seward
+6.0	18.72	63.32	Örnsköldsvik
+6.0	35.17	47.86	Zaporizhzhya
+6.0	59.02	43.77	Muynoq
+6.0	67.27	37.23	Termiz
+6.0	71.78	40.39	Fargona
+6.0	71.67	41.0	Namangan
+6.0	71.55	37.49	Khorugh
+6.0	69.62	40.29	Khujand
+6.0	102.83	16.42	Khon Kaen
+6.0	105.83	21.6	Thái Nguyên
+6.0	105.8	19.82	Thanh Hóa
+6.0	106.2	20.42	Nam Định
+6.0	105.68	18.7	Vinh
+6.0	106.6	17.48	Đồng Hới
+6.0	31.2	-26.47	Lobamba
+6.0	-86.8	15.76	La Ceiba
+6.0	-88.03	15.5	San Pedro Sula
+6.0	-58.27	5.99	Linden
+6.0	-15.21	64.27	Höfn
+6.0	-1.13	37.98	Murcia
+6.0	-5.31	35.89	Ceuta
+6.0	-8.42	43.33	La Coruña
+6.0	-72.21	19.76	Cap-Haïtien
+6.0	-2.96	53.41	Liverpool
+6.0	39.72	40.98	Trabzon
+6.0	80.24	6.03	Galle
+6.0	127.01	37.26	Suwon
+6.0	-3.08	58.43	Wick
+6.0	38.79	37.17	Şanlıurfa
+6.0	30.08	0.17	Kasese
+6.0	14.57	68.23	Svolvær
+6.0	14.17	66.32	Mo i Rana
+6.0	17.29	68.38	Narvik
+6.0	14.43	67.28	Bodø
+6.0	-79.84	-6.76	Chiclayo
+6.0	-70.14	-15.5	Juliaca
+6.0	-76.27	-10.69	Cerro de Pasco
+6.0	-76.48	-6.51	Tarapoto
+6.0	-74.22	-13.18	Ayacucho
+6.0	-57.43	-23.41	Concepción
+6.0	-56.43	-25.75	Villarrica
+6.0	-83.38	14.03	Bilwi
+6.0	-86.88	12.44	León
+6.0	41.08	19.13	Al Qunfudhah
+6.0	15.62	78.22	Longyearbyen
+6.0	4.48	51.92	Rotterdam
+6.0	6.13	49.61	Luxembourg
+6.0	5.28	59.41	Haugesund
+6.0	5.68	58.97	Stavanger
+6.0	9.6	59.2	Skien
+6.0	11.5	64.48	Namsos
+6.0	21.01	56.51	Liepaga
+6.0	23.24	69.97	Alta
+6.0	29.77	70.1	Vadsø
+6.0	49.59	25.35	Hofuf
+6.0	66.45	30.93	Chaman
+6.0	63.07	25.99	Turbat
+6.0	73.11	31.41	Faisalabad
+6.0	73.07	33.59	Rawalpindi
+6.0	71.67	29.39	Bahawalpur
+6.0	69.01	25.53	Mirpur Khas
+6.0	68.85	27.71	Sukkur
+6.0	78.38	42.49	Karakol
+6.0	72.35	34.75	Saidu
+6.0	103.73	1.48	Johor Bahru
+6.0	101.45	3.04	Kelang
+6.0	28.33	-26.15	Benoni
+6.0	27.96	-26.65	Vereeniging
+6.0	-79.87	9.37	Colón
+6.0	-79.57	8.95	Balboa
+6.0	82.91	58.31	Kolpashevo
+6.0	160.5	65.25	Omolon
+6.0	170.31	69.7	Pevek
+6.0	34.35	66.68	Umba
+6.0	32.87	66.69	Kovda
+6.0	31.33	58.5	Velikiy Novgorod
+6.0	30.52	56.32	Velikiye Luki
+6.0	34.77	64.53	Belomorsk
+6.0	34.57	64.95	Kem
+6.0	54.42	70.73	Krasino
+6.0	56.45	73.27	Matočkin Šar
+6.0	39.83	64.57	Severodvinsk
+6.0	36.19	51.74	Kursk
+6.0	37.63	54.2	Tula
+6.0	41.43	52.73	Tambov
+6.0	55.96	53.63	Sterlitamak
+6.0	65.34	55.46	Kurgan
+6.0	49.02	67.69	Indiga
+6.0	44.13	67.87	Shoyna
+6.0	72.93	67.7	Novy Port
+6.0	66.61	66.54	Salekhard
+6.0	78.47	70.88	Gyda
+6.0	78.7	67.47	Tazovsky
+6.0	76.63	66.08	Novy Urengoy
+6.0	72.51	65.53	Nadym
+6.0	75.62	63.17	Noyabrsk
+6.0	50.82	61.66	Syktyvkar
+6.0	53.69	63.56	Ukhta
+6.0	60.58	59.61	Serov
+6.0	47.25	56.13	Cheboksary
+6.0	58.63	51.21	Orsk
+6.0	47.8	52.03	Balakovo
+6.0	64.42	63.19	Igrim
+6.0	65.38	62.15	Nyagan
+6.0	71.33	63.67	Numto
+6.0	74.38	56.9	Tara
+6.0	81.21	51.52	Rubtsovsk
+6.0	85.96	51.96	Gorno Altaysk
+6.0	86.71	53.9	Prokopyevsk
+6.0	54.09	17.03	Salalah
+6.0	47.5	42.98	Makhachkala
+6.0	56.73	24.36	Suhar
+6.0	58.18	23.68	Seeb
+6.0	129.37	36.02	Pohang
+6.0	129.32	35.55	Ulsan
+6.0	128.61	35.87	Daegu
+6.0	123.75	13.17	Legazpi
+6.0	121.73	17.61	Tuguegarao
+6.0	120.39	17.57	Vigan
+6.0	100.25	64.28	Tura
+6.0	91.23	64.48	Noginsk
+6.0	107.78	60.38	Yerema
+6.0	97.99	55.93	Tayshet
+6.0	103.64	52.76	Usolye Sibirskoye
+6.0	103.7	51.65	Slyudyanka
+6.0	103.07	53.16	Cheremkhovo
+6.0	102.03	53.93	Zima
+6.0	100.57	54.57	Tulun
+6.0	99.03	54.9	Nizhneudinsk
+6.0	105.76	56.76	Ust-Kut
+6.0	114.19	57.85	Bodaybo
+6.0	89.26	61.87	Komsa
+6.0	95.71	56.19	Kansk
+6.0	90.5	56.27	Achinsk
+6.0	92.16	58.45	Yeniseysk
+6.0	92.48	58.24	Lesosibirsk
+6.0	87.95	65.84	Turukhansk
+6.0	83.56	71.7	Vorontsovo
+6.0	104.8	72.77	Starorybnoye
+6.0	86.98	75.09	Mikhaylova
+6.0	86.23	69.42	Dudinka
+6.0	90.23	51.03	Teeli
+6.0	111.73	56.13	Novyy Uoyin
+6.0	113.6	54.43	Bagdarin
+6.0	109.31	55.63	Severobaykalsk
+6.0	106.45	50.35	Kyakhta
+6.0	128.13	51.41	Svobodnyy
+6.0	127.27	53.75	Zeya
+6.0	125.8	53.45	Magdagachi
+6.0	127.7	52.0	Shimanovsk
+6.0	123.92	53.98	Skovorodino
+6.0	124.71	55.17	Tynda
+6.0	115.57	50.95	Olovyannaya
+6.0	119.77	53.73	Mogocha
+6.0	118.03	50.07	Krasnokamensk
+6.0	116.52	50.39	Borzya
+6.0	110.45	51.35	Khilok
+6.0	132.89	42.84	Nakhodka
+6.0	132.02	43.8	Ussuriysk
+6.0	133.43	45.47	Lesozavodsk
+6.0	136.22	70.73	Kazachye
+6.0	133.38	67.54	Verkhoyansk
+6.0	161.33	68.75	Chersky
+6.0	153.71	67.45	Srednekolymsk
+6.0	150.89	65.74	Zyryanka
+6.0	135.18	60.8	Eldikan
+6.0	133.9	60.1	Chagda
+6.0	135.6	62.67	Khandyga
+6.0	134.54	60.46	Ust-Maya
+6.0	124.71	56.67	Neryungri
+6.0	112.47	63.01	Chernyshevsky
+6.0	120.55	64.38	Terbyas
+6.0	121.62	63.76	Vilyuysk
+6.0	127.47	63.92	Sangar
+6.0	123.35	67.99	Menkere
+6.0	114.08	71.92	Saskylakh
+6.0	125.99	70.21	Govorovo
+6.0	126.59	73.38	Sagastyr
+6.0	119.77	73.0	Ust-Olenyok
+6.0	117.63	62.14	Suntar
+6.0	112.45	68.53	Olenyok
+6.0	112.4	66.42	Udachny
+6.0	132.95	48.8	Birobidzhan
+6.0	135.43	57.67	Khakhar
+6.0	140.78	51.47	De-Kastri
+6.0	135.31	54.71	Chumikan
+6.0	137.02	50.55	Komsomolsk na Amure
+6.0	138.17	56.45	Ayan
+6.0	140.73	53.15	Nikolayevsk na Amure
+6.0	140.27	48.97	Sovetskaya Gavan
+6.0	159.23	61.95	Evensk
+6.0	150.9	60.1	Palatka
+6.0	155.8	62.53	Omsukchan
+6.0	148.17	62.78	Susuman
+6.0	143.17	51.83	Nogliki
+6.0	142.16	50.9	Aleksandrovsk Sakhalinskiy
+6.0	142.78	46.64	Korsakov
+6.0	-116.62	31.87	Ensenada
+6.0	-101.01	25.42	Saltillo
+6.0	-106.49	31.69	Ciudad Juárez
+6.0	-105.5	28.2	Delicias
+6.0	-104.67	24.03	Durango
+6.0	-109.0	25.79	Los Mochis
+6.0	-99.13	23.72	Ciudad Victoria
+6.0	-102.29	21.88	Aguascalientes
+6.0	-104.32	19.05	Manzanillo
+6.0	-95.23	16.33	Tehuantepec
+6.0	-92.9	18.0	Villahermosa
+6.0	-99.24	18.92	Cuernavaca
+6.0	-100.39	20.58	Querétaro
+6.0	-92.27	14.9	Tapachula
+6.0	-88.3	18.5	Chetumal
+6.0	-89.67	21.28	Progreso
+6.0	104.77	16.54	Savannakhet
+6.0	110.15	44.87	Buyant-Uhaa
+6.0	125.45	38.77	Nampo
+6.0	129.79	41.78	Chongjin
+6.0	129.2	40.67	Kimchaek
+6.0	127.54	39.91	Hamhung
+6.0	110.65	47.32	Öndörkhaan
+6.0	100.98	46.3	Bayankhongor
+6.0	96.82	47.75	Uliastay
+6.0	96.26	46.36	Altai
+6.0	100.15	49.65	Mörön
+6.0	92.07	49.98	Ulaangom
+6.0	103.53	48.81	Bulgan
+6.0	106.27	45.75	Mandalgovi
+6.0	105.97	49.46	Darkhan
+6.0	106.47	48.87	Züünkharaa
+6.0	102.77	46.25	Arvaikheer
+6.0	113.28	46.7	Baruun-Urt
+6.0	165.3	62.55	Manily
+6.0	156.24	52.66	Oktyabrsky
+6.0	160.85	56.3	Klyuchi
+6.0	162.43	56.21	Ust-Kamchatsk
+6.0	-8.47	51.89	Cork
+6.0	8.57	40.73	Sassari
+6.0	7.67	45.07	Turin
+6.0	97.01	33.0	Jyekundo
+6.0	109.41	24.32	Liuzhou
+6.0	104.89	25.09	Xingyi
+6.0	105.93	26.25	Anshun
+6.0	106.92	27.7	Zunyi
+6.0	108.4	30.82	Wanzhou
+6.0	116.75	33.95	Huaibei
+6.0	118.37	31.35	Wuhu
+6.0	116.48	31.75	Luan
+6.0	117.33	32.95	Bengbu
+6.0	117.05	30.5	Anqing
+6.0	113.11	23.01	Foshan
+6.0	117.5	0.13	Bontang
+6.0	115.22	-8.65	Denpasar
+6.0	166.44	-22.26	Nouméa
+6.0	-80.46	-1.06	Portoviejo
+6.0	-75.57	6.33	Bello
+6.0	-75.89	8.76	Montería
+6.0	-73.13	7.13	Bucaramanga
+6.0	-83.7	22.42	Pinar del Rio
+6.0	-77.92	21.38	Camagüey
+6.0	-75.21	20.15	Guantánamo
+6.0	-76.26	20.89	Holguín
+6.0	-77.92	18.47	Montego Bay
+6.0	-75.23	4.44	Ibagué
+6.0	-76.61	2.42	Popayán
+6.0	-74.2	11.25	Santa Marta
+6.0	-72.52	7.92	Cúcuta
+6.0	-73.63	4.15	Villavicencio
+6.0	-79.97	22.4	Santa Clara
+6.0	-6.82	62.03	Tórshavn
+6.0	31.19	30.01	Giza
+6.0	9.2	48.78	Stuttgart
+6.0	8.8	53.08	Bremen
+6.0	11.08	49.45	Nürnberg
+6.0	92.05	31.48	Nagchu
+6.0	94.37	29.65	Nyingchi
+6.0	97.18	31.14	Chamdo
+6.0	86.15	41.73	Korla
+6.0	82.94	41.73	Kuqa
+6.0	82.95	46.75	Tacheng
+6.0	86.03	44.3	Shihezi
+6.0	84.86	45.59	Karamay
+6.0	80.25	41.15	Aksu
+6.0	109.5	18.26	Sanya
+6.0	110.32	20.05	Haikou
+6.0	107.03	33.13	Hanzhong
+6.0	107.15	34.38	Baoji
+6.0	109.03	35.08	Tongchuan
+6.0	111.52	36.08	Linfen
+6.0	112.73	37.68	Yuci
+6.0	113.3	40.08	Datong
+6.0	113.16	30.65	Jianmen
+6.0	111.28	30.7	Yichang
+6.0	113.44	30.37	Xiantao
+6.0	115.03	31.18	Macheng
+6.0	115.1	30.22	Huangshi
+6.0	113.15	27.83	Zhuzhou
+6.0	111.61	26.42	Yongzhou
+6.0	112.33	28.6	Yiyang
+6.0	111.68	29.03	Changde
+6.0	111.2	27.0	Shaoyang
+6.0	103.73	29.57	Leshan
+6.0	101.73	26.55	Panzhihua
+6.0	102.72	29.35	Fulin
+6.0	105.87	32.43	Guangyuan
+6.0	105.38	28.88	Luzhou
+6.0	104.57	28.77	Yibin
+6.0	103.72	27.32	Zhaotang
+6.0	100.27	26.8	Lijiang
+6.0	102.57	24.38	Yuxi
+6.0	100.25	25.59	Dali
+6.0	119.62	39.93	Qinhuangdao
+6.0	116.68	39.52	Langfang
+6.0	114.85	40.81	Zhangjiakou
+6.0	118.19	39.63	Tangshan
+6.0	114.35	36.08	Anyang
+6.0	113.26	35.2	Jiaozuo
+6.0	114.35	34.79	Kaifeng
+6.0	115.65	34.41	Shangqiu
+6.0	113.3	33.73	Pingdingshan
+6.0	114.07	32.13	Xinyang
+6.0	113.91	35.3	Xinxiang
+6.0	112.44	34.64	Luoyang
+6.0	123.18	41.28	Liaoyang
+6.0	124.39	40.15	Dandong
+6.0	122.28	40.67	Yingkow
+6.0	121.1	41.12	Jinzhou
+6.0	121.66	42.01	Fuxin
+6.0	123.75	41.33	Benxi
+6.0	123.87	41.87	Fushun
+6.0	116.55	35.4	Jining
+6.0	119.16	36.7	Weifang
+6.0	117.12	36.2	Taian
+6.0	115.45	35.23	Heze
+6.0	120.71	36.97	Laiyang
+6.0	114.93	27.8	Xinyu
+6.0	114.95	25.92	Ganzhou
+6.0	115.98	29.73	Jiujiang
+6.0	119.97	31.78	Changzhou
+6.0	119.43	32.18	Zhenjiang
+6.0	120.92	31.98	Nantong
+6.0	120.75	30.77	Jiaxing
+6.0	120.1	30.87	Huzhou
+6.0	120.57	30.0	Shaoxing
+6.0	119.65	29.12	Jinhua
+6.0	125.13	42.9	Liaoyuan
+6.0	129.82	42.97	Tumen
+6.0	124.33	43.17	Siping
+6.0	122.82	45.62	Baicheng
+6.0	130.56	31.59	Kagoshima
+6.0	132.77	33.85	Matsuyama
+6.0	106.81	39.66	Wuhai
+6.0	111.97	43.66	Erenhot
+6.0	113.08	41.03	Jining
+6.0	119.97	47.18	Arxan
+6.0	117.43	49.6	Manzhouli
+6.0	116.04	43.94	Xilinhot
+6.0	127.45	50.25	Heihe
+6.0	131.01	45.77	Qitaihe
+6.0	128.9	47.7	Yichun
+6.0	130.3	47.35	Hegang
+6.0	125.23	49.18	Nenjiang
+6.0	124.88	48.49	Nehe
+6.0	129.59	44.58	Mudangiang
+6.0	136.64	36.56	Kanazawa
+6.0	140.98	42.35	Muroran
+6.0	142.38	43.76	Asahikawa
+6.0	135.17	34.68	Kōbe
+6.0	139.6	35.43	Yokohama
+6.0	140.09	39.71	Akita
+6.0	140.71	40.83	Aomori
+6.0	140.47	40.57	Hirosaki
+6.0	141.54	40.51	Hachinohe
+6.0	140.47	37.74	Fukushima
+6.0	141.13	39.72	Morioka
+6.0	139.04	37.92	Niigata
+6.0	131.28	-0.86	Sorong
+6.0	-88.59	15.72	Puerto Barrios
+6.0	82.24	16.97	Kakinada
+6.0	79.58	18.01	Warangal
+6.0	84.8	19.32	Brahmapur
+6.0	75.71	16.84	Vijayapura
+6.0	73.13	19.35	Bhiwandi
+6.0	76.57	18.4	Latur
+6.0	74.75	19.08	Ahmednagar
+6.0	79.3	19.97	Chandrapur
+6.0	77.78	20.93	Amravati
+6.0	74.77	20.9	Dhule
+6.0	94.9	27.48	Dibrugarh
+6.0	93.95	24.8	Imphal
+6.0	179.38	-16.42	Labasa
+6.0	-1.67	48.1	Rennes
+6.0	1.45	43.62	Toulouse
+6.0	3.08	50.65	Lille
+6.0	7.75	48.58	Strasbourg
+6.0	-72.7	-45.4	Puerto Aisén
+6.0	-72.51	-51.72	Puerto Natales
+6.0	-67.62	-54.93	Puerto Williams
+6.0	-72.58	-38.73	Temuco
+6.0	-37.18	65.57	Kulusuk
+6.0	-49.64	62.0	Paamiut
+6.0	-21.97	70.48	Ittoqqortoormiit
+6.0	-42.22	62.53	Timmiarmiut
+6.0	-46.04	60.73	Qaqortoq
+6.0	-50.71	67.01	Kangerlussuaq
+6.0	-17.8	81.72	Nord
+6.0	-53.57	69.24	Qeqertasuaq
+6.0	-57.07	74.12	Nuussuaq
+6.0	-51.1	69.22	Ilulissat
+6.0	21.73	38.23	Patra
+6.0	41.63	41.6	Batumi
+6.0	44.01	36.18	Irbil
+6.0	27.42	66.67	Kemijärvi
+6.0	23.12	63.83	Kokkola
+6.0	25.66	60.99	Lahti
+6.0	29.77	62.6	Joensuu
+6.0	22.25	60.45	Turku
+6.0	58.45	50.27	Khromtau
+6.0	66.9	50.24	Arqalyq
+6.0	63.63	53.22	Oostanay
+6.0	63.24	45.69	Baykonur
+6.0	51.87	47.07	Balyqshy
+6.0	68.35	51.82	Atbasar
+6.0	69.42	53.3	Kokshetau
+6.0	72.96	50.07	Temirtau
+6.0	67.77	47.78	Zhezqazghan
+6.0	75.46	49.42	Qarqaraly
+6.0	74.95	46.85	Balqash
+6.0	69.22	54.88	Petropavlovsk
+6.0	80.43	47.96	Ayakoz
+6.0	78.4	45.0	Taldyqorghan
+6.0	58.45	35.18	Kashmar
+6.0	58.36	29.11	Bam
+6.0	57.08	30.3	Kerman
+6.0	73.73	24.6	Udaipur
+6.0	68.25	43.3	Turkistan
+6.0	83.38	26.75	Gorakhpur
+6.0	87.86	23.25	Barddhaman
+6.0	88.53	23.38	Krishnanagar
+6.0	85.0	24.8	Gaya
+6.0	69.67	21.67	Porbandar
+6.0	-58.08	-32.33	Paysandú
+6.0	-57.97	-31.39	Salto
+6.0	-92.11	46.78	Duluth
+6.0	-94.88	47.47	Bemidji
+6.0	-109.68	48.55	Havre
+6.0	-114.32	48.2	Kalispell
+6.0	-112.03	43.47	Idaho Falls
+6.0	-117.02	46.42	Lewiston
+6.0	-120.5	46.6	Yakima
+6.0	-120.31	47.42	Wenatchee
+6.0	-109.55	31.36	Douglas
+6.0	-119.02	35.37	Bakersfield
+6.0	-122.28	37.8	Oakland
+6.0	-118.14	34.7	Lancaster
+6.0	-121.84	39.73	Chico
+6.0	-121.89	36.6	Monterey
+6.0	-121.64	36.68	Salinas
+6.0	-106.3	35.89	Los Alamos
+6.0	-123.1	44.05	Eugene
+6.0	-124.22	43.37	Coos Bay
+6.0	-121.31	44.05	Bend
+6.0	-109.06	44.52	Cody
+6.0	-91.66	41.97	Cedar Rapids
+6.0	-93.32	37.18	Springfield
+6.0	-96.68	40.82	Lincoln
+6.0	-92.45	31.31	Alexandria
+6.0	-99.73	32.45	Abilene
+6.0	-97.5	25.92	Brownsville
+6.0	-95.3	32.35	Tyler
+6.0	-69.68	11.42	Coro
+6.0	-70.21	11.72	Punto Fijo
+6.0	-71.54	43.21	Concord
+6.0	-86.61	34.72	Huntsville
+6.0	-81.78	24.56	Key West
+6.0	-80.12	26.75	West Palm Beach
+6.0	-82.53	27.34	Sarasota
+6.0	-81.02	29.21	Daytona Beach
+6.0	-82.33	29.65	Gainesville
+6.0	-81.86	26.64	Ft. Myers
+6.0	-81.49	31.15	Brunswick
+6.0	-81.98	33.46	Augusta
+6.0	-90.88	32.35	Vicksburg
+6.0	-78.89	33.69	Myrtle Beach
+6.0	-79.99	32.79	Charleston
+6.0	-89.58	40.69	Peoria
+6.0	-87.56	37.97	Evansville
+6.0	-84.5	38.05	Lexington
+6.0	-80.65	41.1	Youngstown
+6.0	-81.38	40.8	Canton
+6.0	-83.55	41.64	Toledo
+6.0	-85.25	35.07	Chattanooga
+6.0	-78.48	38.03	Charlottesville
+6.0	-89.63	44.96	Wausau
+6.0	-76.5	42.44	Ithaca
+6.0	-76.88	40.27	Harrisburg
+6.0	-65.55	3.17	La Esmeralda
+6.0	-63.6	8.1	Ciudad Bolívar
+6.0	-61.63	6.73	El Dorado
+6.0	-67.6	10.25	Maracay
+6.0	-68.78	44.8	Bangor
+6.0	-83.95	43.42	Saginaw
+6.0	10.72	34.75	Sfax
+6.0	43.85	16.94	Sadah
+6.0	42.95	14.8	Al Hudaydah
+6.0	-131.66	55.36	Ketchikan
+6.0	-166.53	53.87	Unalaska
+6.0	-160.38	59.07	Togiak
+6.0	-157.31	61.76	Red Devil
+6.0	-166.1	61.53	Hooper Bay
+6.0	-160.04	70.64	Wainwright
+6.0	-156.93	64.73	Galena
+6.0	-143.6	70.09	Kaktovik
+6.0	-135.31	59.46	Skagway
+6.0	-145.76	60.54	Cordova
+6.0	-151.26	60.55	Kenai
+6.0	-145.27	66.56	Fort Yukon
+6.0	34.16	44.5	Yalta
+6.0	30.1	51.39	Chernobyl
+6.0	34.78	50.92	Sumy
+6.0	37.56	47.1	Mariupol
+6.0	51.25	15.21	Sayhut al Ghamirah
+6.0	49.13	14.54	Al Mukalla
+6.0	59.96	41.84	Daşoguz
+6.0	60.64	41.56	Urgentch
+6.0	98.38	7.88	Phuket
+6.0	108.0	13.98	Play Ku
+6.0	109.17	12.25	Nha Trang
+6.0	109.22	11.9	Cam Ranh
+6.0	109.18	13.78	Qui Nhon
+6.0	107.58	16.47	Hue
+6.0	106.83	10.97	Biên Hòa
+6.0	105.77	10.05	Can Tho
+6.0	28.89	-11.2	Mansa
+6.0	31.46	-11.83	Mpika
+6.0	31.37	-8.84	Mbala
+6.0	28.4	-13.13	Luanshya
+6.0	28.65	-13.0	Ndola
+6.0	23.11	-13.54	Zambezi
+6.0	28.18	-15.78	Kafue
+6.0	27.76	-15.86	Mazabuka
+6.0	26.5	-18.37	Hwange
+6.0	29.82	-19.45	Gweru
+6.0	32.65	-18.97	Mutare
+6.0	29.91	-18.33	Kadoma
+6.0	-44.8	-4.23	Bacabal
+6.0	-46.77	-1.05	Bragança
+6.0	-55.52	-1.91	Óbidos
+6.0	-65.35	-10.8	Guajara-Miram
+6.0	-48.42	-10.7	Porto Nacional
+6.0	-54.81	-22.23	Dourados
+6.0	-41.97	-18.87	Governador Valadares
+6.0	-44.93	-17.33	Pirapora
+6.0	-43.37	-21.77	Juiz de Fora
+6.0	-53.8	-29.68	Santa Maria
+6.0	-52.42	-28.25	Passo Fundo
+6.0	-52.64	-27.1	Xapeco
+6.0	-48.84	-26.32	Joinville
+6.0	-39.32	-7.21	Juazeiro do Norte
+6.0	-39.37	-17.88	Nova Viçosa
+6.0	-38.43	-12.14	Alagoinhas
+6.0	-40.5	-9.42	Juazeiro
+6.0	-40.35	-20.33	Vitória
+6.0	-34.88	-7.1	João Pessoa
+6.0	-35.88	-7.23	Campina Grande
+6.0	-42.54	-22.26	Nova Friburgo
+6.0	-101.67	57.88	Brochet
+6.0	-101.05	56.85	Lynn Lake
+6.0	-94.7	56.35	Gillam
+6.0	-108.28	52.77	North Battleford
+6.0	-105.75	53.2	Prince Albert
+6.0	-125.0	49.68	Courtenay
+6.0	-119.48	49.9	Kelowna
+6.0	-65.75	66.13	Pangnirtung
+6.0	-117.75	70.73	Holman
+6.0	-59.78	8.2	Mabaruma
+6.0	-57.53	6.25	New Amsterdam
+6.0	-92.83	49.78	Dryden
+6.0	-82.43	52.92	Attawapiskat
+6.0	-79.83	43.25	Hamilton
+6.0	-83.04	42.32	Windsor
+6.0	-72.55	46.35	Trois-Rivières
+6.0	-66.36	50.32	Sept-Îles
+6.0	-57.93	48.95	Corner Brook
+6.0	-23.15	66.08	Ísafjörður
+6.0	-18.1	65.67	Akureyri
+6.0	-22.57	64.02	Keflavík
+6.0	-71.32	-42.9	Esquel
+6.0	-70.07	-38.9	Zapala
+6.0	-66.17	-17.41	Cochabamba
+6.0	-60.33	-36.9	Olavarría
+6.0	-59.15	-37.32	Tandil
+6.0	-63.0	-40.81	Viedma
+6.0	-66.35	-33.3	San Luis
+6.0	-64.35	-33.13	Río Cuarto
+6.0	-65.3	-24.18	San Salvador de Jujuy
+6.0	-64.32	-23.14	San Ramón de la Nueva Orán
+6.0	-59.27	-29.14	Goya
+6.0	-50.45	-21.21	Araçatuba
+6.0	4.41	51.22	Antwerpen
+6.0	67.82	34.81	Bamian
+6.0	68.7	36.14	Baghlan
+6.0	-67.13	-17.98	Oruro
+6.0	-63.52	-20.05	Camiri
+6.0	30.53	39.79	Eskişehir
+6.0	30.7	36.89	Antalya
+6.0	35.49	38.73	Kayseri
+6.0	31.0	52.43	Homyel
+6.0	134.2	-19.65	Tennant Creek
+6.0	130.99	-25.24	Yulara
+6.0	133.2	-25.23	Erldunda
+6.0	121.77	-32.2	Norseman
+6.0	127.67	-18.22	Halls Creek
+6.0	128.73	-15.77	Kununurra
+6.0	123.64	-17.31	Derby
+6.0	115.1	-21.66	Onslow
+6.0	114.12	-21.93	Exmouth
+6.0	113.65	-24.9	Carnarvon
+6.0	119.73	-23.37	Newman
+6.0	118.48	-26.6	Meekatharra
+6.0	115.75	-29.53	Three Springs
+6.0	116.15	-34.23	Manjimup
+6.0	116.65	-31.66	Northam
+6.0	121.89	-33.86	Esperance
+6.0	121.33	-28.88	Leonara
+6.0	122.4	-28.63	Laverton
+6.0	128.22	-15.59	Wyndham
+6.0	146.92	-36.06	Albury
+6.0	152.53	-32.19	Forster-Tuncurry
+6.0	152.92	-31.45	Port Macquarie
+6.0	150.92	-31.1	Tamworth
+6.0	152.94	-29.71	Grafton
+6.0	149.83	-29.47	Moree
+6.0	150.33	-28.55	Goondiwindi
+6.0	153.29	-28.82	Lismore
+6.0	150.89	-34.42	Wollongong
+6.0	133.66	-32.1	Ceduna
+6.0	140.77	-37.83	Mount Gambier
+6.0	137.77	-32.49	Port Augusta
+6.0	142.47	-38.38	Warrnambool
+6.0	142.15	-34.19	Mildura
+6.0	144.4	-38.17	Geelong
+6.0	138.12	-19.92	Camooweal
+6.0	144.25	-26.62	Quilpie
+6.0	146.25	-26.4	Charleville
+6.0	144.2	-20.85	Hughenden
+6.0	153.13	-26.8	Caloundra
+6.0	148.79	-26.56	Roma
+6.0	151.96	-27.56	Toowoomba
+6.0	143.53	-18.3	Georgetown
+6.0	143.82	-28.0	Thargomindah
+6.0	141.87	-12.67	Weipa
+6.0	140.83	-17.48	Karumba
+6.0	140.5	-20.7	Cloncurry
+6.0	152.72	-25.55	Maryborough
+6.0	152.35	-24.88	Bundaberg
+6.0	151.25	-23.85	Gladstone
+6.0	148.21	-20.0	Bowen
+6.0	146.04	-17.53	Innisfail
+6.0	149.15	-21.14	Mackay
+6.0	145.92	-41.07	Burnie
+6.0	147.13	-41.45	Launceston
+6.0	-1.15	60.15	Lerwick
+6.0	37.38	37.08	Gaziantep
+6.0	89.28	25.75	Rangpur
+6.0	96.51	17.32	Bago
+6.0	96.44	18.48	Pyu
+6.0	95.21	18.82	Pyay
+6.0	94.92	20.14	Magway
+6.0	97.39	25.36	Myitkyina
+6.0	95.15	22.1	Monywa
+6.0	-4.75	41.65	Valladolid
+6.0	3.2	13.05	Dosso
+6.0	36.72	34.73	Homs
+6.0	27.4	8.77	Aweil
+6.0	37.73	18.43	Tokar
+6.0	14.65	63.18	Östersund
+6.0	20.22	67.85	Kiruna
+6.0	20.24	63.83	Umeå
+6.0	23.6	46.79	Cluj-Napoca
+6.0	99.97	8.4	Nakhon Si Thammarat
+6.0	100.56	7.21	Songkhla
+6.0	100.47	7.0	Hat Yai
+6.0	100.07	15.7	Nakhon Sawan
+6.0	104.83	15.25	Ubon Ratchathani
+6.0	-81.12	-5.09	Paita
+6.0	-81.28	-4.58	Talara
+6.0	-80.46	-3.57	Tumbes
+6.0	-69.18	-12.6	Puerto Maldonado
+6.0	-71.34	-17.64	Ilo
+6.0	-70.94	-17.19	Moquegua
+6.0	-77.53	-9.53	Huaraz
+6.0	-78.53	-7.15	Cajamarca
+6.0	-76.24	-9.92	Huánuco
+6.0	-79.57	-7.4	Pacasmayo
+6.0	-78.99	-8.22	Salaverry
+6.0	-75.23	-0.12	Gueppi
+6.0	-75.02	-7.34	Contamana
+6.0	-74.99	-12.79	Huancavelica
+6.0	-76.22	-13.71	Pisco
+6.0	-74.94	-14.83	Nasca
+6.0	-60.03	-22.34	Filadelfia
+6.0	-83.76	12.0	Bluefields
+6.0	-2.95	35.3	Melilla
+6.0	-16.88	32.65	Funchal
+6.0	-11.74	7.97	Bo
+6.0	-16.29	12.59	Ziguinchor
+6.0	7.39	18.74	Arlit
+6.0	12.31	21.01	Djado
+6.0	2.65	39.57	Palma
+6.0	36.46	26.23	Al Wajh
+6.0	29.68	6.8	Rumbek
+6.0	28.42	4.57	Yambio
+6.0	31.56	6.21	Bor
+6.0	33.52	14.4	Medani
+6.0	35.38	14.04	Gedaref
+6.0	33.96	17.59	Ad-Damir
+6.0	33.98	17.71	Atbarah
+6.0	31.35	21.8	Wadi Halfa
+6.0	31.82	18.48	Merowe
+6.0	32.66	13.17	Kosti
+6.0	33.6	13.55	Sennar
+6.0	25.35	13.63	El Fasher
+6.0	29.7	11.01	Kadugli
+6.0	42.5	18.23	Abha
+6.0	42.56	16.91	Jizan
+6.0	32.05	3.6	Nimule
+6.0	7.18	62.75	Molde
+6.0	30.05	69.73	Kirkenes
+6.0	45.57	20.46	As Sulayyil
+6.0	24.0	-30.65	De Aar
+6.0	16.5	-28.61	Alexander Bay
+6.0	24.77	-28.75	Kimberley
+6.0	22.19	-33.58	Oudtshoorn
+6.0	18.73	-31.62	Vanhynsdorp
+6.0	17.93	-33.01	Saldanha
+6.0	22.13	-34.17	Mossel Bay
+6.0	33.47	-19.12	Chimoio
+6.0	35.24	-13.3	Lichinga
+6.0	39.91	-16.23	Angoche
+6.0	40.68	-15.04	Mocambique
+6.0	24.73	-26.96	Vryburg
+6.0	27.24	-25.65	Rustenburg
+6.0	25.61	-25.83	Mmabatho
+6.0	26.62	-26.88	Klerksdorp
+6.0	27.21	-27.66	Kroonstad
+6.0	29.45	-23.89	Polokwane
+6.0	30.48	-22.95	Thohoyandou
+6.0	30.03	-22.34	Musina
+6.0	30.79	-27.76	Vryheid
+6.0	30.39	-29.61	Pietermaritzburg
+6.0	143.64	-3.55	Wewak
+6.0	145.79	-5.22	Madang
+6.0	150.81	-2.58	Kavieng
+6.0	-82.87	8.28	Puerto Armuelles
+6.0	-5.81	35.78	Tangier
+6.0	-9.62	30.44	Agadir
+6.0	35.34	-23.86	Inhambane
+6.0	28.79	-31.58	Umtata
+6.0	24.54	-32.3	Graaff Reinet
+6.0	27.39	-32.87	Bhisho
+6.0	43.65	3.12	Baydhabo
+6.0	44.77	1.72	Marka
+6.0	-173.23	64.42	Provideniya
+6.0	-169.81	66.15	Uelen
+6.0	32.41	67.16	Kandalaksha
+6.0	28.75	60.7	Vyborg
+6.0	34.29	62.21	Kondopoga
+6.0	56.37	70.6	Rusanovo
+6.0	44.24	65.85	Mezen
+6.0	42.1	61.07	Velsk
+6.0	46.66	61.26	Kotlas
+6.0	38.08	63.93	Onega
+6.0	41.01	57.01	Ivanovo
+6.0	40.94	57.77	Kostroma
+6.0	46.3	60.77	Velikiy Ustyug
+6.0	36.07	52.97	Orel
+6.0	42.16	47.51	Volgodonsk
+6.0	36.6	50.63	Belgorod
+6.0	37.77	44.73	Novorossiysk
+6.0	40.41	56.13	Vladimir
+6.0	55.54	55.42	Birsk
+6.0	59.65	55.17	Zlatoust
+6.0	61.67	69.76	Amderma
+6.0	53.06	67.65	Naryan Mar
+6.0	60.17	66.04	Inta
+6.0	57.4	65.92	Usinsk
+6.0	57.21	65.16	Pechora
+6.0	59.96	56.91	Pervouralsk
+6.0	53.23	56.85	Izhevsk
+6.0	46.17	48.28	Akhtubinsk
+6.0	44.21	46.33	Elista
+6.0	45.7	51.02	Krasnoarmeysk
+6.0	57.53	22.93	Nizwa
+6.0	59.53	22.58	Sur
+6.0	47.3	3.77	Mereeg
+6.0	45.2	4.74	Beledweyne
+6.0	49.18	11.28	Boosaaso
+6.0	50.82	9.48	Bandarbeyla
+6.0	47.43	6.77	Gaalkacyo
+6.0	49.83	7.98	Eyl
+6.0	48.5	8.4	Garoowe
+6.0	80.38	8.35	Anuradhapura
+6.0	80.01	9.68	Jaffna
+6.0	122.98	10.63	Bacolod
+6.0	122.75	11.59	Roxas
+6.0	118.74	9.75	Puerto Princesa
+6.0	123.18	13.62	Naga
+6.0	120.55	15.15	Angeles
+6.0	121.02	13.78	Batangas
+6.0	124.25	7.22	Cotabato
+6.0	124.6	12.07	Calbayog
+6.0	124.69	8.45	Cagayan de Oro
+6.0	42.75	0.07	Jamaame
+6.0	42.52	-0.36	Kismaayo
+6.0	-109.9	22.89	Cabo San Lucas
+6.0	-101.42	26.9	Monclova
+6.0	-98.42	16.68	Ometepec
+6.0	-86.95	20.51	Cozumel
+6.0	-16.51	16.02	Saint-Louis
+6.0	-11.42	18.55	Tidjikdja
+6.0	4.55	8.49	Ilorin
+6.0	6.55	9.62	Minna
+6.0	7.71	11.08	Zaria
+6.0	8.89	9.93	Jos
+6.0	12.48	9.21	Yola
+6.0	19.46	51.77	Łódź
+6.0	56.76	59.42	Berezniki
+6.0	18.13	-26.57	Keetmanshoop
+6.0	16.94	-24.84	Maltahöhe
+6.0	14.54	-22.67	Swakopmund
+6.0	15.77	-17.78	Ongwediva
+6.0	19.75	-17.92	Rundu
+6.0	17.71	-19.24	Tsumeb
+6.0	32.8	-5.02	Tabora
+6.0	39.7	-10.0	Lindi
+6.0	35.65	-10.68	Songea
+6.0	39.09	-5.07	Tanga
+6.0	-0.89	41.65	Zaragoza
+6.0	-10.07	28.98	Goulimine
+6.0	-11.68	26.73	Smara
+6.0	-15.94	23.71	Ad Dakhla
+6.0	27.8	11.33	Babanusa
+6.0	98.8	1.75	Sibolga
+6.0	99.06	2.96	Pematangsiantar
+6.0	101.42	0.57	Pekanbaru
+6.0	124.85	1.48	Manado
+6.0	110.38	-7.78	Yogyakarta
+6.0	122.6	-3.96	Kendari
+6.0	119.83	-0.91	Palu
+6.0	135.51	-3.35	Nabire
+6.0	140.4	-8.49	Merauke
+6.0	-8.62	52.66	Limerick
+6.0	-9.04	5.01	Greenville
+6.0	-10.05	5.92	Buchanan
+6.0	-11.37	6.75	Robertsport
+6.0	15.78	4.25	Berbérati
+6.0	21.98	6.53	Bria
+6.0	37.98	2.33	Marsabit
+6.0	39.05	3.52	Moyale
+6.0	36.07	-0.28	Nakuru
+6.0	26.51	55.88	Daugavpils
+6.0	97.14	5.19	Lhokseumawe
+6.0	100.72	4.86	Taiping
+6.0	101.06	4.6	Ipoh
+6.0	102.23	6.12	Kota Baharu
+6.0	102.25	2.21	Malacca
+6.0	103.32	3.83	Kuantan
+6.0	118.75	30.95	Xuanzhou
+6.0	113.57	22.28	Zhuhai
+6.0	117.15	-0.5	Samarinda
+6.0	117.9	4.27	Tawau
+6.0	118.11	5.84	Sandakan
+6.0	116.11	5.98	Kota Kinabalu
+6.0	111.84	2.3	Sibu
+6.0	40.92	-2.26	Lamu
+6.0	40.1	-3.21	Malindi
+6.0	34.75	-0.09	Kisumu
+6.0	47.03	-19.85	Antsirabe
+6.0	50.28	-14.88	Antalaha
+6.0	48.27	-13.4	Andoany
+6.0	47.83	-22.82	Farafangana
+6.0	48.33	-21.22	Mananjary
+6.0	44.02	-18.07	Maintirano
+6.0	49.4	-18.18	Toamasina
+6.0	49.73	-15.43	Maroantsetra
+6.0	46.99	-25.03	Tôlanaro
+6.0	43.37	-21.74	Morombe
+6.0	44.07	-25.02	Androka
+6.0	44.28	-20.28	Morondava
+6.0	108.57	-6.73	Cirebon
+6.0	108.21	-7.33	Tasikmalaya
+6.0	106.75	-6.57	Bogor
+6.0	102.27	-3.8	Bengkulu
+6.0	109.32	-0.03	Pontianak
+6.0	104.9	-4.83	Kotabumi
+6.0	103.53	-3.8	Lahat
+6.0	106.15	-2.08	Pangkalpinang
+6.0	113.69	-8.17	Jember
+6.0	114.84	-3.41	Martapura
+6.0	120.47	-8.61	Ruteng
+6.0	-79.96	-3.26	Machala
+6.0	-79.21	-3.99	Loja
+6.0	-80.73	-0.98	Manta
+6.0	-78.65	-1.67	Riobamba
+6.0	-71.23	18.81	San Juan
+6.0	-78.81	1.81	Tumaco
+6.0	21.51	2.14	Lisala
+6.0	19.77	3.26	Gemena
+6.0	21.59	17.18	Fada
+6.0	19.12	17.92	Faya Largeau
+6.0	15.31	14.12	Mao
+6.0	9.77	1.87	Bata
+6.0	20.92	14.53	Biltine
+6.0	18.39	9.15	Sarh
+6.0	20.28	11.03	Am Timan
+6.0	25.52	29.2	Siwa
+6.0	30.75	28.09	El Minya
+6.0	32.95	24.47	Kom Ombo
+6.0	30.55	25.44	El Kharga
+6.0	33.83	27.23	Hurghada
+6.0	24.74	2.82	Buta
+6.0	29.53	3.04	Watsa
+6.0	27.62	2.76	Isiro
+6.0	23.67	3.81	Bondo
+6.0	26.71	58.38	Tartu
+6.0	108.71	34.35	Xianyang
+6.0	112.13	32.02	Xiangyang
+6.0	105.53	30.54	Suining
+6.0	119.4	41.24	Lingyuan
+6.0	122.1	37.5	Weihai
+6.0	114.4	27.84	Yichun
+6.0	120.17	33.34	Yancheng
+6.0	119.95	30.06	Fuyang
+6.0	18.28	-1.94	Inongo
+6.0	20.77	-6.41	Tshikapa
+6.0	13.05	-5.83	Boma
+6.0	28.84	-2.51	Bukavu
+6.0	29.14	-3.37	Uvira
+6.0	25.91	-2.96	Kindu
+6.0	23.44	-7.0	Mwene-Ditu
+6.0	26.78	-10.97	Likasi
+6.0	27.45	-7.3	Manono
+6.0	25.01	-8.73	Kamina
+6.0	35.13	-16.55	Chiromo
+6.0	35.31	-15.39	Zomba
+6.0	103.61	-1.59	Jambi
+6.0	134.07	-0.87	Manokwari
+6.0	-52.65	5.16	Kourou
+6.0	-1.63	6.69	Kumasi
+6.0	-1.7	4.94	Sekondi
+6.0	11.58	1.62	Oyem
+6.0	24.51	58.37	Pärnu
+6.0	79.99	14.44	Nellore
+6.0	78.03	15.83	Kurnool
+6.0	80.45	16.33	Guntur
+6.0	77.1	13.33	Tumakuru
+6.0	75.92	14.47	Davangere
+6.0	76.92	15.15	Ballari
+6.0	74.51	15.87	Belagavi
+6.0	10.65	-3.42	Mayumba
+6.0	10.0	-2.65	Gamba
+6.0	-1.15	46.17	La Rochelle
+6.0	-3.98	22.67	Taoudenni
+6.0	-3.53	18.9	Araouane
+6.0	1.09	20.2	Tessalit
+6.0	2.4	15.92	Ménaka
+6.0	-70.19	-22.09	Tocopilla
+6.0	-68.92	-22.45	Calama
+6.0	-70.45	-23.1	Mejillones
+6.0	-70.47	-25.4	Taltal
+6.0	-70.76	-28.57	Vallenar
+6.0	-70.62	-26.35	Chañaral
+6.0	-71.2	-30.61	Ovalle
+6.0	-72.11	-36.61	Chillán
+6.0	-70.74	-34.17	Rancagua
+6.0	-73.13	-40.58	Osorno
+6.0	-73.83	-41.87	Ancud
+6.0	-71.67	-35.43	Talca
+6.0	-71.24	-34.98	Curicó
+6.0	-11.58	25.23	Bir Mogrein
+6.0	-15.81	16.52	Rosso
+6.0	-11.4	16.62	Kiffa
+6.0	-7.28	15.18	Nara
+6.0	-7.55	12.88	Koulikoro
+6.0	-4.18	14.49	Mopti
+6.0	16.05	1.61	Ouésso
+6.0	9.5	30.13	Ghadamis
+6.0	22.11	37.04	Kalamata
+6.0	15.93	29.12	Hun
+6.0	14.28	27.53	Birak
+6.0	10.17	24.96	Ghat
+6.0	13.9	25.9	Marzuq
+6.0	20.22	30.77	Ajdabiya
+6.0	21.29	29.11	Awjilah
+6.0	16.59	31.21	Surt
+6.0	22.64	32.76	Darnah
+6.0	23.96	32.08	Tubruq
+6.0	25.13	35.33	Iraklio
+6.0	41.02	43.02	Sukhumi
+6.0	35.83	34.44	Ṭarābulus
+6.0	37.72	10.34	Debre Markos
+6.0	39.63	11.13	Dese
+6.0	37.75	6.9	Sodo
+6.0	37.55	6.04	Arba Minch
+6.0	42.15	9.32	Harar
+6.0	39.97	7.01	Goba
+6.0	36.83	7.68	Jima
+6.0	39.27	8.55	Nazret
+6.0	39.58	5.32	Negele Boran
+6.0	43.45	5.95	Gode
+6.0	42.08	4.18	Dolo Bay
+6.0	24.58	65.73	Kemi
+6.0	25.47	65.0	Oulu
+6.0	59.61	47.84	Shalqar
+6.0	62.11	45.76	Qazaly
+6.0	61.67	46.8	Aral
+6.0	54.02	46.98	Qulsary
+6.0	51.33	51.27	Oral
+6.0	50.83	28.92	Bandar-e Bushehr
+6.0	48.28	30.33	Abadan
+6.0	48.3	38.25	Ardabil
+6.0	50.95	34.65	Qom
+6.0	50.0	36.27	Qazvin
+6.0	55.1	45.18	Beyneu
+6.0	51.24	43.62	Aqtau
+6.0	47.06	34.38	Kermanshah
+6.0	59.22	32.88	Birjand
+6.0	57.63	36.22	Sabzewar
+6.0	61.48	31.02	Zabol
+6.0	60.83	29.5	Zahedan
+6.0	78.13	8.8	Tuticorin
+6.0	77.98	10.36	Dindigul
+6.0	10.21	56.16	Århus
+6.0	-5.64	9.46	Korhogo
+6.0	-12.3	11.32	Labé
+6.0	-14.3	10.94	Boké
+6.0	-12.87	10.06	Kindia
+6.0	-6.45	6.89	Daloa
+6.0	27.25	-29.82	Mafetang
+6.0	-68.77	-11.02	Cobija
+6.0	-68.67	-9.07	Sena Madureira
+6.0	-66.09	-2.51	Fonte Boa
+6.0	-69.87	-6.66	Eirunepé
+6.0	-61.3	-5.81	Manicoré
+6.0	-62.92	-0.97	Barcelos
+6.0	-67.8	-2.87	Tonantins
+6.0	-64.7	-3.36	Tefé
+6.0	-63.13	-4.08	Coari
+6.0	-67.08	-0.13	São Gabriel da Cachoeira
+6.0	-60.94	-2.62	Novo Airão
+6.0	-58.44	-3.14	Itacoatiara
+6.0	-56.74	-2.61	Parintins
+6.0	-60.27	-6.98	Natal
+6.0	-63.04	-7.46	Crato
+6.0	-47.49	-5.52	Imperatriz
+6.0	-46.05	-7.52	Balsas
+6.0	-50.49	-1.68	Breves
+6.0	-57.76	-6.23	Jacareacanga
+6.0	-49.67	-3.77	Tucuruí
+6.0	-55.93	-4.26	Itaituba
+6.0	-49.29	-8.25	Conceição do Araguaia
+6.0	-48.88	-1.72	Abaetetuba
+6.0	-64.42	-12.42	Principe da Beira
+6.0	-48.21	-7.19	Araguaína
+6.0	-48.29	-10.24	Palmas
+6.0	-41.5	-17.87	Teófilo Otoni
+6.0	-47.95	-19.78	Uberaba
+6.0	-44.37	-15.48	Januária
+6.0	-59.95	-15.0	Santissima Trindade
+6.0	-59.44	-10.18	Aripuanã
+6.0	-55.46	-11.85	Sinop
+6.0	-53.37	-32.56	Jaguarão
+6.0	-54.1	-31.32	Bagé
+6.0	-51.18	-23.3	Londrina
+6.0	-49.39	-28.68	Criciúma
+6.0	-37.77	-4.56	Aracati
+6.0	-38.85	-6.4	Icó
+6.0	-41.77	-2.91	Parnaíba
+6.0	-41.44	-7.08	Picos
+6.0	-36.67	-9.75	Arapiraca
+6.0	-40.08	-13.85	Jequié
+6.0	-39.05	-14.78	Ilhéus
+6.0	-38.96	-15.64	Canavieiras
+6.0	-44.21	-13.39	Santa Maria da Vitória
+6.0	-41.87	-11.3	Irecê
+6.0	-42.73	-10.82	Xique-Xique
+6.0	-40.05	-19.39	Linhares
+6.0	-41.32	-21.75	Campos
+6.0	-37.34	-5.19	Mossoró
+6.0	-37.12	-10.9	Aracaju
+6.0	-97.83	53.97	Norway House
+6.0	-101.88	54.77	Flin Flon
+6.0	-100.05	51.15	Dauphin
+6.0	-101.23	53.82	The Pas
+6.0	-108.62	59.57	Uranium City
+6.0	-105.55	50.4	Moose Jaw
+6.0	-118.08	52.88	Jasper
+6.0	-110.68	50.03	Medicine Hat
+6.0	-113.8	52.27	Red Deer
+6.0	-115.57	51.18	Banff
+6.0	-118.8	55.17	Grand Prairie
+6.0	-127.17	54.77	Smithers
+6.0	-120.33	50.67	Kamloops
+6.0	-122.15	52.12	Williams Lake
+6.0	-122.69	58.8	Fort Nelson
+6.0	-78.0	72.68	Pond Inlet
+6.0	-76.54	64.31	Cape Dorset
+6.0	-69.88	62.85	Kimmirut
+6.0	-95.92	68.63	Gjoa Haven
+6.0	-82.95	76.44	Grise Fiord
+6.0	-62.25	82.48	Alert
+6.0	-100.88	61.13	Ennadai
+6.0	-92.1	62.82	Rankin Inlet
+6.0	-113.68	61.17	Fort Resolution
+6.0	-121.33	61.85	Fort Simpson
+6.0	-133.7	68.35	Inuvik
+6.0	-133.05	69.45	Tuktoyaktuk
+6.0	-128.71	60.06	Watson Lake
+6.0	-52.48	-0.85	Laranjal do Jari
+6.0	-50.8	2.05	Amapá
+6.0	-51.22	3.22	Vila Velha
+6.0	-87.88	52.22	Lansdowne House
+6.0	-80.66	51.28	Moosonee
+6.0	-80.97	46.5	Sudbury
+6.0	-94.47	49.77	Kenora
+6.0	-64.49	48.84	Gaspé
+6.0	-64.02	50.3	Mingan
+6.0	-72.23	48.87	Dolbeau
+6.0	-77.77	48.12	Val d'Or
+6.0	-77.9	62.42	Ivugivik
+6.0	-78.14	58.47	Inukjuak
+6.0	-71.07	48.43	Chicoutimi
+6.0	-64.77	46.08	Moncton
+6.0	-66.63	45.95	Fredericton
+6.0	-65.65	47.6	Bathurst
+6.0	-66.11	43.83	Yarmouth
+6.0	-54.55	48.95	Gander
+6.0	-57.01	53.7	Cartwright
+6.0	-58.45	54.18	Rigolet
+6.0	-64.74	60.27	Port Burwell
+6.0	15.6	5.95	Bouar
+6.0	-67.72	-49.3	Puerto San Julián
+6.0	-70.93	-46.6	Perito Moreno
+6.0	-67.7	-53.79	Rio Grande
+6.0	-68.31	-54.79	Ushuaia
+6.0	-69.08	-45.6	Sarmiento
+6.0	-68.33	-34.6	San Rafael
+6.0	-58.75	-38.56	Necochea
+6.0	-64.08	-38.97	Río Colorado
+6.0	-65.78	-28.47	Catamarca
+6.0	-66.85	-29.41	La Rioja
+6.0	-64.27	-27.78	Santiago del Estero
+6.0	-58.99	-27.46	Resistencia
+6.0	-58.52	-33.02	Gualeguaychú
+6.0	-46.33	-23.96	Santos
+6.0	-49.08	-22.33	Bauru
+6.0	-47.57	-24.72	Iguape
+6.0	-47.39	-20.53	Franca
+6.0	-36.5	-8.89	Garanhuns
+6.0	-35.98	-8.28	Caruaru
+6.0	62.1	32.39	Farah
+6.0	20.83	-7.38	Dundo
+6.0	13.13	-7.85	Ambriz
+6.0	14.43	-9.69	Dondo
+6.0	13.85	-11.21	Sumbe
+6.0	15.05	-7.62	Uíge
+6.0	16.94	-12.38	Kuito
+6.0	13.54	-12.37	Lobito
+6.0	14.97	-16.74	Xangongo
+6.0	19.9	-11.79	Luena
+6.0	11.86	-15.8	Tômbua
+6.0	-58.42	-16.36	San Matias
+6.0	-60.78	-17.85	San Jose
+6.0	-0.29	27.87	Adrar
+6.0	0.17	26.7	Reggane
+6.0	-2.23	31.61	Béchar
+6.0	-8.15	27.67	Tindouf
+6.0	8.47	26.48	Illizi
+6.0	3.75	25.28	Arak
+6.0	2.47	27.22	I-n-Salah
+6.0	2.88	30.57	El Goléa
+6.0	2.88	33.81	Laghouat
+6.0	6.06	33.1	Touggourt
+6.0	5.34	31.97	Ouargla
+6.0	5.73	34.86	Biskra
+6.0	3.25	34.68	Djelfa
+6.0	5.4	36.18	Sétif
+6.0	6.17	35.57	Batna
+6.0	27.47	42.51	Burgas
+6.0	30.19	55.19	Vitsyebsk
+6.0	25.51	-24.4	Molepolole
+6.0	98.61	12.45	Myeik
+6.0	158.15	6.92	Palikir
+6.0	171.38	7.1	Majuro
+6.0	144.75	13.47	Agana
+6.0	-66.73	18.44	Arecibo
+6.0	179.22	-8.52	Funafuti
+6.0	134.63	7.49	Melekeok
+6.0	-9.65	26.12	Bir Lehlou
+6.0	173.02	1.34	Tarawa
+6.0	-37.63	65.6	Tasiilaq
+6.0	43.24	-11.7	Moroni
+6.0	113.54	22.19	Macau
+6.0	1.53	42.51	Andorra
+6.0	-65.11	76.02	Savissivik
+6.0	-55.55	72.38	Kangersuatsiaq
+6.0	-52.12	70.68	Uummannaq
+6.0	-16.25	28.47	Santa Cruz de Tenerife
+6.0	-159.79	-21.2	Avarua
+6.0	-122.03	36.97	Santa Cruz
+6.0	121.6	23.98	Hualien
+6.0	120.2	23.0	Tainan
+6.0	121.14	22.76	Taitung
+6.0	175.61	-40.35	Palmerston North
+6.0	175.04	-39.93	Whanganui
+6.0	176.84	-39.64	Hastings
+6.0	178.02	-38.66	Gisborne
+6.0	176.25	-38.13	Rotorua
+6.0	176.08	-38.69	Taupo
+6.0	176.15	-37.7	Tauranga
+6.0	171.24	-44.4	Timaru
+6.0	173.25	-41.29	Nelson
+6.0	174.32	-35.73	Whangarei
+6.0	168.73	-45.02	Queenstown
+6.0	168.37	-46.41	Invercargill
+6.1	10.42	33.4	Medenine
+6.1	35.15	42.02	Sinop
+6.1	-7.91	38.56	Évora
+6.1	-8.68	39.23	Santarém
+6.1	6.44	60.63	Vossavangen
+6.1	11.07	60.82	Hamar
+6.1	27.29	61.69	Mikkeli
+6.1	44.78	43.23	Nazran
+6.1	-54.95	-34.97	Punta del Este
+6.1	-96.37	30.67	Bryan
+6.1	-72.1	41.36	New London
+6.1	-89.07	42.27	Rockford
+6.1	-86.25	41.68	South Bend
+6.1	-91.5	44.81	Eau Claire
+6.1	-88.4	44.27	Appleton
+6.1	-76.31	40.04	Lancaster
+6.1	-75.5	40.6	Allentown
+6.1	-5.57	42.58	León
+6.1	15.42	60.48	Borlänge
+6.1	16.56	59.61	Västerås
+6.1	31.98	46.97	Mykolayiv
+6.1	30.21	48.75	Uman
+6.1	33.34	47.93	Kryvyy Rih
+6.1	38.05	48.3	Horlivka
+6.1	37.53	48.72	Kramatorsk
+6.1	36.79	46.76	Berdyansk
+6.1	-2.67	42.85	Vitoria
+6.1	-3.95	51.63	Swansea
+6.1	28.36	37.22	Muğla
+6.1	34.95	40.52	Corum
+6.1	18.41	47.19	Székesfehérvár
+6.1	21.92	47.05	Oradea
+6.1	38.05	24.09	Yanbu al Bahr
+6.1	42.6	20.01	Qal at Bishah
+6.1	44.65	43.75	Mozdok
+6.1	43.47	44.16	Georgievsk
+6.1	43.09	44.08	Pyatigorsk
+6.1	38.5	52.58	Yelets
+6.1	40.08	47.42	Novocherkassk
+6.1	39.92	47.77	Novoshakhtinsk
+6.1	37.38	51.27	Gubkin
+6.1	40.5	52.9	Michurinsk
+6.1	48.48	53.17	Syzran
+6.1	52.39	55.73	Naberezhnyye Chelny
+6.1	52.45	54.6	Leninogorsk
+6.1	-7.11	52.26	Waterford
+6.1	16.27	41.32	Barletta
+6.1	35.85	32.55	Irbid
+6.1	13.24	46.07	Udine
+6.1	7.02	51.45	Essen
+6.1	14.45	45.33	Rijeka
+6.1	125.75	41.68	Tonghua
+6.1	2.9	42.7	Perpignan
+6.1	21.77	61.48	Pori
+6.1	44.92	31.99	Ad Diwaniyah
+6.1	48.5	36.67	Zanjan
+6.1	77.7	29.49	Muzaffarnagar
+6.1	19.68	46.07	Subotica
+6.1	-80.94	44.57	Owen Sound
+6.1	-82.4	42.97	Sarnia
+6.1	-81.25	42.97	London
+6.1	16.25	47.82	Wiener Neustadt
+6.1	16.18	54.2	Koszalin
+6.1	-94.16	45.56	St. Cloud
+6.1	-111.04	45.68	Bozeman
+6.1	-114.46	42.56	Twin Falls
+6.1	-119.29	46.29	Richland
+6.1	-122.49	48.76	Bellingham
+6.1	-114.57	35.15	Bullhead City
+6.1	-112.14	36.05	Grand Canyon
+6.1	-121.29	37.96	Stockton
+6.1	-117.02	34.9	Barstow
+6.1	-119.32	36.33	Visalia
+6.1	-120.66	35.28	San Luis Obispo
+6.1	-120.48	37.3	Merced
+6.1	-122.39	40.59	Redding
+6.1	-122.7	38.45	Santa Rosa
+6.1	-120.99	37.66	Modesto
+6.1	-116.53	33.78	Palm Springs
+6.1	-124.2	41.76	Crescent City
+6.1	-105.06	40.56	Fort Collins
+6.1	-104.63	38.28	Pueblo
+6.1	-105.24	40.01	Boulder
+6.1	-106.78	32.31	Las Cruces
+6.1	-108.73	35.52	Gallup
+6.1	-109.55	38.57	Moab
+6.1	-113.06	37.68	Cedar City
+6.1	-111.97	41.23	Ogden
+6.1	-94.16	36.06	Fayetteville
+6.1	-90.59	41.55	Davenport
+6.1	-92.12	32.51	Monroe
+6.1	-98.16	26.3	Edinburg
+6.1	-93.93	29.9	Port Arthur
+6.1	-71.32	42.63	Lowell
+6.1	-87.54	33.23	Tuscaloosa
+6.1	-81.79	26.14	Naples
+6.1	-80.33	27.45	Fort Pierce
+6.1	-80.14	26.14	Fort Lauderdale
+6.1	-84.16	31.58	Albany
+6.1	-83.38	33.96	Athens
+6.1	-83.63	32.85	Macon
+6.1	-84.98	32.47	Columbus
+6.1	-82.39	34.85	Greenville
+6.1	-87.84	42.36	Waukegan
+6.1	-85.13	41.08	Fort Wayne
+6.1	-78.89	35.05	Fayetteville
+6.1	-80.26	36.11	Winston-Salem
+6.1	-75.7	36.08	Kitty Hawk
+6.1	-79.94	37.27	Roanoke
+6.1	-74.42	39.36	Atlantic City
+6.1	-75.66	41.41	Scranton
+6.1	-80.08	42.13	Erie
+6.1	-66.25	9.34	Chaguaramas
+6.1	-64.26	8.89	El Tigre
+6.1	-83.72	42.3	Ann Arbor
+6.1	-85.59	42.29	Kalamazoo
+6.1	-83.69	43.01	Flint
+6.1	-85.67	42.96	Grand Rapids
+6.1	-2.43	36.83	Almería
+6.1	-4.02	39.87	Toledo
+6.1	-5.67	40.97	Salamanca
+6.1	-3.68	42.35	Burgos
+6.1	10.73	36.46	Nabeul
+6.1	10.1	33.9	Gabès
+6.1	39.02	35.93	Ar Raqqah
+6.1	43.32	14.2	Zabīd
+6.1	8.97	46.0	Lugano
+6.1	16.37	61.35	Bollnäs
+6.1	17.17	60.67	Gävle
+6.1	16.37	56.67	Kalmar
+6.1	14.82	56.88	Växjö
+6.1	15.22	59.28	Örebro
+6.1	13.5	59.37	Karlstad
+6.1	20.95	64.77	Skellefteå
+6.1	18.3	57.63	Visby
+6.1	34.4	45.72	Dzhankoy
+6.1	34.1	44.95	Simferopol
+6.1	32.6	46.63	Kherson
+6.1	31.33	47.55	Voznesensk
+6.1	25.92	48.31	Chernivtsi
+6.1	25.33	50.75	Lutsk
+6.1	28.48	49.23	Vinnytsya
+6.1	34.41	47.57	Nikopol
+6.1	37.6	49.72	Kupyansk
+6.1	38.43	48.92	Lysychansk
+6.1	39.33	48.57	Luhansk
+6.1	34.57	49.57	Poltava
+6.1	33.43	49.08	Kremenchuk
+6.1	35.38	46.84	Melitopol
+6.1	54.02	12.65	Hadiboh
+6.1	55.94	25.79	Ras al Khaymah
+6.1	64.55	39.72	Kogon
+6.1	64.2	41.58	Zarafshon
+6.1	65.8	38.87	Qarshi
+6.1	67.83	40.1	Jizzax
+6.1	99.61	7.56	Trang
+6.1	99.48	18.29	Lampang
+6.1	99.75	17.01	Sukhothai
+6.1	100.62	14.8	Lop Buri
+6.1	101.38	14.06	Prachin Buri
+6.1	99.94	12.57	Hua Hin
+6.1	108.1	10.93	Phan Thiet
+6.1	104.98	22.83	Ha Giang
+6.1	31.18	-10.2	Kasama
+6.1	167.18	-15.51	Luganville
+6.1	-14.39	65.27	Egilsstaðir
+6.1	-19.64	65.75	Sauðárkrókur
+6.1	-21.0	63.93	Selfoss
+6.1	-0.98	37.6	Cartagena
+6.1	-1.98	43.32	San Sebastián
+6.1	30.68	4.09	Yei
+6.1	33.42	16.68	Shendi
+6.1	-2.11	57.15	Aberdeen
+6.1	-3.44	56.39	Perth
+6.1	-1.23	54.58	Middlesbrough
+6.1	-2.35	51.38	Bath
+6.1	0.12	52.2	Cambridge
+6.1	-0.33	53.75	Kingston upon Hull
+6.1	-7.33	55.0	Londonderry/Derry
+6.1	-5.55	50.13	Penzance
+6.1	-3.55	55.07	Dumfries
+6.1	26.41	40.15	Çanakkale
+6.1	26.57	41.67	Edirne
+6.1	29.93	40.78	İzmit
+6.1	31.61	40.74	Bolu
+6.1	30.55	38.75	Afyon
+6.1	29.08	37.77	Denizli
+6.1	27.44	38.63	Manisa
+6.1	38.28	37.77	Adıyaman
+6.1	38.3	38.37	Malatya
+6.1	37.03	39.75	Sivas
+6.1	41.29	39.92	Erzurum
+6.1	39.49	39.75	Erzincan
+6.1	40.23	37.92	Diyarbakır
+6.1	1.3	52.63	Norwich
+6.1	127.75	34.74	Yeosu
+6.1	126.52	33.51	Jeju
+6.1	-0.17	50.83	Brighton
+6.1	-4.23	57.47	Inverness
+6.1	-1.25	51.75	Oxford
+6.1	-1.08	50.8	Portsmouth
+6.1	-2.18	53.0	Stoke
+6.1	31.78	41.43	Zonguldak
+6.1	34.05	37.51	Ereğli
+6.1	33.22	37.18	Karaman
+6.1	33.53	39.85	Kırıkkale
+6.1	43.1	40.61	Kars
+6.1	40.74	37.31	Mardin
+6.1	43.4	38.5	Van
+6.1	32.07	1.7	Masindi-Port
+6.1	18.22	46.08	Pécs
+6.1	17.63	47.7	Győr
+6.1	20.15	46.25	Szeged
+6.1	21.63	47.53	Debrecen
+6.1	31.62	-7.96	Sumbawanga
+6.1	30.6	-7.43	Kipili
+6.1	33.18	-4.21	Nzega
+6.1	30.96	-3.28	Kakonko
+6.1	30.1	-4.58	Kasulu
+6.1	35.69	-7.77	Iringa
+6.1	33.8	-1.49	Musoma
+6.1	38.54	-5.09	Korogwe
+6.1	1.3	51.13	Dover
+6.1	12.3	58.27	Trollhättan
+6.1	12.72	56.04	Helsingborg
+6.1	-0.05	39.97	Castello
+6.1	28.42	12.69	En Nuhud
+6.1	23.83	44.33	Craiova
+6.1	24.56	46.56	Tirgu Mures
+6.1	24.88	44.86	Pitești
+6.1	25.61	45.65	Brașov
+6.1	26.92	46.58	Bacău
+6.1	-7.93	37.02	Faro
+6.1	20.31	42.66	Pec
+6.1	43.96	26.37	Buraydah
+6.1	41.7	27.52	Hail
+6.1	41.02	30.99	Arar
+6.1	43.49	29.62	Rafha
+6.1	35.57	3.13	Lodwar
+6.1	40.05	1.75	Wajir
+6.1	39.67	-0.44	Garissa
+6.1	6.58	53.22	Groningen
+6.1	16.52	68.79	Harstad
+6.1	10.2	59.74	Drammen
+6.1	11.5	64.02	Steinkjer
+6.1	21.56	57.39	Ventspils
+6.1	21.12	55.72	Klaipėda
+6.1	21.25	48.73	Košice
+6.1	23.88	54.95	Kaunas
+6.1	47.31	24.16	Al Kharj
+6.1	45.96	28.43	Hafar al Batin
+6.1	49.65	27.0	Al Jubayl
+6.1	74.3	35.92	Gilgit
+6.1	71.47	32.45	Kundian
+6.1	72.32	31.28	Jhang
+6.1	70.13	28.3	Sadiqabad
+6.1	68.4	26.25	Nawabshah
+6.1	76.19	42.46	Balykchy
+6.1	75.8	41.17	At Bashy
+6.1	72.94	41.88	Toktogul
+6.1	72.79	40.54	Osh
+6.1	70.6	32.99	Bannu
+6.1	81.62	28.05	Nepalganj
+6.1	113.04	3.17	Bintulu
+6.1	40.35	-11.32	Mocimboa
+6.1	154.67	-5.43	Sohano
+6.1	155.63	-6.22	Kieta
+6.1	156.84	-8.1	Gizo
+6.1	148.57	-10.04	Abau
+6.1	148.25	-8.77	Popondetta
+6.1	150.41	-5.47	Hoskins
+6.1	-6.16	35.2	Larache
+6.1	-4.45	31.94	Er Rachidia
+6.1	-5.56	33.9	Meknes
+6.1	29.64	46.85	Tiraspol
+6.1	165.86	-10.74	Lata
+6.1	84.9	56.49	Timiryazevskiy
+6.1	77.58	60.73	Strezhevoy
+6.1	21.88	55.07	Sovetsk
+6.1	30.22	69.41	Nikel
+6.1	32.83	67.93	Monchegorsk
+6.1	33.67	67.61	Kirovsk
+6.1	31.35	57.99	Staraya Russa
+6.1	32.34	59.93	Volkhov
+6.1	28.92	61.1	Svetogorsk
+6.1	30.13	59.57	Gatchina
+6.1	29.84	58.74	Luga
+6.1	32.86	53.95	Roslavl
+6.1	34.29	55.21	Vyazma
+6.1	34.32	63.75	Segezha
+6.1	45.51	58.38	Sharya
+6.1	37.34	56.87	Kimry
+6.1	36.69	57.76	Bezhetsk
+6.1	32.77	56.22	Nelidovo
+6.1	37.91	59.14	Cherepovets
+6.1	39.4	57.19	Rostov
+6.1	36.27	54.52	Kaluga
+6.1	35.4	52.35	Zheleznogorsk
+6.1	40.79	48.19	Belaya Kalitva
+6.1	40.27	47.72	Shakhty
+6.1	38.12	53.15	Yefremov
+6.1	43.22	50.07	Mikhaylovka
+6.1	40.74	44.63	Labinsk
+6.1	41.13	45.0	Armavir
+6.1	40.14	45.85	Tikhoretsk
+6.1	45.18	54.17	Saransk
+6.1	41.39	54.94	Kasimov
+6.1	41.91	54.35	Sasovo
+6.1	41.5	52.59	Kotovsk
+6.1	41.8	53.45	Morshansk
+6.1	42.04	55.57	Murom
+6.1	55.78	52.77	Kumertau
+6.1	55.93	53.37	Salavat
+6.1	54.26	56.08	Neftekamsk
+6.1	63.63	56.08	Shadrinsk
+6.1	48.96	57.58	Sovetsk
+6.1	60.41	60.69	Ivdel
+6.1	52.63	58.12	Glazov
+6.1	47.47	55.51	Kanash
+6.1	46.6	54.85	Alatyr
+6.1	51.35	53.38	Otradnyy
+6.1	49.42	53.51	Tolyatti
+6.1	47.37	52.03	Volsk
+6.1	52.32	54.9	Almetyevsk
+6.1	51.82	55.64	Nizhnekamsk
+6.1	60.97	64.25	Saranpaul
+6.1	76.1	61.06	Megion
+6.1	71.27	54.93	Isikul
+6.1	69.45	56.15	Ishim
+6.1	66.3	56.67	Yalutorovsk
+6.1	85.18	52.53	Biysk
+6.1	83.96	53.4	Novoaltaysk
+6.1	81.34	53.79	Kamenna Obi
+6.1	81.49	50.99	Gornyak
+6.1	78.95	52.58	Kulunda
+6.1	87.76	56.21	Mariinsk
+6.1	89.95	54.49	Shira
+6.1	80.28	55.2	Kargat
+6.1	78.02	53.73	Karasuk
+6.1	50.75	11.97	Caluula
+6.1	48.28	42.06	Derbent
+6.1	128.9	37.76	Gangneung
+6.1	127.14	35.83	Jeonju
+6.1	107.78	55.9	Ulkan
+6.1	108.11	57.79	Kirensk
+6.1	99.1	58.69	Kodinskiy
+6.1	89.82	55.33	Uzhur
+6.1	114.89	56.33	Taksimo
+6.1	106.5	51.28	Gusinoozyorsk
+6.1	129.62	49.75	Progress
+6.1	116.55	52.01	Nerchinsk
+6.1	132.82	44.6	Spassk Dalniy
+6.1	112.56	59.45	Vitim
+6.1	134.26	46.82	Bikin
+6.1	134.75	47.53	Vyazemskiy
+6.1	133.02	51.12	Chegdomyn
+6.1	-115.94	30.56	San Quintín
+6.1	-114.17	27.99	Guerrero Negro
+6.1	-109.92	27.47	Ciudad Obregon
+6.1	-98.74	20.11	Pachuca
+6.1	-5.78	25.38	Chegga
+6.1	7.35	5.1	Aba
+6.1	3.35	7.16	Abeokuta
+6.1	5.2	7.25	Akure
+6.1	6.78	6.14	Onitsha
+6.1	11.17	10.29	Gombe
+6.1	10.46	30.17	Dirj
+6.1	17.58	28.55	Zillah
+6.1	20.83	32.5	Al Marj
+6.1	19.22	29.23	Maradah
+6.1	18.27	30.67	As Sidr
+6.1	17.03	51.11	Wrocław
+6.1	14.53	53.42	Szczecin
+6.1	18.01	53.12	Bydgoszcz
+6.1	19.02	50.26	Katowice
+6.1	23.18	53.13	Białystok
+6.1	22.57	51.25	Lublin
+6.1	22.0	50.03	Rzeszów
+6.1	55.74	58.07	Krasnokamsk
+6.1	89.95	48.93	Olgiy
+6.1	126.6	40.97	Kanggye
+6.1	96.78	48.97	Hodrogo
+6.1	-11.1	28.43	Tan Tan
+6.1	122.79	-0.94	Luwuk
+6.1	120.76	-1.39	Poso
+6.1	136.05	-1.16	Biak
+6.1	136.89	-4.55	Timika
+6.1	-6.4	54.0	Dundalk
+6.1	-9.05	53.27	Galway
+6.1	10.32	44.81	Parma
+6.1	11.34	44.5	Bologna
+6.1	9.1	39.22	Cagliari
+6.1	10.4	43.72	Pisa
+6.1	11.35	43.32	Siena
+6.1	17.93	40.64	Brindisi
+6.1	17.23	40.51	Taranto
+6.1	15.55	38.2	Messina
+6.1	12.44	37.81	Marsala
+6.1	15.29	37.07	Siracusa
+6.1	14.22	42.46	Pescara
+6.1	13.5	43.6	Ancona
+6.1	35.08	29.53	Al Aqabah
+6.1	11.12	46.08	Trento
+6.1	10.99	45.44	Verona
+6.1	101.42	36.05	Guide
+6.1	108.62	21.95	Qinzhou
+6.1	109.1	21.48	Beihai
+6.1	109.13	27.68	Tongren
+6.1	117.0	25.07	Longyan
+6.1	119.62	27.07	Fuan
+6.1	118.17	26.63	Nanping
+6.1	114.68	23.73	Heyuan
+6.1	110.87	21.92	Maoming
+6.1	108.97	0.91	Singkawang
+6.1	113.85	-7.0	Sumenep
+6.1	120.25	-9.66	Waingapu
+6.1	120.24	-3.1	Palopo
+6.1	5.72	45.18	Grenoble
+6.1	23.27	-1.18	Ikela
+6.1	18.09	42.66	Dubrovnik
+6.1	16.47	43.52	Split
+6.1	27.23	31.35	Matruh
+6.1	25.15	31.57	Salum
+6.1	30.71	28.3	Samalut
+6.1	27.97	27.07	Qasr Farafra
+6.1	28.88	25.7	El Qasr
+6.1	35.48	23.95	Berenice
+6.1	33.61	28.24	El Tur
+6.1	7.08	50.72	Bonn
+6.1	7.62	51.97	Münster
+6.1	8.47	49.5	Mannheim
+6.1	8.65	50.58	Gießen
+6.1	9.92	51.52	Göttingen
+6.1	9.43	54.78	Flensburg
+6.1	10.67	53.87	Lübeck
+6.1	6.97	49.25	Saarbrücken
+6.1	13.36	49.74	Pizen
+6.1	12.12	49.02	Regensburg
+6.1	11.92	50.32	Hof
+6.1	9.95	49.8	Würzburg
+6.1	16.61	49.2	Brno
+6.1	11.62	52.13	Magdeburg
+6.1	12.41	51.34	Leipzig
+6.1	28.16	59.38	Narva
+6.1	79.98	32.2	Gar
+6.1	89.17	42.94	Turpan
+6.1	85.53	38.13	Quiemo
+6.1	89.53	46.99	Koktokay
+6.1	108.2	4.22	Telukbutun
+6.1	112.42	39.3	Shuozhou
+6.1	112.83	35.5	Jincheng
+6.1	111.9	37.04	Jiexiu
+6.1	113.11	36.18	Changzhi
+6.1	111.85	29.63	Jinshi
+6.1	105.97	31.58	Langzhong
+6.1	100.98	22.78	Simao
+6.1	104.25	23.37	Wenshan
+6.1	103.82	25.6	Zhanyi
+6.1	117.93	40.96	Chengde
+6.1	116.87	38.32	Cangzhou
+6.1	119.45	35.43	Rizhao
+6.1	117.97	28.47	Shangrao
+6.1	117.18	29.27	Jingdezhen
+6.1	119.23	34.59	Lianyungang
+6.1	121.45	28.68	Jiaojing
+6.1	133.07	35.47	Matsue
+6.1	124.82	45.18	Songyuan
+6.1	126.94	41.84	Linjiang
+6.1	130.7	32.8	Kumamoto
+6.1	131.6	33.24	Ōita
+6.1	118.03	43.52	Linxi
+6.1	119.18	43.98	Bairin Zuoqi
+6.1	121.52	50.65	Yitulihe
+6.1	121.93	48.78	Bugt
+6.1	108.27	41.09	Wuyuan
+6.1	127.97	45.22	Shangzhi
+6.1	132.02	47.27	Fujin
+6.1	131.88	45.55	Mishan
+6.1	128.05	46.95	Tieli
+6.1	136.76	35.42	Gifu
+6.1	136.52	34.72	Tsu
+6.1	138.39	34.99	Shizuoka
+6.1	137.73	34.72	Hamamatsu
+6.1	143.9	43.85	Kitami
+6.1	140.48	36.37	Mito
+6.1	138.58	35.65	Kōfu
+6.1	140.89	37.06	Iwaki
+6.1	138.86	37.45	Nagaoka
+6.1	20.61	-4.32	Ilebo
+6.1	26.67	-3.6	Kampene
+6.1	26.58	-0.73	Lubutu
+6.1	28.7	-8.7	Luanza
+6.1	101.4	-2.06	Sungaipenuh
+6.1	112.95	-2.53	Sampit
+6.1	75.03	29.49	Sirsa
+6.1	80.06	15.51	Ongole
+6.1	76.57	8.9	Kollam
+6.1	85.9	19.82	Puri
+6.1	84.83	22.23	Raurkela
+6.1	72.64	10.56	Kavaratti
+6.1	92.74	11.67	Port Blair
+6.1	94.12	25.67	Kohima
+6.1	177.42	-17.8	Nandi
+6.1	177.47	-17.62	Lautoka
+6.1	-4.5	48.39	Brest
+6.1	8.73	41.93	Ajaccio
+6.1	9.45	42.7	Bastia
+6.1	5.92	43.13	Toulon
+6.1	3.87	43.61	Montpellier
+6.1	4.35	43.83	Nîmes
+6.1	2.4	47.08	Bourges
+6.1	1.9	47.9	Orléans
+6.1	1.53	45.15	Brive
+6.1	4.08	48.34	Troyes
+6.1	4.03	49.25	Reims
+6.1	19.91	39.62	Kerkira
+6.1	22.38	37.51	Tripoli
+6.1	21.45	37.68	Pirgos
+6.1	20.85	39.67	Ioanina
+6.1	28.22	36.44	Rodos
+6.1	42.45	36.38	Tall Afar
+6.1	43.68	34.6	Tikrit
+6.1	34.98	32.82	Haifa
+6.1	44.02	32.61	Karbala
+6.1	38.31	6.41	Dila
+6.1	38.59	7.2	Shashemene
+6.1	35.83	9.17	Gimbi
+6.1	12.15	54.07	Rostock
+6.1	26.6	67.42	Sodankylä
+6.1	25.75	62.26	Jyväskylä
+6.1	27.69	62.89	Kuopio
+6.1	28.18	61.07	Lappeenranta
+6.1	25.67	60.4	Porvoo
+6.1	57.44	49.47	Oktyabrsk
+6.1	66.75	44.17	Shieli
+6.1	51.14	50.19	Chapaev
+6.1	66.31	51.1	Derzhavinsk
+6.1	70.41	52.64	Makinsk
+6.1	73.1	51.63	Erymentau
+6.1	73.62	46.12	Saryshaghan
+6.1	71.65	48.69	Atasu
+6.1	75.45	53.35	Ertis
+6.1	84.86	47.48	Zaysan
+6.1	84.25	49.75	Zyryanovsk
+6.1	81.6	47.1	Urzhar
+6.1	79.91	45.42	Sarqan
+6.1	75.21	43.53	Otar
+6.1	51.58	33.98	Kashan
+6.1	53.67	28.97	Fasa
+6.1	54.48	36.83	Gorgan
+6.1	52.36	36.47	Amol
+6.1	50.97	35.8	Karaj
+6.1	48.47	32.38	Dezful
+6.1	45.28	31.31	As Samawah
+6.1	46.27	31.04	An Nasiriyah
+6.1	45.83	32.49	Al Kut
+6.1	50.33	35.02	Saveh
+6.1	45.72	36.77	Mahabad
+6.1	44.97	38.53	Khvoy
+6.1	46.22	37.42	Maragheh
+6.1	44.66	33.75	Baqubah
+6.1	60.89	33.51	Yazdan
+6.1	58.5	37.11	Quchan
+6.1	60.63	25.3	Chabahar
+6.1	74.18	30.13	Abohar
+6.1	74.64	25.35	Bhilwara
+6.1	73.33	28.02	Bikaner
+6.1	74.03	44.94	Burylbaytal
+6.1	73.25	42.92	Oytal
+6.1	78.56	25.45	Jhansi
+6.1	79.91	27.88	Shahjahanpur
+6.1	87.33	22.4	Medinipur
+6.1	82.16	22.09	Bilaspur
+6.1	78.75	23.85	Sagar
+6.1	79.15	12.92	Vellore
+6.1	72.85	20.42	Daman
+6.1	69.67	23.23	Bhuj
+6.1	10.38	55.4	Odense
+6.1	8.45	55.47	Esbjerg
+6.1	9.92	57.03	Aalborg
+6.1	40.28	33.04	Ar Rutbah
+6.1	43.78	33.35	Al Fallujah
+6.1	-127.5	50.72	Port Hardy
+6.1	-64.13	44.98	Windsor
+6.1	17.45	6.48	Bossangoa
+6.1	20.33	43.89	Čačak
+6.1	21.9	43.33	Niš
+6.1	22.82	4.73	Bangassou
+6.1	19.85	45.25	Novi Sad
+6.1	-64.93	-40.73	San Antonio Oeste
+6.1	-67.8	-40.58	Sierra Colorado
+6.1	48.92	39.93	Şirvan
+6.1	48.85	38.75	Lankaran
+6.1	46.75	39.82	Stepanakert
+6.1	65.1	36.93	Andkhvoy
+6.1	70.58	37.13	Feyzabad
+6.1	68.87	36.73	Kondoz
+6.1	20.39	-9.66	Saurimo
+6.1	-1.25	32.05	Béni Ounif
+6.1	-2.73	31.02	Abadla
+6.1	1.99	7.19	Abomey
+6.1	9.48	24.55	Djanet
+6.1	1.01	33.69	El Bayadh
+6.1	1.32	36.17	Chlef
+6.1	2.77	36.27	Médéa
+6.1	25.66	43.09	Turnovo
+6.1	27.9	43.22	Varna
+6.1	25.97	43.85	Ruse
+6.1	15.41	47.08	Graz
+6.1	14.31	46.62	Klagenfurt
+6.1	14.29	48.32	Linz
+6.1	13.04	47.81	Salzburg
+6.1	11.41	47.28	Innsbruck
+6.1	26.09	52.13	Pinsk
+6.1	29.27	52.05	Mazyr
+6.1	29.19	53.13	Babruysk
+6.1	30.42	54.52	Orsha
+6.1	25.28	53.89	Lida
+6.1	23.83	53.68	Hrodna
+6.1	45.41	39.21	Naxcivan
+6.1	90.37	22.7	Barishal
+6.1	131.1	-13.25	Adelaide River
+6.1	17.18	44.78	Banja Luka
+6.1	95.18	16.61	Wakema
+6.1	95.09	21.33	Pakokku
+6.1	97.4	23.08	Namtu
+6.1	33.03	34.68	Lemosos
+6.1	84.01	28.2	Pokhara
+6.1	145.75	15.21	Capitol Hill
+6.1	-36.51	-54.28	Grytviken
+6.1	-60.09	-51.95	Fox Bay
+6.1	-13.54	28.97	Arrecife
+6.1	45.54	9.52	Burco
+6.1	12.44	43.94	San Marino
+6.1	-59.68	-62.5	Capitan Arturo Prat Station
+6.1	-58.65	-62.22	Carlini Base
+6.1	-58.77	-62.22	King Sejong Station
+6.1	-58.95	-62.19	Escudero Base
+6.1	-58.0	-62.0	Elephant Island
+6.1	76.34	-69.43	Zhongshan Station
+6.1	-90.58	-68.8	Peter I Island
+6.1	62.88	-67.61	Mawson Station
+6.1	78.14	-68.78	Davis Station
+6.1	-13.42	-73.05	Wasa Station
+6.1	2.53	-72.02	Troll Station
+6.1	-11.22	-74.58	Svea Station
+6.1	-11.85	-71.3	Novolazarevskaya Station
+6.1	-7.84	-70.89	Neumayer Station III
+6.1	11.73	-70.78	Maitri Station
+6.1	-26.47	-76.09	Halley Station
+6.1	-34.62	-77.87	Belgrano II Base
+6.1	-40.5	-81.18	Sobral Base
+6.1	-13.42	-75.05	Aboa Station
+6.1	-67.1	-68.12	San Martín Base
+6.1	-57.89	-63.33	Gen. O'Higgins Base
+6.1	-44.73	-60.73	Orcadas Station
+6.1	-45.6	-60.63	Signy Research Station
+6.1	39.75	-69.03	Showa Station
+6.1	171.6	-41.76	Westport
+6.1	171.01	-42.71	Hokitika
