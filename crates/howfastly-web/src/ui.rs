@@ -11,6 +11,7 @@ use howfastly_map::chart::{chart_y, format_speed, peak, svg_path, throughput_poi
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use wasm_bindgen::JsValue;
+use web_sys::AbortController;
 
 use crate::engine;
 use crate::map::Map;
@@ -47,9 +48,20 @@ impl Lane {
     }
 }
 
+// what a run is doing, the controls and the loop both follow it
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Phase {
+    Idle,
+    Running,
+    Paused,
+    Cancelled,
+}
+
 #[derive(Clone, Copy)]
 struct State {
-    running: RwSignal<bool>,
+    phase: RwSignal<Phase>,
+    // the transfer in flight, pause and cancel abort it
+    abort: StoredValue<Option<AbortController>, LocalStorage>,
     error: RwSignal<Option<String>>,
     notice: RwSignal<Option<String>>,
     meta: RwSignal<Option<MetaResponse>>,
@@ -61,7 +73,8 @@ struct State {
 #[component]
 pub fn App() -> impl IntoView {
     let state = State {
-        running: RwSignal::new(false),
+        phase: RwSignal::new(Phase::Idle),
+        abort: StoredValue::new_local(None),
         error: RwSignal::new(None),
         notice: RwSignal::new(None),
         meta: RwSignal::new(None),
@@ -145,13 +158,15 @@ pub fn App() -> impl IntoView {
                 <div class="rounded border border-nord-13 bg-nord-1 p-4 text-nord-13">{n}</div>
             })}
 
+            <Controls state=state/>
+
             <div class="grid gap-8 lg:grid-cols-2">
                 <section class="flex flex-col gap-4">
-                    <Headline lane=state.down state=state/>
+                    <Headline lane=state.down/>
                     <SizeTable lane=state.down/>
                 </section>
                 <section class="flex flex-col gap-4">
-                    <Headline lane=state.up state=state/>
+                    <Headline lane=state.up/>
                     <SizeTable lane=state.up/>
                 </section>
             </div>
@@ -216,8 +231,7 @@ pub fn App() -> impl IntoView {
                         <h2 class="text-lg font-semibold">HowFastly</h2>
                         <p class="mt-2">
                             "Tests run automatically and transfer up to ~640 MB in total. "
-                            "Close the page early to spend less. "
-                            "Tap a speed card to run the test again."
+                            "Pause or cancel at any time, retest once it is done."
                         </p>
                         <button
                             class="mt-4 w-full cursor-pointer rounded bg-nord-10 px-8 py-3 text-nord-6 hover:bg-nord-9"
@@ -317,7 +331,7 @@ fn SpeedChart(lane: Lane) -> impl IntoView {
 }
 
 #[component]
-fn Headline(lane: Lane, state: State) -> impl IntoView {
+fn Headline(lane: Lane) -> impl IntoView {
     let label = lane.dir.name();
     // live estimate while this direction transfers, p90 once summarized
     let speed = move || {
@@ -333,20 +347,8 @@ fn Headline(lane: Lane, state: State) -> impl IntoView {
         };
         bps.map(format_speed)
     };
-    let rerun = move |_| launch(state);
     view! {
-        <div
-            class=move || {
-                let cursor = if state.running.get() {
-                    "cursor-wait"
-                } else {
-                    "cursor-pointer hover:ring-1 hover:ring-nord-3"
-                };
-                format!("flex-1 rounded bg-nord-1 p-4 {cursor}")
-            }
-            title="Run the test again"
-            on:click=rerun
-        >
+        <div class="flex-1 rounded bg-nord-1 p-4">
             <div class="font-mono text-4xl text-nord-6">
                 {move || match speed() {
                     Some((v, unit)) => view! {
@@ -558,13 +560,49 @@ impl DirRun {
     }
 }
 
+// why a run stopped short of a finish
+enum Interrupt {
+    Cancelled,
+    Failed(JsValue),
+}
+
+#[component]
+fn Controls(state: State) -> impl IntoView {
+    let primary = "cursor-pointer rounded bg-nord-10 px-4 py-2 text-nord-6 hover:bg-nord-9";
+    let plain = "cursor-pointer rounded border border-nord-3 px-4 py-2 hover:bg-nord-2";
+    view! {
+        <div class="flex justify-end gap-2">
+            {move || match state.phase.get() {
+                Phase::Idle => view! {
+                    <button class=primary on:click=move |_| launch(state)>"Retest"</button>
+                }
+                    .into_any(),
+                Phase::Running => view! {
+                    <button class=plain on:click=move |_| pause(state)>"Pause"</button>
+                    <button class=plain on:click=move |_| cancel(state)>"Cancel"</button>
+                }
+                    .into_any(),
+                Phase::Paused => view! {
+                    <button class=primary on:click=move |_| resume(state)>"Resume"</button>
+                    <button class=plain on:click=move |_| cancel(state)>"Cancel"</button>
+                }
+                    .into_any(),
+                Phase::Cancelled => view! {
+                    <span class="px-4 py-2 text-nord-4">"Stopping"</span>
+                }
+                    .into_any(),
+            }}
+        </div>
+    }
+}
+
 // one full run bracketed by the start and finish markers
-// a click during a run is ignored
+// a cancelled run sends no finish and counts as abandoned
 fn launch(state: State) {
-    if state.running.get_untracked() {
+    if state.phase.get_untracked() != Phase::Idle {
         return;
     }
-    state.running.set(true);
+    state.phase.set(Phase::Running);
     state.error.set(None);
     state.latency.set(None);
     state.down.reset();
@@ -574,7 +612,8 @@ fn launch(state: State) {
         let outcome = run_all(state).await;
         state.down.running.set(false);
         state.up.running.set(false);
-        state.running.set(false);
+        state.abort.set_value(None);
+        state.phase.set(Phase::Idle);
         match outcome {
             Ok(()) => {
                 engine::finish(&SpeedtestResults {
@@ -585,17 +624,59 @@ fn launch(state: State) {
                 })
                 .await
             }
-            Err(e) => state.error.set(Some(format!("{e:?}"))),
+            Err(Interrupt::Cancelled) => {}
+            Err(Interrupt::Failed(e)) => state.error.set(Some(format!("{e:?}"))),
         }
     });
 }
 
-async fn run_all(state: State) -> Result<(), JsValue> {
+fn abort(state: State) {
+    state.abort.with_value(|a| {
+        if let Some(a) = a {
+            a.abort();
+        }
+    });
+}
+
+// the transfer in flight is dropped and tried again after the resume
+fn pause(state: State) {
+    if state.phase.get_untracked() == Phase::Running {
+        state.phase.set(Phase::Paused);
+        abort(state);
+    }
+}
+
+fn resume(state: State) {
+    if state.phase.get_untracked() == Phase::Paused {
+        state.phase.set(Phase::Running);
+    }
+}
+
+fn cancel(state: State) {
+    if matches!(state.phase.get_untracked(), Phase::Running | Phase::Paused) {
+        state.phase.set(Phase::Cancelled);
+        abort(state);
+    }
+}
+
+// waits out a pause, the run only moves on while running
+async fn hold(state: State) -> Result<(), Interrupt> {
+    loop {
+        match state.phase.get_untracked() {
+            Phase::Running => return Ok(()),
+            Phase::Paused => TimeoutFuture::new(100).await,
+            Phase::Idle | Phase::Cancelled => return Err(Interrupt::Cancelled),
+        }
+    }
+}
+
+async fn run_all(state: State) -> Result<(), Interrupt> {
     let cfg = TestConfig::default();
 
     let mut pings = Vec::new();
     for _ in 0..cfg.latency_samples {
-        pings.push(engine::ping().await?);
+        hold(state).await?;
+        pings.push(engine::ping().await.map_err(Interrupt::Failed)?);
     }
     state.latency.set(summarize_latency(&pings));
 
@@ -605,7 +686,7 @@ async fn run_all(state: State) -> Result<(), JsValue> {
     for i in 0..down.plans.len().max(up.plans.len()) {
         for run in [&mut down, &mut up] {
             if let Some(&plan) = run.plans.get(i) {
-                segment(run, plan, cfg.time_budget_secs).await?;
+                segment(state, run, plan, cfg.time_budget_secs).await?;
             }
         }
     }
@@ -613,7 +694,12 @@ async fn run_all(state: State) -> Result<(), JsValue> {
 }
 
 // one size class for one direction with its own loaded latency pinger
-async fn segment(run: &mut DirRun, plan: SizePlan, budget_secs: f64) -> Result<(), JsValue> {
+async fn segment(
+    state: State,
+    run: &mut DirRun,
+    plan: SizePlan,
+    budget_secs: f64,
+) -> Result<(), Interrupt> {
     run.lane.running.set(true);
     let stop = Rc::new(Cell::new(false));
     let seg_loaded = Rc::new(RefCell::new(Vec::new()));
@@ -623,6 +709,10 @@ async fn segment(run: &mut DirRun, plan: SizePlan, budget_secs: f64) -> Result<(
         let seg_loaded = seg_loaded.clone();
         async move {
             while !stop.get() {
+                if state.phase.get_untracked() == Phase::Paused {
+                    TimeoutFuture::new(100).await;
+                    continue;
+                }
                 if let Ok(ms) = engine::ping().await {
                     seg_loaded.borrow_mut().push(ms);
                 }
@@ -631,38 +721,18 @@ async fn segment(run: &mut DirRun, plan: SizePlan, budget_secs: f64) -> Result<(
         }
     });
 
-    let seg_start = engine::now_ms();
     let mut s = SizeSamples {
         bytes: plan.bytes,
         mbps: Vec::new(),
         skipped: false,
     };
-    for _ in 0..plan.iterations {
-        if (run.active_ms + engine::now_ms() - seg_start) / 1e3 > budget_secs {
-            s.skipped = true;
-            break;
-        }
-        let progress = recorder(run.lane, run.active_ms, seg_start, run.events.clone());
-        let sample = match run.lane.dir {
-            Direction::Download => engine::download(plan.bytes, progress).await,
-            Direction::Upload => engine::upload(plan.bytes, progress).await,
-        };
-        let mbps = match sample {
-            Ok(mbps) => mbps,
-            Err(e) => {
-                stop.set(true);
-                run.lane.running.set(false);
-                return Err(e);
-            }
-        };
-        s.mbps.push(mbps);
-        let mut live = run.out.clone();
-        live.push(s.clone());
-        run.lane.sizes.set(live);
-    }
+    let outcome = transfers(state, run, plan, budget_secs, &mut s).await;
     stop.set(true);
+    if let Err(e) = outcome {
+        run.lane.running.set(false);
+        return Err(e);
+    }
 
-    run.active_ms += engine::now_ms() - seg_start;
     run.out.push(s);
     run.loaded.extend(seg_loaded.borrow().iter().copied());
     run.lane
@@ -673,6 +743,55 @@ async fn segment(run: &mut DirRun, plan: SizePlan, budget_secs: f64) -> Result<(
         .summary
         .set(Some(summarize_direction(&run.out, &run.loaded)));
     run.lane.running.set(false);
+    Ok(())
+}
+
+// the transfers of one size class, each one only counts once it completes
+// a transfer aborted by a pause is wiped from the timeline and tried again
+async fn transfers(
+    state: State,
+    run: &mut DirRun,
+    plan: SizePlan,
+    budget_secs: f64,
+    s: &mut SizeSamples,
+) -> Result<(), Interrupt> {
+    let mut done = 0;
+    while done < plan.iterations {
+        hold(state).await?;
+        if run.active_ms / 1e3 > budget_secs {
+            s.skipped = true;
+            return Ok(());
+        }
+        let abort = AbortController::new().map_err(Interrupt::Failed)?;
+        state.abort.set_value(Some(abort.clone()));
+        let start = engine::now_ms();
+        let mark = run.events.borrow().len();
+        let progress = recorder(run.lane, run.active_ms, start, run.events.clone());
+        let sample = match run.lane.dir {
+            Direction::Download => engine::download(plan.bytes, progress, &abort.signal()).await,
+            Direction::Upload => engine::upload(plan.bytes, progress, &abort.signal()).await,
+        };
+        state.abort.set_value(None);
+        match sample {
+            Ok(mbps) => {
+                run.active_ms += engine::now_ms() - start;
+                s.mbps.push(mbps);
+                done += 1;
+                let mut live = run.out.clone();
+                live.push(s.clone());
+                run.lane.sizes.set(live);
+            }
+            Err(e) => {
+                run.events.borrow_mut().truncate(mark);
+                run.lane
+                    .points
+                    .set(throughput_points(&run.events.borrow(), WINDOW_MS, EMIT_MS));
+                if state.phase.get_untracked() == Phase::Running {
+                    return Err(Interrupt::Failed(e));
+                }
+            }
+        }
+    }
     Ok(())
 }
 

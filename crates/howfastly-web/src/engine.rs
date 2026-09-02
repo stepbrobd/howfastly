@@ -8,8 +8,8 @@ use js_sys::{Reflect, Uint8Array};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{
-    Headers, ProgressEvent, ReadableStreamDefaultReader, RequestInit, Response, Window,
-    XmlHttpRequest,
+    AbortSignal, Headers, ProgressEvent, ReadableStreamDefaultReader, RequestInit, Response,
+    Window, XmlHttpRequest,
 };
 
 fn window() -> Window {
@@ -37,9 +37,15 @@ pub fn save_autostart() {
     }
 }
 
-async fn fetch(method: &str, url: &str, json: Option<&str>) -> Result<Response, JsValue> {
+async fn fetch(
+    method: &str,
+    url: &str,
+    json: Option<&str>,
+    signal: Option<&AbortSignal>,
+) -> Result<Response, JsValue> {
     let init = RequestInit::new();
     init.set_method(method);
+    init.set_signal(signal);
     if let Some(json) = json {
         let headers = Headers::new()?;
         headers.set("content-type", "application/json")?;
@@ -54,12 +60,12 @@ async fn fetch(method: &str, url: &str, json: Option<&str>) -> Result<Response, 
 
 // run markers for the edge side counting, the outcome is ignored
 pub async fn start() {
-    let _ = fetch("POST", "/start", None).await;
+    let _ = fetch("POST", "/start", None, None).await;
 }
 
 pub async fn finish(results: &SpeedtestResults) {
     if let Ok(json) = serde_json::to_string(results) {
-        let _ = fetch("POST", "/finish", Some(&json)).await;
+        let _ = fetch("POST", "/finish", Some(&json), None).await;
     }
 }
 
@@ -75,7 +81,7 @@ fn server_dur_ms(resp: &Response) -> f64 {
 
 pub async fn ping() -> Result<f64, JsValue> {
     let start = now_ms();
-    let resp = fetch("GET", "/ping", None).await?;
+    let resp = fetch("GET", "/ping", None, None).await?;
     Ok((now_ms() - start - server_dur_ms(&resp)).max(0.0))
 }
 
@@ -94,9 +100,14 @@ async fn drain(resp: &Response, on_progress: &mut impl FnMut(f64, u64)) -> Resul
     }
 }
 
-pub async fn download(bytes: u64, mut on_progress: impl FnMut(f64, u64)) -> Result<f64, JsValue> {
+// the signal aborts the transfer, which then returns an error
+pub async fn download(
+    bytes: u64,
+    mut on_progress: impl FnMut(f64, u64),
+    signal: &AbortSignal,
+) -> Result<f64, JsValue> {
     let start = now_ms();
-    let resp = fetch("GET", &format!("/down?bytes={bytes}"), None).await?;
+    let resp = fetch("GET", &format!("/down?bytes={bytes}"), None, Some(signal)).await?;
     drain(&resp, &mut on_progress).await?;
     let secs = ((now_ms() - start - server_dur_ms(&resp)) / 1e3).max(1e-9);
     Ok(stats::mbps(bytes, secs))
@@ -105,9 +116,18 @@ pub async fn download(bytes: u64, mut on_progress: impl FnMut(f64, u64)) -> Resu
 pub async fn upload(
     bytes: u64,
     mut on_progress: impl FnMut(f64, u64) + 'static,
+    signal: &AbortSignal,
 ) -> Result<f64, JsValue> {
     let xhr = XmlHttpRequest::new()?;
     xhr.open("POST", "/up")?;
+
+    let onabort = Closure::<dyn FnMut()>::new({
+        let xhr = xhr.clone();
+        move || {
+            let _ = xhr.abort();
+        }
+    });
+    signal.set_onabort(Some(onabort.as_ref().unchecked_ref()));
 
     let resolve = Rc::new(RefCell::new(None::<js_sys::Function>));
     let promise = js_sys::Promise::new(&mut |res, _| {
@@ -135,6 +155,7 @@ pub async fn upload(
     let start = now_ms();
     xhr.send_with_opt_buffer_source(Some(&body))?;
     JsFuture::from(promise).await?;
+    signal.set_onabort(None);
 
     let status = xhr.status().unwrap_or(0);
     if !(200..300).contains(&status) {
@@ -153,7 +174,7 @@ pub async fn upload(
 }
 
 pub async fn meta() -> Result<MetaResponse, JsValue> {
-    let resp = fetch("GET", "/meta", None).await?;
+    let resp = fetch("GET", "/meta", None, None).await?;
     let text = JsFuture::from(resp.text()?).await?;
     parse_meta(&text.as_string().unwrap_or_default()).map_err(|e| JsValue::from_str(&e.to_string()))
 }

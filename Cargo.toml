@@ -29,5 +29,5 @@ wasm-bindgen             = "=0.2.127"
 wasm-bindgen-futures     = "0.4"
 
 [workspace.dependencies.web-sys]
-features = ["Headers", "Performance", "ProgressEvent", "ReadableStream", "ReadableStreamDefaultReader", "RequestInit", "Response", "Storage", "Window", "XmlHttpRequest", "XmlHttpRequestEventTarget", "XmlHttpRequestUpload"]
+features = ["AbortController", "AbortSignal", "Headers", "Performance", "ProgressEvent", "ReadableStream", "ReadableStreamDefaultReader", "RequestInit", "Response", "Storage", "Window", "XmlHttpRequest", "XmlHttpRequestEventTarget", "XmlHttpRequestUpload"]
 version  = "0.3"
