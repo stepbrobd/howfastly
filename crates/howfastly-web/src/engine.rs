@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use howfastly::http::parse_server_timing;
+use howfastly::http;
 use howfastly::stats;
 use howfastly::types::{MetaResponse, SpeedtestResults, parse_meta};
 use js_sys::{Reflect, Uint8Array};
@@ -64,12 +64,13 @@ pub async fn finish(results: &SpeedtestResults) {
 }
 
 fn server_dur_ms(resp: &Response) -> f64 {
-    resp.headers()
-        .get("server-timing")
-        .ok()
-        .flatten()
-        .and_then(|h| parse_server_timing(&h))
-        .unwrap_or(0.0)
+    http::server_dur_ms(
+        resp.headers()
+            .get("server-timing")
+            .ok()
+            .flatten()
+            .as_deref(),
+    )
 }
 
 pub async fn ping() -> Result<f64, JsValue> {
@@ -140,12 +141,12 @@ pub async fn upload(
             "upload failed with status {status}"
         )));
     }
-    let server_ms = xhr
-        .get_response_header("server-timing")
-        .ok()
-        .flatten()
-        .and_then(|h| parse_server_timing(&h))
-        .unwrap_or(0.0);
+    let server_ms = http::server_dur_ms(
+        xhr.get_response_header("server-timing")
+            .ok()
+            .flatten()
+            .as_deref(),
+    );
     let secs = ((now_ms() - start - server_ms) / 1e3).max(1e-9);
     Ok(stats::mbps(bytes, secs))
 }

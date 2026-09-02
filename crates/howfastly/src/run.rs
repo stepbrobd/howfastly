@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, ensure};
-use howfastly::http::parse_server_timing;
+use howfastly::http;
 use howfastly::stats;
 use howfastly::types::{
     DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
@@ -148,11 +148,11 @@ struct Runner {
 }
 
 fn server_dur_ms(resp: &Response) -> f64 {
-    resp.headers()
-        .get("server-timing")
-        .and_then(|v| v.to_str().ok())
-        .and_then(parse_server_timing)
-        .unwrap_or(0.0)
+    http::server_dur_ms(
+        resp.headers()
+            .get("server-timing")
+            .and_then(|v| v.to_str().ok()),
+    )
 }
 
 impl Runner {

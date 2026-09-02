@@ -1,11 +1,16 @@
 pub const MAX_DOWN_BYTES: u64 = 1 << 30;
 
-// single-metric header like "app;dur=12.5"
+// the dur metric wherever it sits, "app;dur=12.5" or "cache;desc=HIT, app;dur=12.5"
 pub fn parse_server_timing(header: &str) -> Option<f64> {
     let dur = header
-        .split(';')
+        .split([';', ','])
         .find_map(|part| part.trim().strip_prefix("dur="))?;
     dur.parse().ok()
+}
+
+// a missing or unreadable header counts as no server time
+pub fn server_dur_ms(header: Option<&str>) -> f64 {
+    header.and_then(parse_server_timing).unwrap_or(0.0)
 }
 
 // missing param means 0 bytes
@@ -42,9 +47,11 @@ mod tests {
         }
 
         #[test]
-        fn server_timing_roundtrip(dur in 0.0f64..1e5) {
-            let header = format!("app;dur={dur}");
-            prop_assert_eq!(parse_server_timing(&header), Some(dur));
+        fn server_timing_roundtrip(dur in 0.0f64..1e5, desc in "[a-zA-Z]{0,8}") {
+            prop_assert_eq!(parse_server_timing(&format!("app;dur={dur}")), Some(dur));
+            prop_assert_eq!(parse_server_timing(&format!("cache;desc={desc}, app;dur={dur}")), Some(dur));
+            prop_assert_eq!(parse_server_timing(&format!("app;dur={dur}, cache;desc={desc}")), Some(dur));
+            prop_assert_eq!(server_dur_ms(Some(&format!("app;dur={dur}"))), dur);
         }
     }
 
@@ -61,6 +68,9 @@ mod tests {
         assert_eq!(parse_server_timing("app;dur=1.5"), Some(1.5));
         assert_eq!(parse_server_timing("nope"), None);
         assert_eq!(parse_server_timing("app;dur=x"), None);
+        assert_eq!(parse_server_timing("app; dur=2"), Some(2.0));
+        assert_eq!(server_dur_ms(None), 0.0);
+        assert_eq!(server_dur_ms(Some("nope")), 0.0);
     }
 
     #[test]
