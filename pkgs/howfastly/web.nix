@@ -23,10 +23,6 @@ let
       ../../crates/howfastly-map/assets
     ];
   };
-in
-crane.lib.buildTrunkPackage {
-  pname = "howfastly-web";
-  inherit src version;
 
   cargoArtifacts = crane.lib.buildDepsOnly {
     pname = "howfastly-web";
@@ -36,6 +32,13 @@ crane.lib.buildTrunkPackage {
     doCheck = false;
     env.CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
   };
+in
+crane.lib.buildTrunkPackage {
+  pname = "howfastly-web";
+  inherit src version cargoArtifacts;
+
+  # the clippy check lints against the same dependencies
+  passthru = { inherit cargoArtifacts; };
 
   strictDeps = true;
   cargoExtraArgs = "--package howfastly-web";

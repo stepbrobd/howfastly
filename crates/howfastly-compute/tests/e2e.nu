@@ -81,12 +81,16 @@ def main [] {
     null
   } catch { |err| $err }
 
-  job kill $server
-  rm $log
+  # the job is already gone when viceroy died on its own
+  try { job kill $server }
 
   if $failure != null {
     print -e ($failure.debug? | default $failure.msg)
+    print -e "viceroy log:"
+    print -e (open $log)
+    rm $log
     exit 1
   }
+  rm $log
   print ok
 }
