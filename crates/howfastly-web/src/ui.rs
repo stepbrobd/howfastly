@@ -123,9 +123,10 @@ pub fn App() -> impl IntoView {
                             " "
                             {m.pop.code.clone()}
                             {(!m.pop.name.is_empty()).then(|| {
-                                match m.pop.group.is_empty() {
-                                    true => format!(" ({})", m.pop.name),
-                                    false => format!(" ({}, {})", m.pop.name, m.pop.group),
+                                if m.pop.group.is_empty() {
+                                    format!(" ({})", m.pop.name)
+                                } else {
+                                    format!(" ({}, {})", m.pop.name, m.pop.group)
                                 }
                             })}
                             {(!m.protocol.is_empty()).then(|| format!(" via {}", m.protocol))}

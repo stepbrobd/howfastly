@@ -29,9 +29,10 @@ pub async fn run(args: &Args) -> Result<SpeedtestResults> {
     if let Some(warning) = meta.mismatch() {
         eprintln!("Warning: {warning}");
     }
-    let pop = match meta.pop.name.is_empty() {
-        true => meta.pop.code.clone(),
-        false => format!("{} {}", meta.pop.code, meta.pop.name),
+    let pop = if meta.pop.name.is_empty() {
+        meta.pop.code.clone()
+    } else {
+        format!("{} {}", meta.pop.code, meta.pop.name)
     };
     eprintln!(
         "Server: POP {pop} ({version:?}) | Client: {} | AS{} {} | {}, {}",

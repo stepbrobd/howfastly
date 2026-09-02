@@ -50,8 +50,9 @@ pub fn event(req: &Request, name: &str, extra: &[(&str, String)]) {
 
 // the cli announces itself, everything else counts as a browser
 fn client(agent: &str) -> &'static str {
-    match agent.starts_with("HowFastly/") {
-        true => "CLI",
-        false => "Web",
+    if agent.starts_with("HowFastly/") {
+        "CLI"
+    } else {
+        "Web"
     }
 }
