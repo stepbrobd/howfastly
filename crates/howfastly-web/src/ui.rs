@@ -111,8 +111,8 @@ pub fn App() -> impl IntoView {
 
     view! {
         <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4 lg:max-w-6xl">
-            <section class="overflow-x-auto rounded bg-nord-1 p-4">
-                <div class="mx-auto w-max whitespace-nowrap font-mono" title=tips::ROUTE>
+            <section class="rounded bg-nord-1 p-4">
+                <div class="text-center font-mono [overflow-wrap:anywhere]" title=tips::ROUTE>
                     {move || match state.meta.get() {
                         Some(m) => view! {
                             <a href=format!("https://bgp.tools/prefix/{}", m.ip)
@@ -504,16 +504,16 @@ fn SizeTable(lane: Lane) -> impl IntoView {
                 <table class="w-full border-separate border-spacing-0 overflow-hidden rounded border border-nord-3">
                     <thead>
                         <tr>
-                            <th class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6">
+                            <th class="border-b border-nord-3 bg-nord-0 px-2 py-2 text-left font-semibold text-nord-6 sm:px-4">
                                 {title}
                             </th>
                             <th
-                                class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6"
+                                class="border-b border-nord-3 bg-nord-0 px-2 py-2 text-left font-semibold text-nord-6 sm:px-4"
                                 title=tips::MEDIAN
                             >
                                 "Median"
                             </th>
-                            <th class="w-1/2 border-b border-nord-3 bg-nord-0 px-4 py-2"></th>
+                            <th class="w-1/3 border-b border-nord-3 bg-nord-0 px-2 py-2 sm:w-1/2 sm:px-4"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -536,9 +536,9 @@ fn SizeTable(lane: Lane) -> impl IntoView {
                                 };
                                 view! {
                                     <tr class="odd:bg-nord-1">
-                                        <td class="px-4 py-2" title=tips::COUNT>{label}</td>
-                                        <td class="px-4 py-2 font-mono" title=tips::MEDIAN>{text}</td>
-                                        <td class="px-4 py-2" title=tips::PLOT>
+                                        <td class="px-2 py-2 whitespace-nowrap sm:px-4" title=tips::COUNT>{label}</td>
+                                        <td class="px-2 py-2 font-mono whitespace-nowrap sm:px-4" title=tips::MEDIAN>{text}</td>
+                                        <td class="px-2 py-2 sm:px-4" title=tips::PLOT>
                                             <BoxPlot samples=s.mbps max=max dir=lane.dir/>
                                         </td>
                                     </tr>

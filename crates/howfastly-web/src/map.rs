@@ -6,8 +6,10 @@ use leptos::task::spawn_local;
 
 use crate::engine;
 
-// the frame is twice as wide as tall
+// the frame is twice as wide as tall, taller on phones where the css breakpoint matches
 const ASPECT: f64 = 2.0;
+const NARROW_ASPECT: f64 = 4.0 / 3.0;
+const NARROW_PX: f64 = 640.0;
 // fraction of the route extent kept clear on each side
 const PAD: f64 = 0.35;
 // narrowest viewport in map units so a short route keeps its surroundings
@@ -16,6 +18,17 @@ const FLY_MS: f64 = 1500.0;
 const FRAME_MS: u32 = 16;
 const ARC_STEPS: usize = 64;
 const MAX_LABELS: usize = 24;
+// a phone frame holds fewer labels and needs wider gaps between them
+const NARROW_LABELS: usize = 12;
+const NARROW_GAP: (f64, f64) = (0.2, 0.07);
+
+// the frame shape is settled once at mount from the viewport width
+fn narrow() -> bool {
+    web_sys::window()
+        .and_then(|w| w.inner_width().ok())
+        .and_then(|v| v.as_f64())
+        .is_some_and(|w| w < NARROW_PX)
+}
 
 // map points of the visitor and the pop joined by the great circle
 // the arc is traced from the visitor so the pop lands on its nearest copy
@@ -36,9 +49,9 @@ impl Route {
     }
 
     // the viewport the flight ends in
-    fn target(&self) -> Option<View> {
+    fn target(&self, aspect: f64) -> Option<View> {
         let (lo, hi) = map::bounds(&self.points())?;
-        Some(map::fit(lo, hi, ASPECT, PAD, MIN_W))
+        Some(map::fit(lo, hi, aspect, PAD, MIN_W))
     }
 }
 
@@ -96,7 +109,12 @@ pub fn Map(
     let land = map::land(map::LAND).expect("land outline");
     let borders = map::borders(map::BORDERS).expect("borders");
     let places = StoredValue::new(map::places(map::PLACES).expect("places"));
-    let view = RwSignal::new(map::world(ASPECT));
+    let (aspect, gap, limit) = if narrow() {
+        (NARROW_ASPECT, NARROW_GAP, NARROW_LABELS)
+    } else {
+        (ASPECT, map::GAP, MAX_LABELS)
+    };
+    let view = RwSignal::new(map::world(aspect));
     let route = Memo::new(move |_| {
         active
             .get()
@@ -116,7 +134,7 @@ pub fn Map(
     // towns are laid out once for the viewport the flight ends in
     // the route labels are placed first, towns fill the space left
     let towns = Memo::new(move |_| {
-        let Some((r, target)) = route.get().and_then(|r| r.target().map(|t| (r, t))) else {
+        let Some((r, target)) = route.get().and_then(|r| r.target(aspect).map(|t| (r, t))) else {
             return Vec::new();
         };
         let taken: Vec<(f64, f64)> = r
@@ -126,7 +144,7 @@ pub fn Map(
             .map(|p| target.frac(p))
             .collect();
         places.with_value(|p| {
-            map::labels(p, &target, &taken, map::GAP, MAX_LABELS)
+            map::labels(p, &target, &taken, gap, limit)
                 .into_iter()
                 .map(|l| Town {
                     name: l.place.name.clone(),
@@ -137,7 +155,7 @@ pub fn Map(
     });
 
     Effect::new(move |_| {
-        let Some(to) = route.get().and_then(|r| r.target()) else {
+        let Some(to) = route.get().and_then(|r| r.target(aspect)) else {
             return;
         };
         let id = flight.get_untracked() + 1;
@@ -146,7 +164,7 @@ pub fn Map(
     });
 
     view! {
-        <div class="relative aspect-[2/1] w-full overflow-hidden rounded border border-nord-3 bg-nord-0">
+        <div class="relative aspect-[4/3] w-full overflow-hidden rounded border border-nord-3 bg-nord-0 sm:aspect-[2/1]">
             <svg
                 class="h-full w-full"
                 viewBox=move || view.get().view_box()
