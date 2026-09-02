@@ -14,6 +14,7 @@ use leptos::task::spawn_local;
 use wasm_bindgen::JsValue;
 
 use crate::engine;
+use crate::map::Map;
 
 const WINDOW_MS: f64 = 500.0;
 const EMIT_MS: f64 = 100.0;
@@ -133,6 +134,10 @@ pub fn App() -> impl IntoView {
                         None => view! { "-" }.into_any(),
                     }}
                 </div>
+            </section>
+
+            <section class="rounded bg-nord-1 p-4">
+                <Map meta=state.meta.into()/>
             </section>
 
             {move || state.notice.get().map(|n| view! {

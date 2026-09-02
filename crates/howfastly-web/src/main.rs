@@ -1,4 +1,5 @@
 mod engine;
+mod map;
 mod ui;
 
 fn main() {
