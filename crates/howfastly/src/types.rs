@@ -435,7 +435,8 @@ mod tests {
             },
         ];
         let d = summarize_direction(&sizes, &[]);
-        assert!(d.p90.unwrap() > 10.0);
+        // the 90th percentile of 10 and 20 interpolates to 19
+        assert!((d.p90.unwrap() - 19.0).abs() < 1e-9);
         assert_eq!(d.sizes.len(), 2);
         assert_eq!(d.sizes[0].median, Some(15.0));
         assert!(d.sizes[1].skipped);

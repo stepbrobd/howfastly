@@ -17,8 +17,9 @@ pub fn peak(points: &[(f64, f64)]) -> f64 {
 }
 
 // svg y grows downwards, larger values sit higher
+// a zero ceiling would divide by zero, so it is floored like peak
 pub fn chart_y(value: f64, max: f64, height: f64) -> f64 {
-    height - value.max(0.0) / max * height
+    height - value.max(0.0) / max.max(f64::EPSILON) * height
 }
 
 // map samples into svg space
@@ -167,6 +168,7 @@ mod tests {
         assert_eq!(chart_y(7.0, 7.0, 80.0), 0.0);
         assert_eq!(chart_y(0.0, 7.0, 80.0), 80.0);
         assert_eq!(chart_y(-1.0, 7.0, 80.0), 80.0);
+        assert!(chart_y(1.0, 0.0, 80.0).is_finite());
     }
 
     proptest! {

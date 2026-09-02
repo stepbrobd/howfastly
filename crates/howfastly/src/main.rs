@@ -212,6 +212,14 @@ mod tests {
         assert!(Args::try_parse_from(["howfastly", "-f", "json-pretty"]).is_err());
     }
 
+    // the flag values name sizes the download plan really has
+    #[test]
+    fn payload_sizes_follow_the_plan() {
+        for size in PayloadSize::value_variants() {
+            assert!(types::DOWNLOAD_PLAN.iter().any(|p| p.bytes == size.bytes()));
+        }
+    }
+
     #[test]
     fn http_flags() {
         let a = Args::try_parse_from(["howfastly"]).unwrap();

@@ -85,18 +85,20 @@ mod tests {
     }
 
     #[test]
-    fn csv_has_header_and_rows() {
+    fn csv_exact() {
         let s = render(&results(), crate::OutputFormat::Csv).unwrap();
-        let lines: Vec<_> = s.lines().collect();
-        assert!(lines[0].starts_with("direction,"));
-        assert_eq!(lines.len(), 2);
+        assert_eq!(
+            s,
+            "direction,bytes,samples,median,p90\ndownload,100000,1,50.00,50.00\n"
+        );
     }
 
     #[test]
-    fn human_mentions_sections() {
+    fn human_exact() {
         let s = render(&results(), crate::OutputFormat::Human).unwrap();
-        assert!(s.contains("latency"));
-        assert!(s.contains("Download"));
-        assert!(!s.contains("Upload:"));
+        assert_eq!(
+            s,
+            "\nDownload: 50.00 Mbps (p90)\nDownload loaded latency: Median 5.5 ms / Jitter 1.0 ms\n"
+        );
     }
 }
