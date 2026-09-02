@@ -19,18 +19,17 @@ lib.fix (crane: {
     strictDeps = true;
     __structuredAttrs = true;
 
-    # crane cant infer pname/version
-    # set a placeholder and override in per crate drv
+    # crane cannot read a workspace version, each crate derivation sets its own
     pname = "howfastly";
     version = "2001.717.0";
   };
 
-  # pre-build/cache deps
+  # dependencies built once and shared by every crate derivation
   cargoArtifacts = crane.lib.buildDepsOnly crane.commonArgs;
 
   individualCrateArgs = crane.commonArgs // {
     inherit (crane) cargoArtifacts;
-    # test with cargo-nextest
+    # tests run in the nextest check, never inside a package build
     doCheck = false;
   };
 
