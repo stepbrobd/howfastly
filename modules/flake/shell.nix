@@ -15,7 +15,6 @@
         # rustc         # from crane
         # rustfmt       # from crane
 
-        cargo-hakari
         cargo-nextest
 
         # fastly
