@@ -319,11 +319,11 @@ fn SpeedChart(lane: Lane) -> impl IntoView {
                         let side = if y < CHART_H / 2.0 { "" } else { "-translate-y-full" };
                         view! {
                             <small
-                                class=format!("absolute right-1 text-nord-4 {side}")
+                                class=format!("absolute left-1 text-nord-4 {side}")
                                 style=format!("top:{:.1}%", y / CHART_H * 100.0)
                                 title=tips::HEADLINE
                             >
-                                "p90"
+                                "90th percentile"
                             </small>
                         }
                     })}
