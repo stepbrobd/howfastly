@@ -2,7 +2,7 @@ use std::io::{Read, Write};
 use std::time::{Duration, Instant};
 
 use fastly::cache::simple::{self, CacheEntry};
-use fastly::http::{StatusCode, header};
+use fastly::http::{StatusCode, Version, header};
 use fastly::{Request, Response};
 
 static CHUNK: [u8; 64 * 1024] = [0x55; 64 * 1024];
@@ -119,11 +119,16 @@ pub fn up(req: &mut Request) -> Response {
         .with_body(received.to_string())
 }
 
-// the debug form reads HTTP/2.0, the trailing .0 is noise
-pub fn protocol(req: &Request) -> String {
-    format!("{:?}", req.get_version())
-        .trim_end_matches(".0")
-        .to_string()
+// the wire name of the version, empty for one this build does not know
+pub fn protocol(req: &Request) -> &'static str {
+    match req.get_version() {
+        Version::HTTP_09 => "HTTP/0.9",
+        Version::HTTP_10 => "HTTP/1.0",
+        Version::HTTP_11 => "HTTP/1.1",
+        Version::HTTP_2 => "HTTP/2",
+        Version::HTTP_3 => "HTTP/3",
+        _ => "",
+    }
 }
 
 pub fn meta(req: &Request, start: Instant) -> Response {
@@ -159,7 +164,7 @@ pub fn meta(req: &Request, start: Instant) -> Response {
             })
             .filter(|c| c.latitude != 0.0 || c.longitude != 0.0),
         pop,
-        protocol: protocol(req),
+        protocol: protocol(req).to_string(),
         version: std::env::var("FASTLY_SERVICE_VERSION").unwrap_or_default(),
         cargo: howfastly::VERSION.to_string(),
     };
