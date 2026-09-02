@@ -107,8 +107,9 @@ pub fn up(req: &mut Request) -> Response {
     let mut received: u64 = 0;
     loop {
         match body.read(&mut buf) {
-            Ok(0) | Err(_) => break,
+            Ok(0) => break,
             Ok(n) => received += n as u64,
+            Err(_) => return base(StatusCode::BAD_REQUEST, Instant::now()),
         }
     }
     // dur starts after the drain
@@ -165,7 +166,7 @@ pub fn meta(req: &Request, start: Instant) -> Response {
 
     base(StatusCode::OK, start)
         .with_header(header::CONTENT_TYPE, "application/json")
-        .with_body(serde_json::to_string(&meta).unwrap_or_default())
+        .with_body(serde_json::to_string(&meta).expect("meta serializes"))
 }
 
 pub fn not_found() -> Response {
