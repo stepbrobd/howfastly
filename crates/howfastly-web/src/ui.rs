@@ -151,14 +151,14 @@ pub fn App() -> impl IntoView {
             </section>
 
             <section class="rounded bg-nord-1 p-4">
-                <Map meta=state.meta.into() active=Signal::derive(move || !gate.get())/>
+                <Map meta=state.meta.into() active=Signal::derive(move || !gate.get())>
+                    <Controls state=state/>
+                </Map>
             </section>
 
             {move || state.notice.get().map(|n| view! {
                 <div class="rounded border border-nord-13 bg-nord-1 p-4 text-nord-13">{n}</div>
             })}
-
-            <Controls state=state/>
 
             <div class="grid gap-8 lg:grid-cols-2">
                 <section class="flex flex-col gap-4">
@@ -568,10 +568,10 @@ enum Interrupt {
 
 #[component]
 fn Controls(state: State) -> impl IntoView {
-    let primary = "cursor-pointer rounded bg-nord-10 px-4 py-2 text-nord-6 hover:bg-nord-9";
-    let plain = "cursor-pointer rounded border border-nord-3 px-4 py-2 hover:bg-nord-2";
+    let primary = "cursor-pointer rounded bg-nord-10 px-3 py-1 text-sm text-nord-6 hover:bg-nord-9";
+    let plain = "cursor-pointer rounded bg-nord-1 px-3 py-1 text-sm text-nord-4 hover:bg-nord-2";
     view! {
-        <div class="flex justify-end gap-2">
+        <div class="absolute bottom-1 left-1 flex gap-1">
             {move || match state.phase.get() {
                 Phase::Idle => view! {
                     <button class=primary on:click=move |_| launch(state)>"Retest"</button>
@@ -588,7 +588,7 @@ fn Controls(state: State) -> impl IntoView {
                 }
                     .into_any(),
                 Phase::Cancelled => view! {
-                    <span class="px-4 py-2 text-nord-4">"Stopping"</span>
+                    <span class="rounded bg-nord-1 px-3 py-1 text-sm text-nord-4">"Stopping"</span>
                 }
                     .into_any(),
             }}

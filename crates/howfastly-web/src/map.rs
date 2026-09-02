@@ -86,8 +86,13 @@ async fn fly(view: RwSignal<View>, flight: RwSignal<u32>, id: u32, to: View) {
 }
 
 // active gates the flight, nothing moves before the visitor confirms the first run
+// children overlay the frame, the run controls sit in its corner
 #[component]
-pub fn Map(meta: Signal<Option<MetaResponse>>, active: Signal<bool>) -> impl IntoView {
+pub fn Map(
+    meta: Signal<Option<MetaResponse>>,
+    active: Signal<bool>,
+    children: Children,
+) -> impl IntoView {
     let land = map::land(map::LAND).expect("land outline");
     let borders = map::borders(map::BORDERS).expect("borders");
     let places = StoredValue::new(map::places(map::PLACES).expect("places"));
@@ -206,6 +211,7 @@ pub fn Map(meta: Signal<Option<MetaResponse>>, active: Signal<bool>) -> impl Int
                 {r.client.map(|p| view! { <Label at=p view=view text=you class="text-nord-6"/> })}
                 {r.pop.map(|p| view! { <Label at=p view=view text=pop class="text-nord-6"/> })}
             })}
+            {children()}
             <details class="absolute right-1 bottom-1">
                 <summary class="flex h-5 w-5 cursor-pointer list-none items-center justify-center rounded-full bg-nord-1 font-serif text-xs text-nord-4 [&::-webkit-details-marker]:hidden">
                     "i"
