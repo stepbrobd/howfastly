@@ -13,14 +13,22 @@ const API_BACKEND: &str = "fastly";
 
 // resolve the serving pop against the datacenters api
 // the simple cache keeps the response body in this pop for a day
-// any failure (missing store or token, api error) degrades to None
-fn pop_info(code: &str) -> Option<howfastly::types::Pop> {
+// the error names the step that failed so the log says why meta degraded
+fn pop_info(code: &str) -> Result<howfastly::types::Pop, &'static str> {
     if code.is_empty() {
-        return None;
+        return Err("pop code empty");
     }
-    let store = fastly::secret_store::SecretStore::open(SECRET_STORE).ok()?;
-    let plaintext = store.try_get(API_KEY).ok()??.try_plaintext().ok()?;
-    let api_key = std::str::from_utf8(&plaintext).ok()?.trim().to_string();
+    let store = fastly::secret_store::SecretStore::open(SECRET_STORE)
+        .map_err(|_| "secret store missing")?;
+    let secret = store
+        .try_get(API_KEY)
+        .map_err(|_| "secret store unreadable")?
+        .ok_or("api key missing")?;
+    let plaintext = secret.try_plaintext().map_err(|_| "api key unreadable")?;
+    let api_key = std::str::from_utf8(&plaintext)
+        .map_err(|_| "api key not utf8")?
+        .trim()
+        .to_string();
 
     let body = simple::get_or_set_with("datacenters", || {
         let resp = Request::get("https://api.fastly.com/datacenters")
@@ -34,11 +42,14 @@ fn pop_info(code: &str) -> Option<howfastly::types::Pop> {
             ttl: Duration::from_secs(86_400),
         })
     })
-    .ok()??;
+    .map_err(|_| "datacenters unreachable")?
+    .ok_or("datacenters cache empty")?;
 
-    let pops: Vec<howfastly::types::Pop> = serde_json::from_reader(body).ok()?;
+    let pops: Vec<howfastly::types::Pop> =
+        serde_json::from_reader(body).map_err(|_| "datacenters body invalid")?;
     pops.into_iter()
         .find(|pop| pop.code.eq_ignore_ascii_case(code))
+        .ok_or("pop unknown to the api")
 }
 
 fn base(status: StatusCode, start: Instant) -> Response {
@@ -135,9 +146,12 @@ pub fn meta(req: &Request, start: Instant) -> Response {
     let ip = req.get_client_ip_addr();
     let geo = ip.and_then(fastly::geo::geo_lookup);
     let code = fastly::compute_runtime::pop();
-    let pop = pop_info(code).unwrap_or_else(|| howfastly::types::Pop {
-        code: code.to_string(),
-        ..Default::default()
+    let pop = pop_info(code).unwrap_or_else(|cause| {
+        eprintln!("pop lookup degraded to the bare code: {cause}");
+        howfastly::types::Pop {
+            code: code.to_string(),
+            ..Default::default()
+        }
     });
 
     let meta = howfastly::types::MetaResponse {
