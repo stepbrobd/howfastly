@@ -225,6 +225,105 @@ pub fn summarize_direction(sizes: &[SizeSamples], loaded_ms: &[f64]) -> Directio
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
+
+    // serde_json parses floats best effort, a nanodegree is well under a millimeter
+    fn close(a: Option<Coordinates>, b: Option<Coordinates>) -> bool {
+        match (a, b) {
+            (Some(a), Some(b)) => {
+                (a.latitude - b.latitude).abs() < 1e-9 && (a.longitude - b.longitude).abs() < 1e-9
+            }
+            (None, None) => true,
+            _ => false,
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn title_case_keeps_length_and_settles(s in "[a-z .-]{0,20}") {
+            let once = title_case(&s);
+            prop_assert_eq!(once.chars().count(), s.chars().count());
+            prop_assert_eq!(title_case(&once), once.clone());
+            prop_assert_eq!(once.to_lowercase(), s);
+        }
+
+        #[test]
+        fn latency_summary_orders(samples in prop::collection::vec(0.0f64..1e4, 1..50)) {
+            let s = summarize_latency(&samples).unwrap();
+            let max = samples.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+            prop_assert!(s.min <= s.median && s.median <= max);
+            prop_assert!(s.min <= s.avg && s.avg <= max + 1e-9);
+            prop_assert!(s.jitter >= 0.0);
+        }
+
+        #[test]
+        fn direction_summary_keeps_shape(
+            sizes in prop::collection::vec(
+                (1u64..1_000_000, prop::collection::vec(0.0f64..1e4, 0..8), any::<bool>()),
+                0..6,
+            ),
+            loaded in prop::collection::vec(0.0f64..1e4, 0..20),
+        ) {
+            let samples: Vec<SizeSamples> = sizes
+                .iter()
+                .map(|(bytes, mbps, skipped)| SizeSamples {
+                    bytes: *bytes,
+                    mbps: mbps.clone(),
+                    skipped: *skipped,
+                })
+                .collect();
+            let d = summarize_direction(&samples, &loaded);
+            prop_assert_eq!(d.sizes.len(), samples.len());
+            prop_assert_eq!(d.loaded.is_some(), !loaded.is_empty());
+            let all: Vec<f64> = samples.iter().flat_map(|s| s.mbps.iter().copied()).collect();
+            match d.p90 {
+                Some(p) => {
+                    let lo = all.iter().copied().fold(f64::INFINITY, f64::min);
+                    let hi = all.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+                    prop_assert!(lo <= p && p <= hi);
+                }
+                None => prop_assert!(all.is_empty()),
+            }
+            for (s, out) in samples.iter().zip(&d.sizes) {
+                prop_assert_eq!(out.bytes, s.bytes);
+                prop_assert_eq!(out.samples, s.mbps.len());
+                prop_assert_eq!(out.skipped, s.skipped);
+                prop_assert_eq!(out.median.is_some(), !s.mbps.is_empty());
+            }
+        }
+
+        #[test]
+        fn meta_roundtrips(
+            ip in "[0-9a-f:.]{1,40}",
+            asn in any::<u32>(),
+            city in "[A-Za-z ]{0,20}",
+            lat in -90.0f64..90.0,
+            lon in -180.0f64..180.0,
+            code in "[A-Z]{3}",
+        ) {
+            let meta = MetaResponse {
+                ip,
+                asn,
+                city,
+                coordinates: Some(Coordinates { latitude: lat, longitude: lon }),
+                pop: Pop {
+                    code,
+                    coordinates: Some(Coordinates { latitude: -lat, longitude: -lon }),
+                    ..Default::default()
+                },
+                cargo: crate::VERSION.to_string(),
+                ..Default::default()
+            };
+            let back = parse_meta(&serde_json::to_string(&meta).unwrap()).unwrap();
+            prop_assert!(back.mismatch().is_none());
+            prop_assert_eq!(back.ip, meta.ip);
+            prop_assert_eq!(back.asn, meta.asn);
+            prop_assert_eq!(back.city, meta.city);
+            prop_assert!(close(back.coordinates, meta.coordinates));
+            prop_assert_eq!(back.pop.code, meta.pop.code);
+            prop_assert!(close(back.pop.coordinates, meta.pop.coordinates));
+        }
+    }
 
     #[test]
     fn meta_fallback() {
