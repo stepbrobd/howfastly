@@ -17,6 +17,6 @@ override_host = "stats.ysun.co"
 url           = "https://api.fastly.com/"
 override_host = "api.fastly.com"
 
-[[local_server.secret_stores.howfastly]]
+[[local_server.secret_stores.secretstore]]
 key  = "fastly-api-key"
 data = "unset"

@@ -7,7 +7,7 @@ use fastly::{Request, Response};
 
 static CHUNK: [u8; 64 * 1024] = [0x55; 64 * 1024];
 
-const SECRET_STORE: &str = "howfastly";
+const SECRET_STORE: &str = "secretstore";
 const API_KEY: &str = "fastly-api-key";
 const API_BACKEND: &str = "fastly";
 
