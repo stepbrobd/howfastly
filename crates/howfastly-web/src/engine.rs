@@ -130,7 +130,8 @@ pub async fn upload(
     });
     xhr.set_onloadend(Some(onloadend.as_ref().unchecked_ref()));
 
-    let body = Uint8Array::new_with_length(bytes as u32);
+    let len = u32::try_from(bytes).map_err(|_| JsValue::from_str("upload size exceeds u32"))?;
+    let body = Uint8Array::new_with_length(len);
     let start = now_ms();
     xhr.send_with_opt_buffer_source(Some(&body))?;
     JsFuture::from(promise).await?;
