@@ -9,8 +9,8 @@ const MAX_LAT: f64 = 85.051_129;
 pub const LAND: &str = include_str!("../assets/land.txt");
 pub const BORDERS: &str = include_str!("../assets/borders.txt");
 pub const PLACES: &str = include_str!("../assets/places.txt");
-// labels this close in viewport fractions would overlap
-pub const GAP: (f64, f64) = (0.12, 0.05);
+// margin kept after a label's text and between rows, in viewport fractions
+pub const GAP: (f64, f64) = (0.03, 0.05);
 
 // a viewport in map units
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -200,26 +200,33 @@ pub struct Label<'a> {
     pub frac: (f64, f64),
 }
 
+// the width a label takes right of its dot, in viewport fractions
+// text is the offset from the dot to the first glyph and the advance per glyph
+pub fn width(name: &str, text: (f64, f64)) -> f64 {
+    text.0 + name.chars().count() as f64 * text.1
+}
+
 // places worth a label in the viewport, in order of prominence
-// none within gap of another, of a taken spot, or of the frame edge where text would clip
+// none overlaps another, a taken strip, or the frame edge, gap is the clearance kept
 // a place is tried on its copy nearest the viewport so wrapped views keep their labels
 pub fn labels<'a>(
     places: &'a [Place],
     view: &View,
-    taken: &[(f64, f64)],
+    taken: &[(f64, f64, f64)],
     gap: (f64, f64),
+    text: (f64, f64),
     limit: usize,
 ) -> Vec<Label<'a>> {
     let zoom = zoom(view.w);
     let mut out: Vec<Label> = Vec::new();
-    let mut spots: Vec<(f64, f64)> = taken.to_vec();
-    let crowded = |spots: &[(f64, f64)], (fx, fy): (f64, f64)| {
-        spots
-            .iter()
-            .any(|&(sx, sy)| (sx - fx).abs() < gap.0 && (sy - fy).abs() < gap.1)
+    let mut spots: Vec<(f64, f64, f64)> = taken.to_vec();
+    let crowded = |spots: &[(f64, f64, f64)], (fx, fy, w): (f64, f64, f64)| {
+        spots.iter().any(|&(sx, sy, sw)| {
+            (sy - fy).abs() < gap.1 && fx < sx + sw + gap.0 && sx < fx + w + gap.0
+        })
     };
-    let inside = |(fx, fy): (f64, f64)| {
-        (0.0..1.0 - gap.0).contains(&fx) && (gap.1..1.0 - gap.1).contains(&fy)
+    let inside = |(fx, fy, w): (f64, f64, f64)| {
+        fx >= 0.0 && fx + w <= 1.0 && (gap.1..1.0 - gap.1).contains(&fy)
     };
     for place in places.iter().filter(|p| p.zoom <= zoom) {
         if out.len() >= limit {
@@ -227,10 +234,11 @@ pub fn labels<'a>(
         }
         let at = (nearest(view.x + view.w / 2.0, place.at.0), place.at.1);
         let frac = view.frac(at);
-        if !inside(frac) || crowded(&spots, frac) {
+        let strip = (frac.0, frac.1, width(&place.name, text));
+        if !inside(strip) || crowded(&spots, strip) {
             continue;
         }
-        spots.push(frac);
+        spots.push(strip);
         out.push(Label { place, at, frac });
     }
     out
@@ -478,29 +486,36 @@ mod tests {
     #[test]
     fn labels_keep_their_distance(
         raw in prop::collection::vec((-180.0f64..180.0, -80.0f64..80.0, 0.0f64..9.0), 0..80),
-        taken in prop::collection::vec((0.0f64..1.0, 0.0f64..1.0), 0..3),
+        taken in prop::collection::vec((0.0f64..1.0, 0.0f64..1.0, 0.0f64..0.3), 0..3),
         w in 24.0f64..WORLD,
+        text in (0.0f64..0.05, 0.005f64..0.03),
         limit in 0usize..20,
     ) {
         let mut towns: Vec<Place> = raw
             .iter()
             .enumerate()
-            .map(|(i, &(lon, lat, z))| town(&i.to_string(), lon, lat, z))
+            .map(|(i, &(lon, lat, z))| town(&format!("town{i}"), lon, lat, z))
             .collect();
         towns.sort_by(|a, b| a.zoom.total_cmp(&b.zoom));
         let v = fit((400.0, 300.0), (400.0 + w / 2.0, 300.0 + w / 4.0), 2.0, 0.0, w);
-        let out = labels(&towns, &v, &taken, GAP, limit);
+        let out = labels(&towns, &v, &taken, GAP, text, limit);
         prop_assert!(out.len() <= limit);
-        let spots: Vec<(f64, f64)> = taken.iter().copied().chain(out.iter().map(|o| o.frac)).collect();
+        let width = |l: &Label| width(&l.place.name, text);
+        let spots: Vec<(f64, f64, f64)> = taken
+            .iter()
+            .copied()
+            .chain(out.iter().map(|o| (o.frac.0, o.frac.1, width(o))))
+            .collect();
         for (i, l) in out.iter().enumerate() {
             let (fx, fy) = l.frac;
-            prop_assert!((0.0..1.0 - GAP.0).contains(&fx) && (GAP.1..1.0 - GAP.1).contains(&fy));
+            prop_assert!(fx >= 0.0 && fx + width(l) <= 1.0 && (GAP.1..1.0 - GAP.1).contains(&fy));
             prop_assert!(l.place.zoom <= zoom(v.w));
             prop_assert!(holds(&v, l.at));
             prop_assert!((v.frac(l.at).0 - fx).abs() < 1e-9);
-            for (j, &(sx, sy)) in spots.iter().enumerate() {
+            for (j, &(sx, sy, sw)) in spots.iter().enumerate() {
                 if j != taken.len() + i {
-                    prop_assert!((sx - fx).abs() >= GAP.0 || (sy - fy).abs() >= GAP.1);
+                    let apart = fx >= sx + sw + GAP.0 || sx >= fx + width(l) + GAP.0;
+                    prop_assert!(apart || (sy - fy).abs() >= GAP.1);
                 }
             }
         }
@@ -513,43 +528,49 @@ mod tests {
     fn labels_exact() {
         let towns = [
             town("Lyon", 4.83, 45.77, 4.7),
+            town("Chambery", 5.9, 45.77, 5.0),
             town("Grenoble", 5.72, 45.18, 6.1),
             town("Vienne", 4.87, 45.53, 8.0),
         ];
         let v = fit(project(3.0, 44.0), project(7.0, 47.0), 2.0, 0.2, 24.0);
-        let shown: Vec<&str> = labels(&towns, &v, &[], GAP, 10)
-            .iter()
-            .map(|l| l.place.name.as_str())
-            .collect();
-        assert_eq!(shown, vec!["Lyon", "Grenoble"]);
-        let lyon = labels(&towns, &v, &[], GAP, 10)[0].frac;
+        let names = |char_w: f64| -> Vec<&str> {
+            labels(&towns, &v, &[], GAP, (0.0, char_w), 10)
+                .iter()
+                .map(|l| l.place.name.as_str())
+                .collect()
+        };
+        assert_eq!(names(0.005), vec!["Lyon", "Chambery", "Grenoble"]);
+        let lyon = labels(&towns, &v, &[], GAP, (0.0, 0.005), 10)[0].frac;
         assert!(
-            labels(&towns, &v, &[lyon], GAP, 10)
+            labels(&towns, &v, &[(lyon.0, lyon.1, 0.02)], GAP, (0.0, 0.005), 10)
                 .iter()
                 .all(|l| l.place.name != "Lyon")
         );
-        assert!(labels(&towns, &world(2.0), &[], GAP, 10).is_empty());
-        assert_eq!(labels(&towns, &v, &[], GAP, 0).len(), 0);
-        // a town on the right edge would clip and stays out
+        // wide glyphs let lyon run into chambery on the same row, which then drops out
+        assert_eq!(names(0.05), vec!["Lyon", "Grenoble"]);
+        assert!(labels(&towns, &world(2.0), &[], GAP, (0.0, 0.005), 10).is_empty());
+        assert_eq!(labels(&towns, &v, &[], GAP, (0.0, 0.005), 0).len(), 0);
+        // a town whose name would run off the right edge stays out
         let edge = View {
-            x: towns[0].at.0 - 95.0,
+            x: towns[0].at.0 - 99.0,
             y: towns[0].at.1 - 25.0,
             w: 100.0,
             h: 50.0,
         };
-        assert!(labels(&towns, &edge, &[], GAP, 10).is_empty());
+        assert!(labels(&towns, &edge, &[], GAP, (0.0, 0.005), 10).is_empty());
+        assert!((width("Lyon", (0.01, 0.005)) - 0.03).abs() < 1e-12);
     }
 
     #[test]
     fn labels_follow_a_wrapped_view() {
         let towns = [town("Tokyo", 139.69, 35.68, 1.7)];
         let mut v = fit(project(-170.0, 30.0), project(-120.0, 40.0), 2.0, 0.0, 24.0);
-        assert!(labels(&towns, &v, &[], GAP, 10).is_empty());
+        assert!(labels(&towns, &v, &[], GAP, (0.0, 0.005), 10).is_empty());
         // stretch west past the antimeridian, tokyo's western copy is now in view
         v.x -= 200.0;
         v.w += 200.0;
         v.h = v.w / 2.0;
-        let shown = labels(&towns, &v, &[], GAP, 10);
+        let shown = labels(&towns, &v, &[], GAP, (0.0, 0.005), 10);
         assert_eq!(shown.len(), 1);
         assert!(shown[0].frac.0 < 0.5);
         assert!(shown[0].at.0 < 0.0);

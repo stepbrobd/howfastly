@@ -10,6 +10,13 @@ use crate::engine;
 const ASPECT: f64 = 2.0;
 const NARROW_ASPECT: f64 = 4.0 / 3.0;
 const NARROW_PX: f64 = 640.0;
+// the main column caps at 72rem from 1024 px up and at 65ch below, the paddings and border come off
+const WIDE_COLUMN_PX: f64 = 1152.0;
+const COLUMN_PX: f64 = 585.0;
+const INSET_PX: f64 = 66.0;
+// the label text starts two spacing units right of its dot, then advances per glyph
+const OFFSET_PX: f64 = 8.0;
+const CHAR_PX: f64 = 6.6;
 // fraction of the route extent kept clear on each side
 const PAD: f64 = 0.35;
 // narrowest viewport in map units so a short route keeps its surroundings
@@ -18,16 +25,28 @@ const FLY_MS: f64 = 1500.0;
 const FRAME_MS: u32 = 16;
 const ARC_STEPS: usize = 64;
 const MAX_LABELS: usize = 24;
-// a phone frame holds fewer labels and needs wider gaps between them
+// a phone frame holds fewer labels and needs more clearance between rows
 const NARROW_LABELS: usize = 12;
-const NARROW_GAP: (f64, f64) = (0.2, 0.07);
+const NARROW_GAP: (f64, f64) = (0.05, 0.07);
 
-// the frame shape is settled once at mount from the viewport width
-fn narrow() -> bool {
-    web_sys::window()
+// aspect, clearance, label budget and text metrics, settled once at mount
+fn frame() -> (f64, (f64, f64), usize, (f64, f64)) {
+    let inner = web_sys::window()
         .and_then(|w| w.inner_width().ok())
         .and_then(|v| v.as_f64())
-        .is_some_and(|w| w < NARROW_PX)
+        .unwrap_or(WIDE_COLUMN_PX);
+    let column = if inner >= 1024.0 {
+        WIDE_COLUMN_PX
+    } else {
+        COLUMN_PX
+    };
+    let px = inner.min(column) - INSET_PX;
+    let text = (OFFSET_PX / px, CHAR_PX / px);
+    if inner < NARROW_PX {
+        (NARROW_ASPECT, NARROW_GAP, NARROW_LABELS, text)
+    } else {
+        (ASPECT, map::GAP, MAX_LABELS, text)
+    }
 }
 
 // map points of the visitor and the pop joined by the great circle
@@ -109,11 +128,7 @@ pub fn Map(
     let land = map::land(map::LAND).expect("land outline");
     let borders = map::borders(map::BORDERS).expect("borders");
     let places = StoredValue::new(map::places(map::PLACES).expect("places"));
-    let (aspect, gap, limit) = if narrow() {
-        (NARROW_ASPECT, NARROW_GAP, NARROW_LABELS)
-    } else {
-        (ASPECT, map::GAP, MAX_LABELS)
-    };
+    let (aspect, gap, limit, text) = frame();
     let view = RwSignal::new(map::world(aspect));
     let route = Memo::new(move |_| {
         active
@@ -137,14 +152,19 @@ pub fn Map(
         let Some((r, target)) = route.get().and_then(|r| r.target(aspect).map(|t| (r, t))) else {
             return Vec::new();
         };
-        let taken: Vec<(f64, f64)> = r
+        let (you, pop) = names.get().unwrap_or_default();
+        let strip = |p: (f64, f64), name: &str| {
+            let (fx, fy) = target.frac(p);
+            (fx, fy, map::width(name, text))
+        };
+        let taken: Vec<(f64, f64, f64)> = r
             .client
+            .map(|p| strip(p, &you))
             .into_iter()
-            .chain(r.pop)
-            .map(|p| target.frac(p))
+            .chain(r.pop.map(|p| strip(p, &pop)))
             .collect();
         places.with_value(|p| {
-            map::labels(p, &target, &taken, gap, limit)
+            map::labels(p, &target, &taken, gap, text, limit)
                 .into_iter()
                 .map(|l| Town {
                     name: l.place.name.clone(),
