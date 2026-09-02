@@ -11,58 +11,63 @@ fn main() {
 
     use fastly::Request;
     use fastly::http::Method;
-    use howfastly::stats::{latency_bucket, speed_bucket};
+    use plausible::Event;
 
     let start = Instant::now();
     let mut req = Request::from_client();
     let method = req.get_method().clone();
     let path = req.get_path().to_string();
 
-    let mut results = None;
-    match (&method, path.as_str()) {
-        (&Method::GET, "/ping") | (&Method::POST, "/start") => {
-            handlers::ack(start).send_to_client()
+    // each arm answers the client and says what the request counts as
+    let event = match (&method, path.as_str()) {
+        (&Method::GET, "/ping") => {
+            handlers::ack(start).send_to_client();
+            None
         }
-        (&Method::GET, "/down") => handlers::down(&req, start),
-        (&Method::POST, "/up") => handlers::up(&mut req).send_to_client(),
-        (&Method::GET, "/meta") => handlers::meta(&req, start).send_to_client(),
+        (&Method::POST, "/start") => {
+            handlers::ack(start).send_to_client();
+            Some(Event::Start)
+        }
+        (&Method::GET, "/down") => {
+            handlers::down(&req, start);
+            None
+        }
+        (&Method::POST, "/up") => {
+            handlers::up(&mut req).send_to_client();
+            None
+        }
+        (&Method::GET, "/meta") => {
+            handlers::meta(&req, start).send_to_client();
+            None
+        }
         (&Method::POST, "/finish") => {
-            let (resp, parsed) = handlers::finish(&mut req, start);
-            results = parsed;
-            resp.send_to_client()
+            let (resp, results) = handlers::finish(&mut req, start);
+            resp.send_to_client();
+            results.map(|r| Event::Finish(Box::new(r)))
         }
         (_, "/ping" | "/down" | "/up" | "/meta" | "/start" | "/finish") => {
-            handlers::method_not_allowed().send_to_client()
+            handlers::method_not_allowed().send_to_client();
+            None
         }
         (&Method::GET, p) => match assets::serve(p) {
-            Some(resp) => resp.send_to_client(),
-            None => handlers::not_found().send_to_client(),
+            Some(resp) => {
+                resp.send_to_client();
+                (p == "/").then_some(Event::Pageview)
+            }
+            None => {
+                handlers::not_found().send_to_client();
+                None
+            }
         },
-        _ => handlers::not_found().send_to_client(),
-    }
+        _ => {
+            handlers::not_found().send_to_client();
+            None
+        }
+    };
 
     // counted after the response is on the wire so no measurement includes it
-    // a run is bracketed by start and finish
-    match (method, path.as_str()) {
-        (Method::GET, "/") => plausible::event(&req, "pageview", &[]),
-        (Method::POST, "/start") => plausible::event(&req, "Start", &[]),
-        (Method::POST, "/finish") => {
-            let Some(results) = results else {
-                return;
-            };
-            let mut props = Vec::new();
-            if let Some(mbps) = results.download.and_then(|d| d.p90) {
-                props.push(("Download", speed_bucket(mbps).to_string()));
-            }
-            if let Some(mbps) = results.upload.and_then(|d| d.p90) {
-                props.push(("Upload", speed_bucket(mbps).to_string()));
-            }
-            if let Some(latency) = results.latency {
-                props.push(("Latency", latency_bucket(latency.median).to_string()));
-            }
-            plausible::event(&req, "Finish", &props)
-        }
-        _ => {}
+    if let Some(event) = event {
+        plausible::send(&req, &event);
     }
 }
 
