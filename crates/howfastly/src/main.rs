@@ -139,7 +139,7 @@ impl Args {
     }
 }
 
-#[tokio::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let results = run::run(&args).await?;
