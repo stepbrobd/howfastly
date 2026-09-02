@@ -85,13 +85,19 @@ async fn fly(view: RwSignal<View>, flight: RwSignal<u32>, id: u32, to: View) {
     }
 }
 
+// active gates the flight, nothing moves before the visitor confirms the first run
 #[component]
-pub fn Map(meta: Signal<Option<MetaResponse>>) -> impl IntoView {
+pub fn Map(meta: Signal<Option<MetaResponse>>, active: Signal<bool>) -> impl IntoView {
     let land = map::land(map::LAND).expect("land outline");
     let borders = map::borders(map::BORDERS).expect("borders");
     let places = StoredValue::new(map::places(map::PLACES).expect("places"));
     let view = RwSignal::new(map::world(ASPECT));
-    let route = Memo::new(move |_| meta.with(|m| m.as_ref().map(route)));
+    let route = Memo::new(move |_| {
+        active
+            .get()
+            .then(|| meta.with(|m| m.as_ref().map(route)))
+            .flatten()
+    });
     let names = Memo::new(move |_| {
         meta.with(|m| {
             m.as_ref().map(|m| {

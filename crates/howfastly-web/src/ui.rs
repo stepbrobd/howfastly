@@ -138,7 +138,7 @@ pub fn App() -> impl IntoView {
             </section>
 
             <section class="rounded bg-nord-1 p-4">
-                <Map meta=state.meta.into()/>
+                <Map meta=state.meta.into() active=Signal::derive(move || !gate.get())/>
             </section>
 
             {move || state.notice.get().map(|n| view! {
