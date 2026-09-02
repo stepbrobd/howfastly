@@ -15,6 +15,20 @@ updates:
         patterns:
           - "*"
 
+  - package-ecosystem: cargo
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: saturday
+      time: "03:00"
+      timezone: "Etc/UTC"
+    commit-message:
+      prefix: "cargo"
+    groups:
+      crates:
+        patterns:
+          - "*"
+
   - package-ecosystem: nix
     directory: "/"
     schedule:
