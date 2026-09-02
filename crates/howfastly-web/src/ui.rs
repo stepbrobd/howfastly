@@ -15,6 +15,7 @@ use web_sys::AbortController;
 
 use crate::engine;
 use crate::map::Map;
+use crate::tips;
 
 const WINDOW_MS: f64 = 500.0;
 const EMIT_MS: f64 = 100.0;
@@ -111,7 +112,7 @@ pub fn App() -> impl IntoView {
     view! {
         <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4 lg:max-w-6xl">
             <section class="overflow-x-auto rounded bg-nord-1 p-4">
-                <div class="mx-auto w-max whitespace-nowrap font-mono">
+                <div class="mx-auto w-max whitespace-nowrap font-mono" title=tips::ROUTE>
                     {move || match state.meta.get() {
                         Some(m) => view! {
                             <a href=format!("https://bgp.tools/prefix/{}", m.ip)
@@ -174,15 +175,17 @@ pub fn App() -> impl IntoView {
             <section class="rounded bg-nord-1 p-4">
                 <h2 class="font-semibold">Latency</h2>
                 <div class="mt-2 grid gap-4 sm:grid-cols-3">
-                    <LatencyCard label="Unloaded" summary=state.latency.into()/>
+                    <LatencyCard label="Unloaded" tip=tips::UNLOADED summary=state.latency.into()/>
                     <LatencyCard
                         label="Download loaded"
+                        tip=tips::LOADED
                         summary=Signal::derive(move || {
                             state.down.summary.get().and_then(|d| d.loaded)
                         })
                     />
                     <LatencyCard
                         label="Upload loaded"
+                        tip=tips::LOADED
                         summary=Signal::derive(move || {
                             state.up.summary.get().and_then(|d| d.loaded)
                         })
@@ -318,6 +321,7 @@ fn SpeedChart(lane: Lane) -> impl IntoView {
                             <small
                                 class=format!("absolute right-1 text-nord-4 {side}")
                                 style=format!("top:{:.1}%", y / CHART_H * 100.0)
+                                title=tips::HEADLINE
                             >
                                 "p90"
                             </small>
@@ -349,7 +353,7 @@ fn Headline(lane: Lane) -> impl IntoView {
     };
     view! {
         <div class="flex-1 rounded bg-nord-1 p-4">
-            <div class="font-mono text-4xl text-nord-6">
+            <div class="font-mono text-4xl text-nord-6" title=tips::HEADLINE>
                 {move || match speed() {
                     Some((v, unit)) => view! {
                         {format!("{v:.1}")}
@@ -361,7 +365,7 @@ fn Headline(lane: Lane) -> impl IntoView {
             </div>
             <div class="flex justify-between">
                 <span>{label}</span>
-                <span class="text-nord-4">
+                <span class="text-nord-4" title=tips::PEAK>
                     <small>
                         {move || {
                             let pts = lane.points.get();
@@ -380,20 +384,28 @@ fn Headline(lane: Lane) -> impl IntoView {
 }
 
 #[component]
-fn LatencyCard(label: &'static str, summary: Signal<Option<LatencySummary>>) -> impl IntoView {
+fn LatencyCard(
+    label: &'static str,
+    tip: &'static str,
+    summary: Signal<Option<LatencySummary>>,
+) -> impl IntoView {
     view! {
         <div>
-            <div><small>{label}</small></div>
+            <div title=tip><small>{label}</small></div>
             {move || match summary.get() {
                 Some(s) => view! {
                     <div class="text-nord-6">
-                        {format!("Median {:.1} ms / Jitter {:.1} ms", s.median, s.jitter)}
+                        {format!("Median {:.1} ms / ", s.median)}
+                        <span title=tips::JITTER>{format!("Jitter {:.1} ms", s.jitter)}</span>
                     </div>
                     <div><small>{format!("Min {:.1} / Avg {:.1}", s.min, s.avg)}</small></div>
                 }
                     .into_any(),
                 None => view! {
-                    <div class="text-nord-3">"Median - / Jitter -"</div>
+                    <div class="text-nord-3">
+                        "Median - / "
+                        <span title=tips::JITTER>"Jitter -"</span>
+                    </div>
                     <div class="text-nord-3"><small>"Min - / Avg -"</small></div>
                 }
                     .into_any(),
@@ -495,7 +507,10 @@ fn SizeTable(lane: Lane) -> impl IntoView {
                             <th class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6">
                                 {title}
                             </th>
-                            <th class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6">
+                            <th
+                                class="border-b border-nord-3 bg-nord-0 px-4 py-2 text-left font-semibold text-nord-6"
+                                title=tips::MEDIAN
+                            >
                                 "Median"
                             </th>
                             <th class="w-1/2 border-b border-nord-3 bg-nord-0 px-4 py-2"></th>
@@ -521,9 +536,9 @@ fn SizeTable(lane: Lane) -> impl IntoView {
                                 };
                                 view! {
                                     <tr class="odd:bg-nord-1">
-                                        <td class="px-4 py-2">{label}</td>
-                                        <td class="px-4 py-2 font-mono">{text}</td>
-                                        <td class="px-4 py-2">
+                                        <td class="px-4 py-2" title=tips::COUNT>{label}</td>
+                                        <td class="px-4 py-2 font-mono" title=tips::MEDIAN>{text}</td>
+                                        <td class="px-4 py-2" title=tips::PLOT>
                                             <BoxPlot samples=s.mbps max=max dir=lane.dir/>
                                         </td>
                                     </tr>
