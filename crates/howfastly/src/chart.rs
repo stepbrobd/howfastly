@@ -11,28 +11,33 @@ pub fn format_speed(bps: f64) -> (f64, &'static str) {
     }
 }
 
+// the largest sample, floored so an empty or flat series still scales
+pub fn peak(points: &[(f64, f64)]) -> f64 {
+    points.iter().map(|&(_, y)| y).fold(f64::EPSILON, f64::max)
+}
+
+// svg y grows downwards, larger values sit higher
+pub fn chart_y(value: f64, max: f64, height: f64) -> f64 {
+    height - value.max(0.0) / max * height
+}
+
 // map samples into svg space
 // x spans the input range
-// y spans 0 to the max with larger values higher
-pub fn chart_coords(points: &[(f64, f64)], width: f64, height: f64) -> Vec<(f64, f64)> {
+// y spans 0 to max, which is at least the peak so every sample fits
+fn chart_coords(points: &[(f64, f64)], width: f64, height: f64, max: f64) -> Vec<(f64, f64)> {
     let (x0, x1) = match (points.first(), points.last()) {
         (Some(&(a, _)), Some(&(b, _))) => (a, b),
         _ => return Vec::new(),
     };
     let span = (x1 - x0).max(f64::EPSILON);
-    let max = points.iter().map(|&(_, y)| y).fold(f64::EPSILON, f64::max);
     points
         .iter()
-        .map(|&(x, y)| {
-            let sx = (x - x0) / span * width;
-            let sy = height - y.max(0.0) / max * height;
-            (sx, sy)
-        })
+        .map(|&(x, y)| ((x - x0) / span * width, chart_y(y, max, height)))
         .collect()
 }
 
-pub fn svg_path(points: &[(f64, f64)], width: f64, height: f64) -> String {
-    let coords = chart_coords(points, width, height);
+pub fn svg_path(points: &[(f64, f64)], width: f64, height: f64, max: f64) -> String {
+    let coords = chart_coords(points, width, height, max);
     if coords.len() < 2 {
         return String::new();
     }
@@ -83,9 +88,20 @@ mod tests {
         ) {
             let mut pts = raw;
             pts.sort_by(|a, b| a.0.total_cmp(&b.0));
-            for (x, y) in chart_coords(&pts, 300.0, 80.0) {
+            for (x, y) in chart_coords(&pts, 300.0, 80.0, peak(&pts)) {
                 prop_assert!((-1e-9..=300.0 + 1e-9).contains(&x));
                 prop_assert!((-1e-9..=80.0 + 1e-9).contains(&y));
+            }
+        }
+
+        #[test]
+        fn chart_y_within_frame_below_ceiling(
+            raw in prop::collection::vec((0.0f64..1e4, 0.0f64..1e10), 1..50),
+            headroom in 1.0f64..10.0,
+        ) {
+            let max = peak(&raw) * headroom;
+            for &(_, y) in &raw {
+                prop_assert!((0.0..=80.0).contains(&chart_y(y, max, 80.0)));
             }
         }
 
@@ -95,7 +111,7 @@ mod tests {
         ) {
             let mut pts = raw;
             pts.sort_by(|a, b| a.0.total_cmp(&b.0));
-            let coords = chart_coords(&pts, 300.0, 80.0);
+            let coords = chart_coords(&pts, 300.0, 80.0, peak(&pts));
             for w in coords.windows(2) {
                 prop_assert!(w[1].0 >= w[0].0);
             }
@@ -127,16 +143,30 @@ mod tests {
 
     #[test]
     fn svg_path_exact() {
-        assert_eq!(svg_path(&[], 300.0, 80.0), "");
-        assert_eq!(svg_path(&[(0.0, 1.0)], 300.0, 80.0), "");
-        let p = svg_path(&[(0.0, 0.0), (1.0, 10.0)], 300.0, 80.0);
-        assert_eq!(p, "M0.0,80.0 L300.0,0.0");
+        assert_eq!(svg_path(&[], 300.0, 80.0, 1.0), "");
+        assert_eq!(svg_path(&[(0.0, 1.0)], 300.0, 80.0, 1.0), "");
+        let pts = [(0.0, 0.0), (1.0, 10.0)];
+        assert_eq!(
+            svg_path(&pts, 300.0, 80.0, peak(&pts)),
+            "M0.0,80.0 L300.0,0.0"
+        );
+        assert_eq!(svg_path(&pts, 300.0, 80.0, 20.0), "M0.0,80.0 L300.0,40.0");
     }
 
     #[test]
     fn chart_coords_flat_series_sits_on_baseline() {
-        let coords = chart_coords(&[(0.0, 0.0), (1.0, 0.0)], 300.0, 80.0);
+        let pts = [(0.0, 0.0), (1.0, 0.0)];
+        let coords = chart_coords(&pts, 300.0, 80.0, peak(&pts));
         assert_eq!(coords, vec![(0.0, 80.0), (300.0, 80.0)]);
+    }
+
+    #[test]
+    fn peak_exact() {
+        assert_eq!(peak(&[]), f64::EPSILON);
+        assert_eq!(peak(&[(0.0, 3.0), (1.0, 7.0), (2.0, 5.0)]), 7.0);
+        assert_eq!(chart_y(7.0, 7.0, 80.0), 0.0);
+        assert_eq!(chart_y(0.0, 7.0, 80.0), 80.0);
+        assert_eq!(chart_y(-1.0, 7.0, 80.0), 80.0);
     }
 
     proptest! {

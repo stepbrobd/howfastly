@@ -2,7 +2,7 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use gloo_timers::future::TimeoutFuture;
-use howfastly::chart::{format_speed, svg_path, throughput_points};
+use howfastly::chart::{chart_y, format_speed, peak, svg_path, throughput_points};
 use howfastly::stats;
 use howfastly::types::{
     DOWNLOAD_PLAN, DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse,
@@ -246,14 +246,18 @@ fn SpeedChart(dir: Direction) -> impl IntoView {
         ("stroke-nord-8", "fill-nord-8")
     };
     view! {
-        <div class="mt-2 h-24 w-full">
+        <div class="relative mt-2 h-24 w-full">
             {move || {
                 let pts = dir.points.get();
-                let line = svg_path(&pts, CHART_W, CHART_H);
+                let p90 = dir.summary.get().and_then(|d| d.p90).map(|mbps| mbps * 1e6);
+                // the scale grows to keep the reference line inside the frame
+                let max = peak(&pts).max(p90.unwrap_or(0.0));
+                let line = svg_path(&pts, CHART_W, CHART_H, max);
                 if line.is_empty() {
                     return view! { <Waiting class="h-full bg-nord-0"/> }.into_any();
                 }
                 let area = format!("{line} L{CHART_W:.1},{CHART_H:.1} L0.0,{CHART_H:.1} Z");
+                let mark = p90.map(|v| chart_y(v, max, CHART_H).max(1.0));
                 view! {
                     <svg
                         class="h-full w-full"
@@ -270,7 +274,31 @@ fn SpeedChart(dir: Direction) -> impl IntoView {
                             stroke-linecap="round"
                             vector-effect="non-scaling-stroke"
                         />
+                        {mark.map(|y| view! {
+                            <line
+                                x1="0"
+                                x2=format!("{CHART_W:.1}")
+                                y1=format!("{y:.1}")
+                                y2=format!("{y:.1}")
+                                class="stroke-nord-4"
+                                stroke-opacity="0.7"
+                                stroke-dasharray="4 3"
+                                vector-effect="non-scaling-stroke"
+                            />
+                        })}
                     </svg>
+                    {mark.map(|y| {
+                        // the label sits under a high line and above a low one
+                        let side = if y < CHART_H / 2.0 { "" } else { "-translate-y-full" };
+                        view! {
+                            <small
+                                class=format!("absolute right-1 text-nord-4 {side}")
+                                style=format!("top:{:.1}%", y / CHART_H * 100.0)
+                            >
+                                "p90"
+                            </small>
+                        }
+                    })}
                 }
                     .into_any()
             }}
@@ -323,18 +351,12 @@ fn Headline(label: &'static str, dir: Direction, state: State) -> impl IntoView 
                 <span class="text-nord-4">
                     <small>
                         {move || {
-                            let peak = dir
-                                .points
-                                .get()
-                                .iter()
-                                .map(|&(_, b)| b)
-                                .fold(0.0, f64::max);
-                            if peak > 0.0 {
-                                let (v, unit) = format_speed(peak);
-                                format!("Peak {v:.1} {unit}")
-                            } else {
-                                String::new()
+                            let pts = dir.points.get();
+                            if pts.is_empty() {
+                                return String::new();
                             }
+                            let (v, unit) = format_speed(peak(&pts));
+                            format!("Peak {v:.1} {unit}")
                         }}
                     </small>
                 </span>
