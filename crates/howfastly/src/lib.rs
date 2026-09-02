@@ -1,5 +1,6 @@
 pub mod chart;
 pub mod http;
+pub mod map;
 pub mod stats;
 pub mod types;
 
