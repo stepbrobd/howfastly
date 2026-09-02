@@ -103,7 +103,8 @@ async fn connect(
         return Ok((client, pinned));
     }
 
-    if let Ok(client) = builder(Version::HTTP_3).local_address(local).build()
+    if !base.starts_with("http://")
+        && let Ok(client) = builder(Version::HTTP_3).local_address(local).build()
         && probe(&client, base, Some(Version::HTTP_3)).await.is_ok()
     {
         return Ok((client, Some(Version::HTTP_3)));
