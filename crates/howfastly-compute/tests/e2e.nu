@@ -16,7 +16,11 @@ def checks [url: string, log: string] {
   let up = http post --full --allow-errors --content-type application/octet-stream $"($url)/up" (random binary 100_000)
   assert equal ($up | get status) 200
 
-  assert ((http get $"($url)/meta" | get ip | str length) > 0)
+  let meta = http get $"($url)/meta"
+  assert (($meta.ip | str length) > 0)
+  # viceroy geolocates the loopback address, the pop lookup has no store locally
+  assert equal ($meta.coordinates.latitude | describe) "float"
+  assert equal $meta.pop.coordinates null
   assert equal (http post --full --allow-errors $"($url)/start" "" | get status) 204
   assert equal (http post --full --allow-errors --content-type application/json $"($url)/finish" {meta: null, latency: null, download: null, upload: null} | get status) 204
   assert equal (http post --full --allow-errors --content-type application/json $"($url)/finish" "nope" | get status) 400

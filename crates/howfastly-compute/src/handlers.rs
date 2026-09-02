@@ -149,6 +149,14 @@ pub fn meta(req: &Request, start: Instant) -> Response {
             .as_ref()
             .map(|g| g.country_code().to_string())
             .unwrap_or_default(),
+        // an unknown position reads as the null island
+        coordinates: geo
+            .as_ref()
+            .map(|g| howfastly::types::Coordinates {
+                latitude: g.latitude(),
+                longitude: g.longitude(),
+            })
+            .filter(|c| c.latitude != 0.0 || c.longitude != 0.0),
         pop,
         protocol: protocol(req),
         version: std::env::var("FASTLY_SERVICE_VERSION").unwrap_or_default(),

@@ -33,6 +33,13 @@ impl SizePlan {
     }
 }
 
+// wgs 84 degrees, the shape of the datacenters api coordinates object
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
+pub struct Coordinates {
+    pub latitude: f64,
+    pub longitude: f64,
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct MetaResponse {
     pub ip: String,
@@ -40,6 +47,7 @@ pub struct MetaResponse {
     pub org: String,
     pub city: String,
     pub country: String,
+    pub coordinates: Option<Coordinates>,
     pub pop: Pop,
     pub protocol: String,
     pub version: String,
@@ -103,6 +111,7 @@ pub struct Pop {
     pub code: String,
     pub name: String,
     pub group: String,
+    pub coordinates: Option<Coordinates>,
 }
 
 #[derive(Clone, Debug)]
@@ -234,6 +243,23 @@ mod tests {
             Err(MetaError::Missing)
         ));
         assert!(matches!(parse_meta("nope"), Err(MetaError::Invalid(_))));
+    }
+
+    #[test]
+    fn pop_from_datacenters_entry() {
+        let entry = r#"{"code":"BRU","name":"Brussels","group":"Europe","region":"EU-Central",
+            "coordinates":{"x":0,"y":0,"latitude":50.871,"longitude":4.476},"shield":"bru-brussels-be"}"#;
+        let pop: Pop = serde_json::from_str(entry).unwrap();
+        assert_eq!(pop.code, "BRU");
+        assert_eq!(
+            pop.coordinates,
+            Some(Coordinates {
+                latitude: 50.871,
+                longitude: 4.476
+            })
+        );
+        let bare: Pop = serde_json::from_str(r#"{"code":"XXX","name":"","group":""}"#).unwrap();
+        assert_eq!(bare.coordinates, None);
     }
 
     #[test]
