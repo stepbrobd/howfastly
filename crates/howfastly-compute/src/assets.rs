@@ -7,10 +7,14 @@ static DIST: Dir<'_> = include_dir!("$WEB_DIST");
 pub fn serve(path: &str) -> Option<Response> {
     let (file, cache) = match path {
         "/" => (DIST.get_file("index.html")?, "no-cache"),
-        _ => (
-            DIST.get_file(path.strip_prefix("/assets/")?)?,
-            "public, max-age=31536000, immutable",
-        ),
+        _ => {
+            let name = path.strip_prefix("/assets/")?;
+            // the shell lives at the root only, a long lifetime would pin an old build
+            if name == "index.html" {
+                return None;
+            }
+            (DIST.get_file(name)?, "public, max-age=31536000, immutable")
+        }
     };
 
     let name = file.path().to_str().unwrap_or_default();
