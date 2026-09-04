@@ -59,6 +59,7 @@
           strictDeps = true;
           cargoClippyExtraArgs = "--package howfastly-web --all-targets -- -D warnings";
           env.CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
+          env.CARGO_PROFILE = "wasm";
         };
 
         # the compute crate has nothing but the e2e, which runs below with its tools

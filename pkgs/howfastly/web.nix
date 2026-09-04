@@ -31,6 +31,8 @@ let
     cargoExtraArgs = "--package howfastly-web";
     doCheck = false;
     env.CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
+    # trunk builds under the wasm profile from Trunk.toml, the deps must match
+    env.CARGO_PROFILE = "wasm";
   };
 in
 crane.lib.buildTrunkPackage {
