@@ -101,7 +101,14 @@ struct Town {
 }
 
 // glide the viewport to its target, a newer flight takes over mid-air
-async fn fly(view: RwSignal<View>, flight: RwSignal<u32>, id: u32, to: View) {
+// settled marks the landing, the labels laid out for the target wait for it
+async fn fly(
+    view: RwSignal<View>,
+    flight: RwSignal<u32>,
+    settled: RwSignal<bool>,
+    id: u32,
+    to: View,
+) {
     let from = view.get_untracked();
     let start = engine::now_ms();
     loop {
@@ -111,6 +118,7 @@ async fn fly(view: RwSignal<View>, flight: RwSignal<u32>, id: u32, to: View) {
         let t = ((engine::now_ms() - start) / FLY_MS).min(1.0);
         view.set(from.toward(&to, map::ease(t)));
         if t >= 1.0 {
+            settled.set(true);
             return;
         }
         TimeoutFuture::new(FRAME_MS).await;
@@ -136,15 +144,22 @@ pub fn Map(
             .then(|| meta.with(|m| m.as_ref().map(route)))
             .flatten()
     });
+    // the pop is labeled by city like the towns around it, the code stands in when unresolved
     let names = Memo::new(move |_| {
         meta.with(|m| {
             m.as_ref().map(|m| {
                 let you = if m.city.is_empty() { "You" } else { &m.city };
-                (you.to_string(), m.pop.code.clone())
+                let pop = if m.pop.name.is_empty() {
+                    &m.pop.code
+                } else {
+                    &m.pop.name
+                };
+                (you.to_string(), pop.to_string())
             })
         })
     });
     let flight = RwSignal::new(0u32);
+    let settled = RwSignal::new(false);
 
     // towns are laid out once for the viewport the flight ends in
     // the route labels are placed first, towns fill the space left
@@ -180,7 +195,8 @@ pub fn Map(
         };
         let id = flight.get_untracked() + 1;
         flight.set(id);
-        spawn_local(fly(view, flight, id, to));
+        settled.set(false);
+        spawn_local(fly(view, flight, settled, id, to));
     });
 
     view! {
@@ -212,19 +228,21 @@ pub fn Map(
                 <use href="#tile" x=format!("{}", -map::WORLD)/>
                 <use href="#tile"/>
                 <use href="#tile" x=format!("{}", map::WORLD)/>
-                <For
-                    each=move || towns.get()
-                    key=|t| (t.at.0.to_bits(), t.at.1.to_bits())
-                    children=move |t| view! {
-                        <path
-                            d=format!("M{:.1},{:.1}h0", t.at.0, t.at.1)
-                            class="stroke-nord-4"
-                            stroke-width="4"
-                            stroke-linecap="round"
-                            vector-effect="non-scaling-stroke"
-                        />
-                    }
-                />
+                <g class="transition-opacity duration-300" class=("opacity-0", move || !settled.get())>
+                    <For
+                        each=move || towns.get()
+                        key=|t| (t.at.0.to_bits(), t.at.1.to_bits())
+                        children=move |t| view! {
+                            <path
+                                d=format!("M{:.1},{:.1}h0", t.at.0, t.at.1)
+                                class="stroke-nord-4"
+                                stroke-width="4"
+                                stroke-linecap="round"
+                                vector-effect="non-scaling-stroke"
+                            />
+                        }
+                    />
+                </g>
                 {move || route.get().map(|r| view! {
                     <path
                         d=map::path(&r.arc)
@@ -238,17 +256,22 @@ pub fn Map(
                     {r.client.map(|p| view! { <Dot at=p class="stroke-nord-13"/> })}
                 })}
             </svg>
-            <For
-                each=move || towns.get()
-                key=|t| (t.at.0.to_bits(), t.at.1.to_bits())
-                children=move |t| view! {
-                    <Label at=t.at view=view text=t.name class="text-xs text-nord-4"/>
-                }
-            />
-            {move || route.get().zip(names.get()).map(|(r, (you, pop))| view! {
-                {r.client.map(|p| view! { <Label at=p view=view text=you class="text-nord-6"/> })}
-                {r.pop.map(|p| view! { <Label at=p view=view text=pop class="text-nord-6"/> })}
-            })}
+            <div
+                class="pointer-events-none absolute inset-0 transition-opacity duration-300"
+                class=("opacity-0", move || !settled.get())
+            >
+                <For
+                    each=move || towns.get()
+                    key=|t| (t.at.0.to_bits(), t.at.1.to_bits())
+                    children=move |t| view! {
+                        <Label at=t.at view=view text=t.name class="text-xs text-nord-4"/>
+                    }
+                />
+                {move || route.get().zip(names.get()).map(|(r, (you, pop))| view! {
+                    {r.client.map(|p| view! { <Label at=p view=view text=you class="text-nord-6"/> })}
+                    {r.pop.map(|p| view! { <Label at=p view=view text=pop class="text-nord-6"/> })}
+                })}
+            </div>
             {children()}
             <details class="absolute right-1 bottom-1">
                 <summary class="flex h-5 w-5 cursor-pointer list-none items-center justify-center rounded-full bg-nord-1 font-serif text-xs text-nord-4 [&::-webkit-details-marker]:hidden">
