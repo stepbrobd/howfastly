@@ -19,9 +19,9 @@ lib.fix (crane: {
     strictDeps = true;
     __structuredAttrs = true;
 
-    # crane cannot read a workspace version, each crate derivation sets its own
+    # crane cannot read a workspace version, versionOf resolves it below
     pname = "howfastly";
-    version = "2001.717.0";
+    version = crane.versionOf "howfastly";
   };
 
   # dependencies built once and shared by every crate derivation
