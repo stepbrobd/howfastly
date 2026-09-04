@@ -1,6 +1,6 @@
 [package]
 name        = "howfastly"
-description = "measure your connection speed to the fastly network"
+description = "Measure your connection speed to the Fastly network"
 
 edition.workspace      = true
 license.workspace      = true
