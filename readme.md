@@ -57,8 +57,8 @@ Methodology:
 - 30s time budget per direction (roughly 640 MB transferred worst case)
 - Reports p90 speed with loaded latency per direction (bufferbloat)
 - Server processing time calculated from samples using `Server-Timing` header
-- Reports the serving POP with its name and region, resolved on the edge from
-  the Fastly datacenters API
+- Reports the serving POP with its name and group, resolved on the edge from the
+  Fastly datacenters API
 - No packet loss measurement (this would require raw UDP probes, which
   [speed.cloudflare.com](https://speed.cloudflare.com) sends through a WebRTC
   TURN server native to the Cloudflare network, Fastly Compute cannot emit raw
@@ -101,7 +101,7 @@ Outputs:
 - `download`, `upload`: 90th-percentile throughput in Mbps
 - `latency`: Median unloaded latency in ms
 - `pop`: Three letter code of the Fastly POP that served the test (name and
-  region are in `json` under `meta.pop`)
+  group are in `json` under `meta.pop`)
 - `json`: Full results as compact JSON
 - `results`: Pretty-printed results file, point `actions/upload-artifact` at it
   to keep an artifact
