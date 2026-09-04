@@ -1,10 +1,5 @@
 # HowFastly
 
-Binary Cache:
-
-- Cache: <https://cache.ysun.co>
-- Key: `cache.ysun.co-1:WxPYwT5g3kt9XhUhHPpNLZKI9HIOsVVAuqSHpok8Qt4=`
-
 HowFastly measures your connection speed to the [Fastly](https://www.fastly.com)
 network, running on
 [Fastly Compute](https://www.fastly.com/products/edge-compute). Unlike
@@ -41,6 +36,11 @@ nix run \
 See
 [`stepbrobd/inc#howfastly`](https://github.com/stepbrobd/inc/blob/master/pkgs/howfastly/default.nix)
 for packaging.
+
+Binary Cache:
+
+- Cache: <https://cache.ysun.co>
+- Key: `cache.ysun.co-1:WxPYwT5g3kt9XhUhHPpNLZKI9HIOsVVAuqSHpok8Qt4=`
 
 Nix users: multiple public binary cache instances like
 [cache.nixos.org](https://cache.nixos.org) and
