@@ -8,8 +8,8 @@ use js_sys::{Reflect, Uint8Array};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{
-    AbortSignal, Headers, ProgressEvent, ReadableStreamDefaultReader, RequestInit, Response,
-    Window, XmlHttpRequest,
+    AbortSignal, Headers, ProgressEvent, ReadableStreamDefaultReader, ReadableStreamReadResult,
+    RequestInit, Response, Window, XmlHttpRequest,
 };
 
 fn window() -> Window {
@@ -90,11 +90,11 @@ async fn drain(resp: &Response, on_progress: &mut impl FnMut(f64, u64)) -> Resul
     let reader: ReadableStreamDefaultReader = stream.get_reader().dyn_into()?;
     let mut total = 0u64;
     loop {
-        let chunk = JsFuture::from(reader.read()).await?;
-        if Reflect::get(&chunk, &"done".into())?.is_truthy() {
+        let chunk: ReadableStreamReadResult = JsFuture::from(reader.read()).await?.unchecked_into();
+        if chunk.get_done() == Some(true) {
             return Ok(());
         }
-        let value: Uint8Array = Reflect::get(&chunk, &"value".into())?.dyn_into()?;
+        let value: Uint8Array = chunk.get_value().dyn_into()?;
         total += u64::from(value.length());
         on_progress(now_ms(), total);
     }
