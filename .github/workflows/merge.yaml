@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -28,7 +29,12 @@ jobs:
           } | sort -u | while read -r pr; do
             if gh pr checks "$pr" 2>/dev/null; then
               echo "All checks passed for PR #${pr}, merging."
-              gh pr merge "$pr" --rebase --delete-branch || true
+              # a push made with the workflow token starts no workflow
+              # dispatch what a human push would have run
+              gh pr merge "$pr" --rebase --delete-branch \
+                && gh workflow run ci.yaml --ref master \
+                && gh workflow run deploy.yaml --ref master \
+                || true
             else
               echo "PR #${pr} has pending or failed checks, skipping."
             fi
