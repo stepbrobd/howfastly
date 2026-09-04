@@ -51,6 +51,7 @@ impl PayloadSize {
     )
 )]
 pub struct Args {
+    /// Service to test against
     #[arg(
         long,
         short = 'U',
@@ -60,43 +61,55 @@ pub struct Args {
     pub url: String,
 
     // flat override for the per size iteration plan
+    /// Transfers per size in place of the per size plan
     #[arg(long, short)]
     pub nr_tests: Option<usize>,
 
+    /// Unloaded latency samples before the transfers
     #[arg(long, short = 'l', default_value_t = types::LATENCY_SAMPLES)]
     pub nr_latency_tests: usize,
 
+    /// Largest transfer size, larger sizes leave the plan
     #[arg(long, short, value_enum, default_value = "100m")]
     pub max_payload_size: PayloadSize,
 
+    /// Measure the download direction only
     #[arg(long, short, conflicts_with = "upload_only")]
     pub download_only: bool,
 
+    /// Measure the upload direction only
     #[arg(long, short = 'u')]
     pub upload_only: bool,
 
     // bare flag binds the family's unspecified address
     // the kernel then picks the default outbound address at connect time
+    /// Connect over IPv4, from a given local address or any
     #[arg(long, value_name = "ADDR", num_args = 0..=1, default_missing_value = "0.0.0.0", conflicts_with = "ipv6")]
     pub ipv4: Option<Ipv4Addr>,
 
+    /// Connect over IPv6, from a given local address or any
     #[arg(long, value_name = "ADDR", num_args = 0..=1, default_missing_value = "::")]
     pub ipv6: Option<Ipv6Addr>,
 
     // force one protocol instead of probing h3 then negotiating
     // an unreachable forced version fails the run rather than falling back
+    /// Force HTTP/1.1, an unreachable version fails the run
     #[arg(long, group = "http_version")]
     pub http1: bool,
 
+    /// Force HTTP/2, an unreachable version fails the run
     #[arg(long, group = "http_version")]
     pub http2: bool,
 
+    /// Force HTTP/3, an unreachable version fails the run
     #[arg(long, group = "http_version")]
     pub http3: bool,
 
+    /// Output format for the results on stdout
     #[arg(long, short, value_enum, default_value = "human")]
     pub format: OutputFormat,
 
+    /// Print every transfer sample as it completes
     #[arg(long, short)]
     pub verbose: bool,
 }
