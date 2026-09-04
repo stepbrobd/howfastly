@@ -13,26 +13,15 @@ const API_BACKEND: &str = "fastly";
 
 // resolve the serving pop against the datacenters api
 // the simple cache keeps the response body in this pop for a day
+// the api key is read only when the cache misses
 // the error names the step that failed so the log says why meta degraded
-fn pop_info(code: &str) -> Result<howfastly::types::Pop, &'static str> {
+fn pop_info(code: &str) -> Result<howfastly::types::Pop, String> {
     if code.is_empty() {
-        return Err("pop code empty");
+        return Err("pop code empty".into());
     }
-    let store = fastly::secret_store::SecretStore::open(SECRET_STORE)
-        .map_err(|_| "secret store missing")?;
-    let secret = store
-        .try_get(API_KEY)
-        .map_err(|_| "secret store unreadable")?
-        .ok_or("api key missing")?;
-    let plaintext = secret.try_plaintext().map_err(|_| "api key unreadable")?;
-    let api_key = std::str::from_utf8(&plaintext)
-        .map_err(|_| "api key not utf8")?
-        .trim()
-        .to_string();
-
     let body = simple::get_or_set_with("datacenters", || {
         let resp = Request::get("https://api.fastly.com/datacenters")
-            .with_header("fastly-key", api_key)
+            .with_header("fastly-key", api_key().map_err(fastly::Error::msg)?)
             .send(API_BACKEND)?;
         if resp.get_status() != StatusCode::OK {
             return Err(fastly::Error::msg("datacenters request failed"));
@@ -42,14 +31,28 @@ fn pop_info(code: &str) -> Result<howfastly::types::Pop, &'static str> {
             ttl: Duration::from_secs(86_400),
         })
     })
-    .map_err(|_| "datacenters unreachable")?
+    .map_err(|e| format!("datacenters fetch failed, {e}"))?
     .ok_or("datacenters cache empty")?;
 
     let pops: Vec<howfastly::types::Pop> =
         serde_json::from_reader(body).map_err(|_| "datacenters body invalid")?;
     pops.into_iter()
         .find(|pop| pop.code.eq_ignore_ascii_case(code))
-        .ok_or("pop unknown to the api")
+        .ok_or_else(|| "pop unknown to the api".to_string())
+}
+
+fn api_key() -> Result<String, &'static str> {
+    let store = fastly::secret_store::SecretStore::open(SECRET_STORE)
+        .map_err(|_| "secret store missing")?;
+    let secret = store
+        .try_get(API_KEY)
+        .map_err(|_| "secret store unreadable")?
+        .ok_or("api key missing")?;
+    let plaintext = secret.try_plaintext().map_err(|_| "api key unreadable")?;
+    Ok(std::str::from_utf8(&plaintext)
+        .map_err(|_| "api key not utf8")?
+        .trim()
+        .to_string())
 }
 
 fn base(status: StatusCode, start: Instant) -> Response {
