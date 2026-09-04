@@ -32,3 +32,9 @@ wasm-bindgen-futures     = "0.4"
 [workspace.dependencies.web-sys]
 features = ["AbortController", "AbortSignal", "Headers", "Performance", "ProgressEvent", "ReadableStream", "ReadableStreamDefaultReader", "ReadableStreamReadResult", "RequestInit", "Response", "Storage", "Window", "XmlHttpRequest", "XmlHttpRequestEventTarget", "XmlHttpRequestUpload"]
 version  = "0.3"
+
+[profile.wasm]
+inherits      = "release"
+opt-level     = "z"
+lto           = true
+codegen-units = 1
