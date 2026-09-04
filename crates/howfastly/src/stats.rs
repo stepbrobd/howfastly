@@ -91,29 +91,30 @@ mod tests {
     }
 
     proptest! {
-    #[test]
-    fn percentile_within_bounds(
-        samples in prop::collection::vec(0.0f64..1e6, 1..100),
-        p in 0.0f64..=100.0,
-    ) {
-        let v = percentile(&samples, p).unwrap();
-        let min = samples.iter().copied().fold(f64::INFINITY, f64::min);
-        let max = samples.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-        prop_assert!(v >= min && v <= max);
-    }
+        #[test]
+        fn percentile_within_bounds(
+            samples in prop::collection::vec(0.0f64..1e6, 1..100),
+            p in 0.0f64..=100.0,
+        ) {
+            let v = percentile(&samples, p).unwrap();
+            let min = samples.iter().copied().fold(f64::INFINITY, f64::min);
+            let max = samples.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+            prop_assert!(v >= min && v <= max);
+        }
 
-    #[test]
-    fn percentile_monotone_in_p(
-        samples in prop::collection::vec(0.0f64..1e6, 1..100),
-        p in 0.0f64..=99.0,
-    ) {
-        prop_assert!(percentile(&samples, p).unwrap() <= percentile(&samples, p + 1.0).unwrap());
-    }
+        #[test]
+        fn percentile_monotone_in_p(
+            samples in prop::collection::vec(0.0f64..1e6, 1..100),
+            p in 0.0f64..=99.0,
+        ) {
+            prop_assert!(percentile(&samples, p).unwrap() <= percentile(&samples, p + 1.0).unwrap());
+        }
 
-    #[test]
-    fn jitter_of_constant_is_zero(x in 0.0f64..1e6, n in 2usize..50) {
-        prop_assert_eq!(jitter(&vec![x; n]), Some(0.0));
-    }    }
+        #[test]
+        fn jitter_of_constant_is_zero(x in 0.0f64..1e6, n in 2usize..50) {
+            prop_assert_eq!(jitter(&vec![x; n]), Some(0.0));
+        }
+    }
 
     #[test]
     fn percentile_exact() {

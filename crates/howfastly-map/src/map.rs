@@ -450,6 +450,7 @@ mod tests {
         assert_eq!(nearest(900.0, 100.0), 1100.0);
         assert_eq!(nearest(400.0, 600.0), 600.0);
     }
+
     #[test]
     fn land_exact() {
         assert_eq!(land(""), Some(String::new()));
@@ -483,46 +484,47 @@ mod tests {
     }
 
     proptest! {
-    #[test]
-    fn labels_keep_their_distance(
-        raw in prop::collection::vec((-180.0f64..180.0, -80.0f64..80.0, 0.0f64..9.0), 0..80),
-        taken in prop::collection::vec((0.0f64..1.0, 0.0f64..1.0, 0.0f64..0.3), 0..3),
-        w in 24.0f64..WORLD,
-        text in (0.0f64..0.05, 0.005f64..0.03),
-        limit in 0usize..20,
-    ) {
-        let mut towns: Vec<Place> = raw
-            .iter()
-            .enumerate()
-            .map(|(i, &(lon, lat, z))| town(&format!("town{i}"), lon, lat, z))
-            .collect();
-        towns.sort_by(|a, b| a.zoom.total_cmp(&b.zoom));
-        let v = fit((400.0, 300.0), (400.0 + w / 2.0, 300.0 + w / 4.0), 2.0, 0.0, w);
-        let out = labels(&towns, &v, &taken, GAP, text, limit);
-        prop_assert!(out.len() <= limit);
-        let width = |l: &Label| width(&l.place.name, text);
-        let spots: Vec<(f64, f64, f64)> = taken
-            .iter()
-            .copied()
-            .chain(out.iter().map(|o| (o.frac.0, o.frac.1, width(o))))
-            .collect();
-        for (i, l) in out.iter().enumerate() {
-            let (fx, fy) = l.frac;
-            prop_assert!(fx >= 0.0 && fx + width(l) <= 1.0 && (GAP.1..1.0 - GAP.1).contains(&fy));
-            prop_assert!(l.place.zoom <= zoom(v.w));
-            prop_assert!(holds(&v, l.at));
-            prop_assert!((v.frac(l.at).0 - fx).abs() < 1e-9);
-            for (j, &(sx, sy, sw)) in spots.iter().enumerate() {
-                if j != taken.len() + i {
-                    let apart = fx >= sx + sw + GAP.0 || sx >= fx + width(l) + GAP.0;
-                    prop_assert!(apart || (sy - fy).abs() >= GAP.1);
+        #[test]
+        fn labels_keep_their_distance(
+            raw in prop::collection::vec((-180.0f64..180.0, -80.0f64..80.0, 0.0f64..9.0), 0..80),
+            taken in prop::collection::vec((0.0f64..1.0, 0.0f64..1.0, 0.0f64..0.3), 0..3),
+            w in 24.0f64..WORLD,
+            text in (0.0f64..0.05, 0.005f64..0.03),
+            limit in 0usize..20,
+        ) {
+            let mut towns: Vec<Place> = raw
+                .iter()
+                .enumerate()
+                .map(|(i, &(lon, lat, z))| town(&format!("town{i}"), lon, lat, z))
+                .collect();
+            towns.sort_by(|a, b| a.zoom.total_cmp(&b.zoom));
+            let v = fit((400.0, 300.0), (400.0 + w / 2.0, 300.0 + w / 4.0), 2.0, 0.0, w);
+            let out = labels(&towns, &v, &taken, GAP, text, limit);
+            prop_assert!(out.len() <= limit);
+            let width = |l: &Label| width(&l.place.name, text);
+            let spots: Vec<(f64, f64, f64)> = taken
+                .iter()
+                .copied()
+                .chain(out.iter().map(|o| (o.frac.0, o.frac.1, width(o))))
+                .collect();
+            for (i, l) in out.iter().enumerate() {
+                let (fx, fy) = l.frac;
+                prop_assert!(fx >= 0.0 && fx + width(l) <= 1.0 && (GAP.1..1.0 - GAP.1).contains(&fy));
+                prop_assert!(l.place.zoom <= zoom(v.w));
+                prop_assert!(holds(&v, l.at));
+                prop_assert!((v.frac(l.at).0 - fx).abs() < 1e-9);
+                for (j, &(sx, sy, sw)) in spots.iter().enumerate() {
+                    if j != taken.len() + i {
+                        let apart = fx >= sx + sw + GAP.0 || sx >= fx + width(l) + GAP.0;
+                        prop_assert!(apart || (sy - fy).abs() >= GAP.1);
+                    }
                 }
             }
+            for w in out.windows(2) {
+                prop_assert!(w[0].place.zoom <= w[1].place.zoom);
+            }
         }
-        for w in out.windows(2) {
-            prop_assert!(w[0].place.zoom <= w[1].place.zoom);
-        }
-    }    }
+    }
 
     #[test]
     fn labels_exact() {
