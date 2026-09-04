@@ -43,6 +43,7 @@ impl PayloadSize {
 #[derive(Debug, Parser)]
 #[command(
     name = "howfastly",
+    version,
     about = concat!(
         "HowFastly ",
         env!("CARGO_PKG_VERSION"),
