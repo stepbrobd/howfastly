@@ -3,11 +3,12 @@ members  = ["crates/*"]
 resolver = "3"
 
 [workspace.package]
-edition    = "2024"
-version    = "2026.902.1"
-license    = "Apache-2.0"
-repository = "https://github.com/stepbrobd/howfastly"
-readme     = "readme.md"
+edition      = "2024"
+version      = "2026.902.1"
+rust-version = "1.88"
+license      = "Apache-2.0"
+repository   = "https://github.com/stepbrobd/howfastly"
+readme       = "readme.md"
 
 [workspace.dependencies]
 anyhow                   = "1"

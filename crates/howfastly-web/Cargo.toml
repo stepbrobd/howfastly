@@ -2,8 +2,9 @@
 name    = "howfastly-web"
 publish = false
 
-edition.workspace = true
-version.workspace = true
+edition.workspace      = true
+rust-version.workspace = true
+version.workspace      = true
 
 # the bin only builds for wasm32-unknown-unknown, keep it out of host
 # test builds

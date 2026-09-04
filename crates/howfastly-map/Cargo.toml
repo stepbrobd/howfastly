@@ -2,8 +2,9 @@
 name    = "howfastly-map"
 publish = false
 
-edition.workspace = true
-version.workspace = true
+edition.workspace      = true
+rust-version.workspace = true
+version.workspace      = true
 
 [lib]
 name = "howfastly_map"

@@ -2,11 +2,12 @@
 name        = "howfastly"
 description = "measure your connection speed to the fastly network"
 
-edition.workspace    = true
-license.workspace    = true
-readme.workspace     = true
-repository.workspace = true
-version.workspace    = true
+edition.workspace      = true
+license.workspace      = true
+readme.workspace       = true
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
 
 categories = ["command-line-utilities", "network-programming"]
 keywords   = ["bandwidth", "fastly", "network", "speedtest"]
