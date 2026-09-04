@@ -10,7 +10,15 @@ def checks [url: string, log: string] {
   assert equal (fetch $"($url)/ping" | get status) 204
   assert equal (fetch $"($url)/down?bytes=abc" | get status) 400
   assert equal (http delete --full --allow-errors $"($url)/ping" | get status) 405
+  assert equal (http delete --full --allow-errors $"($url)/ping" | get headers.response | where name == allow | first | get value) "GET, HEAD"
   assert equal (fetch $"($url)/nope" | get status) 404
+
+  # a head takes the get path and answers with its headers alone
+  assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($url)/") "200"
+  assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($url)/ping") "204"
+  assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($url)/down?bytes=1000") "200"
+  assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($url)/nope") "404"
+  assert ((curl -sI $"($url)/" | str lowercase) =~ "content-type: text/html")
   assert equal (http get $"($url)/down?bytes=1000000" | into binary | bytes length) 1000000
 
   let up = http post --full --allow-errors --content-type application/octet-stream $"($url)/up" (random binary 100_000)

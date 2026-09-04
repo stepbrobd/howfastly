@@ -86,7 +86,7 @@ pub fn finish(
     (base(status, start), results)
 }
 
-pub fn down(req: &Request, start: Instant) {
+pub fn down(req: &Request, start: Instant, head: bool) {
     let Some(n) = howfastly::http::parse_bytes(req.get_query_parameter("bytes")) else {
         base(StatusCode::BAD_REQUEST, start).send_to_client();
         return;
@@ -95,6 +95,10 @@ pub fn down(req: &Request, start: Instant) {
     let resp = base(StatusCode::OK, start)
         .with_header(header::CONTENT_TYPE, "application/octet-stream")
         .with_header(header::CONTENT_LENGTH, n.to_string());
+    if head {
+        resp.send_to_client();
+        return;
+    }
 
     let mut body = resp.stream_to_client();
     let mut left = n;
@@ -192,6 +196,6 @@ pub fn not_found() -> Response {
     Response::from_status(StatusCode::NOT_FOUND)
 }
 
-pub fn method_not_allowed() -> Response {
-    Response::from_status(StatusCode::METHOD_NOT_ALLOWED)
+pub fn method_not_allowed(allow: &'static str) -> Response {
+    Response::from_status(StatusCode::METHOD_NOT_ALLOWED).with_header(header::ALLOW, allow)
 }

@@ -9,58 +9,75 @@ mod plausible;
 fn main() {
     use std::time::Instant;
 
-    use fastly::Request;
     use fastly::http::Method;
+    use fastly::{Request, Response};
     use plausible::Event;
 
     let start = Instant::now();
     let mut req = Request::from_client();
-    let method = req.get_method().clone();
     let path = req.get_path().to_string();
+    // a head request takes the get path and its answer keeps the body home
+    let head = req.get_method() == Method::HEAD;
+    let method = if head {
+        Method::GET
+    } else {
+        req.get_method().clone()
+    };
+    let send = |resp: Response| {
+        if head {
+            resp.with_body("").send_to_client();
+        } else {
+            resp.send_to_client();
+        }
+    };
 
     // each arm answers the client and says what the request counts as
     let event = match (&method, path.as_str()) {
         (&Method::GET, "/ping") => {
-            handlers::ack(start).send_to_client();
+            send(handlers::ack(start));
             None
         }
         (&Method::POST, "/start") => {
-            handlers::ack(start).send_to_client();
+            send(handlers::ack(start));
             Some(Event::Start)
         }
         (&Method::GET, "/down") => {
-            handlers::down(&req, start);
+            handlers::down(&req, start, head);
             None
         }
         (&Method::POST, "/up") => {
-            handlers::up(&mut req).send_to_client();
+            send(handlers::up(&mut req));
             None
         }
         (&Method::GET, "/meta") => {
-            handlers::meta(&req, start).send_to_client();
+            send(handlers::meta(&req, start));
             None
         }
         (&Method::POST, "/finish") => {
             let (resp, results) = handlers::finish(&mut req, start);
-            resp.send_to_client();
+            send(resp);
             results.map(|r| Event::Finish(Box::new(r)))
         }
-        (_, "/ping" | "/down" | "/up" | "/meta" | "/start" | "/finish") => {
-            handlers::method_not_allowed().send_to_client();
+        (_, "/ping" | "/down" | "/meta") => {
+            send(handlers::method_not_allowed("GET, HEAD"));
+            None
+        }
+        (_, "/start" | "/up" | "/finish") => {
+            send(handlers::method_not_allowed("POST"));
             None
         }
         (&Method::GET, p) => match assets::serve(p) {
             Some(resp) => {
-                resp.send_to_client();
-                (p == "/").then_some(Event::Pageview)
+                send(resp);
+                (p == "/" && !head).then_some(Event::Pageview)
             }
             None => {
-                handlers::not_found().send_to_client();
+                send(handlers::not_found());
                 None
             }
         },
         _ => {
-            handlers::not_found().send_to_client();
+            send(handlers::not_found());
             None
         }
     };
