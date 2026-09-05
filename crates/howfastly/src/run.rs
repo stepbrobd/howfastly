@@ -256,7 +256,8 @@ impl Runner {
             }
         });
 
-        let phase_start = Instant::now();
+        // the budget counts completed transfers only, as the web does
+        let mut active = Duration::ZERO;
         let mut out = Vec::new();
         for &SizePlan { bytes, iterations } in cfg.plans(dir) {
             let mut s = SizeSamples {
@@ -265,12 +266,14 @@ impl Runner {
                 skipped: false,
             };
             for i in 0..iterations {
-                if phase_start.elapsed().as_secs_f64() > cfg.time_budget_secs {
+                if active.as_secs_f64() > cfg.time_budget_secs {
                     s.skipped = true;
                     break;
                 }
+                let start = Instant::now();
                 match self.sample(dir, bytes).await {
                     Ok(mbps) => {
+                        active += start.elapsed();
                         if self.verbose {
                             eprintln!("{name} {} sample {i}: {mbps:.2} Mbps", size_label(bytes));
                         }
