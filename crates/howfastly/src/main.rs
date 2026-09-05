@@ -3,6 +3,7 @@ mod run;
 
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
+use clap::builder::RangedU64ValueParser;
 use clap::{Parser, ValueEnum};
 use howfastly::types::{self, Direction, SizePlan, TestConfig};
 use reqwest::Version;
@@ -40,6 +41,11 @@ impl PayloadSize {
     }
 }
 
+// a zero count would fail like a dead connection, the parser refuses it first
+fn positive() -> RangedU64ValueParser<usize> {
+    RangedU64ValueParser::from(1..)
+}
+
 #[derive(Debug, Parser)]
 #[command(
     name = "howfastly",
@@ -61,11 +67,11 @@ pub struct Args {
 
     // flat override for the per size iteration plan
     /// Transfers per size in place of the per size plan
-    #[arg(long, short)]
+    #[arg(long, short, value_parser = positive())]
     pub nr_tests: Option<usize>,
 
     /// Unloaded latency samples before the transfers
-    #[arg(long, short = 'l', default_value_t = types::LATENCY_SAMPLES)]
+    #[arg(long, short = 'l', default_value_t = types::LATENCY_SAMPLES, value_parser = positive())]
     pub nr_latency_tests: usize,
 
     /// Largest transfer size, larger sizes leave the plan
@@ -230,6 +236,14 @@ mod tests {
         assert_eq!(Args::try_parse_from(["howfastly"]).unwrap().only(), None);
         assert!(Args::try_parse_from(["howfastly", "-d", "-u"]).is_err());
         assert!(Args::try_parse_from(["howfastly", "-f", "json-pretty"]).is_err());
+    }
+
+    #[test]
+    fn counts_start_at_one() {
+        assert!(Args::try_parse_from(["howfastly", "-n", "0"]).is_err());
+        assert!(Args::try_parse_from(["howfastly", "-l", "0"]).is_err());
+        let a = Args::try_parse_from(["howfastly", "-n", "1", "-l", "1"]).unwrap();
+        assert_eq!((a.nr_tests, a.nr_latency_tests), (Some(1), 1));
     }
 
     // the flag values name sizes the download plan really has
