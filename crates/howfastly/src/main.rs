@@ -111,6 +111,10 @@ pub struct Args {
     /// Print every transfer sample as it completes
     #[arg(long, short)]
     pub verbose: bool,
+
+    /// Publish the result summary and print the link on stderr
+    #[arg(long)]
+    pub share: bool,
 }
 
 impl Args {
@@ -136,6 +140,7 @@ impl Args {
             forced: self.http_version(),
             only: self.only(),
             verbose: self.verbose,
+            share: self.share,
             cfg: self.config(),
         }
     }

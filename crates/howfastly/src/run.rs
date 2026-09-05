@@ -1,14 +1,15 @@
 use std::net::IpAddr;
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use anyhow::{Context, Result, ensure};
+use anyhow::{Context, Result, anyhow, ensure};
 use howfastly::http;
+use howfastly::share;
 use howfastly::stats;
 use howfastly::types::{
     Direction, DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
     SpeedtestResults, TestConfig, parse_meta, size_label, summarize_direction, summarize_latency,
 };
-use reqwest::{Client, ClientBuilder, Method, RequestBuilder, Response, Version};
+use reqwest::{Client, ClientBuilder, Method, RequestBuilder, Response, StatusCode, Version};
 use tokio::sync::mpsc;
 
 pub struct Options {
@@ -18,6 +19,8 @@ pub struct Options {
     // one direction alone, or both in order
     pub only: Option<Direction>,
     pub verbose: bool,
+    // publish a summary through the same connection once the run succeeds
+    pub share: bool,
     pub cfg: TestConfig,
 }
 
@@ -74,8 +77,33 @@ pub async fn run(opts: &Options) -> Result<SpeedtestResults> {
         let summary = runner.direction(dir, &opts.cfg).await?;
         results.record(dir, summary);
     }
+    let finished_at = SystemTime::now();
     runner.finish(&results).await;
+
+    // only a completed run gets here, a failed publication warns and keeps the results
+    if opts.share {
+        match runner.share(&opts.cfg, &results, finished_at).await {
+            Ok(shared) => eprintln!(
+                "Shared: {}\nExpires: {}",
+                shared.url,
+                share::iso_utc(shared.expires_at),
+            ),
+            Err(e) => eprintln!("Warning: sharing failed: {e:#}"),
+        }
+    }
     Ok(results)
+}
+
+// error bodies are {"error": "..."} written for the user
+// anything else, such as a proxy page, leaves the status to speak
+fn share_error(status: StatusCode, body: &str) -> anyhow::Error {
+    let explained = serde_json::from_str::<serde_json::Value>(body)
+        .ok()
+        .and_then(|v| v.get("error")?.as_str().map(str::to_owned));
+    match explained {
+        Some(msg) => anyhow!("{status}: {msg}"),
+        None => anyhow!("{status}"),
+    }
 }
 
 // a forced version either connects or fails the run
@@ -192,6 +220,34 @@ impl Runner {
 
     async fn finish(&self, results: &SpeedtestResults) {
         let _ = self.req(Method::POST, "/finish").json(results).send().await;
+    }
+
+    // summary only, the raw samples stay local
+    async fn share(
+        &self,
+        cfg: &TestConfig,
+        results: &SpeedtestResults,
+        finished_at: SystemTime,
+    ) -> Result<share::ShareResponse> {
+        let finished_at = finished_at
+            .duration_since(UNIX_EPOCH)
+            .context("System clock before the UNIX epoch")?
+            .as_secs();
+        let payload =
+            share::Payload::from_results(share::Client::Cli, finished_at, cfg.clone(), results);
+        let resp = self
+            .req(Method::POST, "/share")
+            .json(&payload)
+            .send()
+            .await?;
+        let status = resp.status();
+        let body = resp.text().await?;
+        match status {
+            StatusCode::OK | StatusCode::CREATED => {
+                serde_json::from_str(&body).context("Invalid share response")
+            }
+            _ => Err(share_error(status, &body)),
+        }
     }
 
     async fn ping(&self) -> Result<f64> {
