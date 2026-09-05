@@ -1,7 +1,7 @@
 use fastly::Request;
 use fastly::http::{Url, header};
 use howfastly::stats::{latency_bucket, speed_bucket};
-use howfastly::types::{Direction, SpeedtestResults};
+use howfastly::types::{Direction, Outcome, Run};
 use serde_json::{Map, json};
 
 use crate::handlers;
@@ -10,12 +10,12 @@ const BACKEND: &str = "plausible";
 const ENDPOINT: &str = "https://stats.ysun.co/api/event";
 const DOMAIN: &str = "speed.edgecompute.app";
 
-// what a request counts as, a run is bracketed by start and finish
-// the report is boxed so the enum stays as small as its unit variants
+// what a request counts as, a run is bracketed by start and the way it ended
+// the run is boxed so the enum stays as small as its unit variants
 pub enum Event {
     Pageview,
     Start,
-    Finish(Box<SpeedtestResults>),
+    Finish(Box<Run>),
     // a first publication of a result, a reuse counts nothing
     Share(String),
     // a view of a shared result page, json reads and heads count nothing
@@ -27,7 +27,12 @@ impl Event {
         match self {
             Self::Pageview => "pageview",
             Self::Start => "Start",
-            Self::Finish(_) => "Finish",
+            Self::Finish(run) => match run.outcome {
+                Outcome::Completed => "Finish",
+                Outcome::Canceled { .. } => "Cancel",
+                Outcome::Failed { .. } => "Fail",
+                Outcome::Left { .. } => "Leave",
+            },
             Self::Share(_) => "Share",
             Self::View(_) => "pageview",
         }
@@ -38,13 +43,16 @@ impl Event {
     fn props(&self) -> Vec<(&'static str, String)> {
         let mut props = Vec::new();
         match self {
-            Self::Finish(results) => {
+            Self::Finish(run) => {
+                if let Some(stage) = run.outcome.stage() {
+                    props.push(("Stage", stage.label()));
+                }
                 for dir in Direction::ALL {
-                    if let Some(mbps) = results.direction(dir).and_then(|d| d.p90) {
+                    if let Some(mbps) = run.results.direction(dir).and_then(|d| d.p90) {
                         props.push((dir.name(), speed_bucket(mbps).to_string()));
                     }
                 }
-                if let Some(latency) = &results.latency {
+                if let Some(latency) = &run.results.latency {
                     props.push(("Latency", latency_bucket(latency.median).to_string()));
                 }
             }

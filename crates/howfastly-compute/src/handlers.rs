@@ -66,24 +66,21 @@ pub fn ack(start: Instant) -> Response {
     base(StatusCode::NO_CONTENT, start)
 }
 
-// a finish report is analytics only
+// a run report is analytics only
 // anything unparsable or oversized is a bad request and counts nothing
-pub fn finish(
-    req: &mut Request,
-    start: Instant,
-) -> (Response, Option<howfastly::types::SpeedtestResults>) {
+pub fn finish(req: &mut Request, start: Instant) -> (Response, Option<howfastly::types::Run>) {
     let mut buf = Vec::new();
     let read = req
         .take_body()
         .take(64 * 1024)
         .read_to_end(&mut buf)
         .is_ok();
-    let results = read.then(|| serde_json::from_slice(&buf).ok()).flatten();
-    let status = match results {
+    let run = read.then(|| serde_json::from_slice(&buf).ok()).flatten();
+    let status = match run {
         Some(_) => StatusCode::NO_CONTENT,
         None => StatusCode::BAD_REQUEST,
     };
-    (base(status, start), results)
+    (base(status, start), run)
 }
 
 pub fn down(req: &Request, start: Instant, head: bool) {

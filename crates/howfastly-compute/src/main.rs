@@ -56,9 +56,9 @@ fn main() {
             None
         }
         (&Method::POST, "/finish") => {
-            let (resp, results) = handlers::finish(&mut req, start);
+            let (resp, run) = handlers::finish(&mut req, start);
             send(resp);
-            results.map(|r| Event::Finish(Box::new(r)))
+            run.map(|r| Event::Finish(Box::new(r)))
         }
         (&Method::POST, "/share") => {
             let (resp, created) = share::publish(&mut req);
