@@ -807,7 +807,7 @@ fn Controls(state: State) -> impl IntoView {
                     <button class=plain on:click=move |_| run::cancel(state)>"Cancel"</button>
                 }
                     .into_any(),
-                Phase::Cancelled => view! {
+                Phase::Canceled => view! {
                     <span class=quiet>"Stopping"</span>
                 }
                     .into_any(),

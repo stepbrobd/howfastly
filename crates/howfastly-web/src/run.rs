@@ -54,7 +54,7 @@ pub enum Phase {
     Idle,
     Running,
     Paused,
-    Cancelled,
+    Canceled,
 }
 
 #[derive(Clone, Copy)]
@@ -99,12 +99,12 @@ impl DirRun {
 
 // why a run stopped short of a finish
 enum Interrupt {
-    Cancelled,
+    Canceled,
     Failed(JsValue),
 }
 
 // one full run bracketed by the start and finish markers
-// a cancelled run sends no finish and counts as abandoned
+// a canceled run sends no finish and counts as abandoned
 pub fn launch(state: State) {
     if state.phase.get_untracked() != Phase::Idle {
         return;
@@ -135,7 +135,7 @@ pub fn launch(state: State) {
                 share::snapshot(state, cfg, &results);
                 engine::finish(&results).await
             }
-            Err(Interrupt::Cancelled) => {}
+            Err(Interrupt::Canceled) => {}
             Err(Interrupt::Failed(e)) => state.error.set(Some(engine::describe(e))),
         }
     });
@@ -165,7 +165,7 @@ pub fn resume(state: State) {
 
 pub fn cancel(state: State) {
     if matches!(state.phase.get_untracked(), Phase::Running | Phase::Paused) {
-        state.phase.set(Phase::Cancelled);
+        state.phase.set(Phase::Canceled);
         abort(state);
     }
 }
@@ -176,7 +176,7 @@ async fn hold(state: State) -> Result<(), Interrupt> {
         match state.phase.get_untracked() {
             Phase::Running => return Ok(()),
             Phase::Paused => TimeoutFuture::new(100).await,
-            Phase::Idle | Phase::Cancelled => return Err(Interrupt::Cancelled),
+            Phase::Idle | Phase::Canceled => return Err(Interrupt::Canceled),
         }
     }
 }
