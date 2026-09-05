@@ -369,13 +369,19 @@ fn Failure(problem: Problem) -> impl IntoView {
     }
 }
 
-// the network and the datacenter of a meta, the address leads when the server gave one
+// the network and the datacenter of a meta, each part shown when the server gave it
 // erased so the view owns its strings and outlives the borrow
 fn hops(m: &MetaResponse) -> AnyView {
-    let addressed = !m.ip.is_empty();
-    let ip = m.ip.clone();
-    let asn = m.asn;
-    let place = format!("{}, {}", m.city, m.country);
+    let ip = (!m.ip.is_empty()).then(|| m.ip.clone());
+    let asn = (m.asn != 0).then_some(m.asn);
+    let paired = ip.is_some() && asn.is_some();
+    let unknown = ip.is_none() && asn.is_none();
+    let place = [m.city.as_str(), m.country.as_str()]
+        .into_iter()
+        .filter(|s| !s.is_empty())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let at = (!place.is_empty()).then(|| format!(" @ {place}"));
     let code = m.pop.code.clone();
     let name = (!m.pop.name.is_empty()).then(|| {
         if m.pop.group.is_empty() {
@@ -386,14 +392,16 @@ fn hops(m: &MetaResponse) -> AnyView {
     });
     let via = (!m.protocol.is_empty()).then(|| format!(" via {}", m.protocol));
     view! {
-        {addressed.then(|| view! {
+        {ip.map(|ip| view! {
             <a href=format!("https://bgp.tools/prefix/{ip}") target="_blank" rel="noopener">{ip.clone()}</a>
-            " ("
         })}
-        <a href=format!("https://bgp.tools/as/{asn}") target="_blank" rel="noopener">{format!("AS{asn}")}</a>
-        {addressed.then_some(")")}
-        " @ "
-        {place}
+        {paired.then_some(" (")}
+        {asn.map(|asn| view! {
+            <a href=format!("https://bgp.tools/as/{asn}") target="_blank" rel="noopener">{format!("AS{asn}")}</a>
+        })}
+        {paired.then_some(")")}
+        {unknown.then_some("-")}
+        {at}
         " "
         <svg
             class="inline h-[1lh] w-[1em] align-bottom"
