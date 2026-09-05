@@ -21,7 +21,8 @@ pub const LATENCY_SAMPLES: usize = 25;
 pub const TIME_BUDGET_SECS: f64 = 30.0;
 pub const LOADED_PING_INTERVAL_MS: u32 = 400;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Direction {
     Download,
     Upload,
@@ -197,6 +198,52 @@ pub struct DirectionSummary {
     pub p90: Option<f64>,
     pub sizes: Vec<SizeSummary>,
     pub loaded: Option<LatencySummary>,
+}
+
+// where a run stood, the latency phase or one size class of one direction
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "lowercase", tag = "phase")]
+pub enum Stage {
+    Latency,
+    Transfer { direction: Direction, bytes: u64 },
+}
+
+impl Stage {
+    pub fn label(self) -> String {
+        match self {
+            Self::Latency => "Latency".into(),
+            Self::Transfer { direction, bytes } => {
+                format!("{} {}", direction.name(), size_label(bytes))
+            }
+        }
+    }
+}
+
+// how a run ended, one that did not complete says where it stood
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "lowercase", tag = "outcome")]
+pub enum Outcome {
+    Completed,
+    Canceled { stage: Stage },
+    Failed { stage: Stage },
+    Left { stage: Stage },
+}
+
+impl Outcome {
+    pub fn stage(self) -> Option<Stage> {
+        match self {
+            Self::Completed => None,
+            Self::Canceled { stage } | Self::Failed { stage } | Self::Left { stage } => Some(stage),
+        }
+    }
+}
+
+// what a client posts when a run ends, the results it has under the outcome
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Run {
+    #[serde(flatten)]
+    pub outcome: Outcome,
+    pub results: SpeedtestResults,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -474,6 +521,35 @@ mod tests {
         assert!(r.direction(Direction::Upload).is_some());
         assert!(r.direction(Direction::Download).is_none());
         assert_eq!(Direction::ALL.map(Direction::name), ["Download", "Upload"]);
+    }
+
+    #[test]
+    fn run_names_its_outcome_and_stage() {
+        let run = Run {
+            outcome: Outcome::Left {
+                stage: Stage::Transfer {
+                    direction: Direction::Upload,
+                    bytes: 1_000_000,
+                },
+            },
+            results: SpeedtestResults::default(),
+        };
+        let json = serde_json::to_string(&run).unwrap();
+        assert!(json.starts_with(
+            r#"{"outcome":"left","stage":{"phase":"transfer","direction":"upload","bytes":1000000},"results":"#
+        ));
+        let back: Run = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.outcome, run.outcome);
+        assert_eq!(back.outcome.stage().unwrap().label(), "Upload 1 MB");
+        let done = Run {
+            outcome: Outcome::Completed,
+            results: SpeedtestResults::default(),
+        };
+        let json = serde_json::to_string(&done).unwrap();
+        assert!(json.starts_with(r#"{"outcome":"completed","results":"#));
+        let back: Run = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.outcome, Outcome::Completed);
+        assert_eq!(Stage::Latency.label(), "Latency");
     }
 
     #[test]
