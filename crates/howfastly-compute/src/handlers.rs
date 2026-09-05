@@ -11,9 +11,6 @@ const SECRET_STORE: &str = "secretstore";
 const API_KEY: &str = "fastly-api-key";
 const API_BACKEND: &str = "fastly";
 
-// resolve the serving pop against the datacenters api
-// the simple cache keeps the response body in this pop for a day
-// the api key is read only when the cache misses
 // the error names the step that failed so the log says why meta degraded
 fn pop_info(code: &str) -> Result<howfastly::types::Pop, String> {
     if code.is_empty() {
@@ -160,7 +157,7 @@ pub fn lookup_meta(req: &Request) -> howfastly::types::MetaResponse {
     let geo = ip.and_then(fastly::geo::geo_lookup);
     let code = fastly::compute_runtime::pop();
     let pop = pop_info(code).unwrap_or_else(|cause| {
-        eprintln!("pop lookup degraded to the bare code: {cause}");
+        eprintln!("pop lookup degraded to the bare code, {cause}");
         howfastly::types::Pop {
             code: code.to_string(),
             ..Default::default()
