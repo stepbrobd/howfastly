@@ -30,6 +30,7 @@ pub fn App() -> impl IntoView {
         stage: StoredValue::new(Stage::Latency),
         snapshot: RwSignal::new_local(None),
         share: RwSignal::new(Share::Ready),
+        reported: StoredValue::new(false),
     };
     window_event_listener(leptos::ev::pagehide, move |_| run::leave(state));
 

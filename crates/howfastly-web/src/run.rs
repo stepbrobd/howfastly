@@ -75,6 +75,9 @@ pub struct State {
     // the rc tells a late response whether its run is still the one on screen
     pub snapshot: RwSignal<Option<Rc<Payload>>, LocalStorage>,
     pub share: RwSignal<Share>,
+    // set by the run's first report, a page restored from the back forward cache
+    // continues its run and reports it no second time
+    pub reported: StoredValue<bool>,
 }
 
 // per direction bookkeeping that survives across interleaved segments
@@ -117,6 +120,7 @@ pub fn launch(state: State) {
     state.stage.set_value(Stage::Latency);
     state.snapshot.set(None);
     state.share.set(Share::Ready);
+    state.reported.set_value(false);
     state.down.reset();
     state.up.reset();
     spawn_local(async move {
@@ -136,24 +140,35 @@ pub fn launch(state: State) {
                 Outcome::Failed { stage }
             }
         };
-        let results = results(state);
         if outcome == Outcome::Completed {
-            share::snapshot(state, cfg, &results);
+            share::snapshot(state, cfg, &results(state));
         }
-        engine::finish(&Run { outcome, results });
+        report(state, outcome);
     });
 }
 
 // the page is going away, a run that has not reported yet ends as left
 pub fn leave(state: State) {
     if state.phase.get_untracked() != Phase::Idle {
-        engine::finish(&Run {
-            outcome: Outcome::Left {
+        report(
+            state,
+            Outcome::Left {
                 stage: state.stage.get_value(),
             },
-            results: results(state),
-        });
+        );
     }
+}
+
+// one report per run, whichever end comes first
+fn report(state: State, outcome: Outcome) {
+    if state.reported.get_value() {
+        return;
+    }
+    state.reported.set_value(true);
+    engine::finish(&Run {
+        outcome,
+        results: results(state),
+    });
 }
 
 // whatever the run has so far, a completed run has it all
