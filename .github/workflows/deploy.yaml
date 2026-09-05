@@ -3,6 +3,10 @@ name: Deploy
 on:
   push:
   workflow_dispatch:
+    inputs:
+      version:
+        description: Service version to deploy into
+        default: ""
 
 permissions:
   contents: read
@@ -28,8 +32,16 @@ jobs:
         if: github.ref == 'refs/heads/master'
         env:
           FASTLY_API_TOKEN: ${{ secrets.FASTLY_API_TOKEN }}
+          VERSION: ${{ inputs.version }}
         run: |
+          set -euo pipefail
+
+          # without a version the active one is cloned, a tofu draft must be named
+          args=(--non-interactive --no-default-domain --status-check-off)
+          if [ -n "${VERSION}" ]; then
+            args+=(--version="${VERSION}")
+          fi
           nix shell --inputs-from . nixpkgs#fastly --command \
             fastly compute pack --wasm-binary result/bin/howfastly-compute.wasm
           nix shell --inputs-from . nixpkgs#fastly --command \
-            fastly compute deploy --non-interactive --no-default-domain --status-check-off
+            fastly compute deploy "${args[@]}"
