@@ -2,6 +2,7 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use gloo_timers::future::TimeoutFuture;
+use howfastly::share::Payload;
 use howfastly::types::{
     Direction, DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse, SizePlan,
     SizeSamples, SpeedtestResults, TestConfig, summarize_direction, summarize_latency,
@@ -13,6 +14,7 @@ use wasm_bindgen::JsValue;
 use web_sys::AbortController;
 
 use crate::engine;
+use crate::share::{self, Share};
 
 const WINDOW_MS: f64 = 500.0;
 const EMIT_MS: f64 = 100.0;
@@ -66,6 +68,10 @@ pub struct State {
     pub latency: RwSignal<Option<LatencySummary>>,
     pub down: Lane,
     pub up: Lane,
+    // the completed run as published, only a finished run has one
+    // the rc tells a late response whether its run is still the one on screen
+    pub snapshot: RwSignal<Option<Rc<Payload>>, LocalStorage>,
+    pub share: RwSignal<Share>,
 }
 
 // per direction bookkeeping that survives across interleaved segments
@@ -106,24 +112,28 @@ pub fn launch(state: State) {
     state.phase.set(Phase::Running);
     state.error.set(None);
     state.latency.set(None);
+    state.snapshot.set(None);
+    state.share.set(Share::Ready);
     state.down.reset();
     state.up.reset();
     spawn_local(async move {
         engine::start().await;
-        let outcome = run_all(state).await;
+        let cfg = TestConfig::default();
+        let outcome = run_all(state, &cfg).await;
         state.down.running.set(false);
         state.up.running.set(false);
         state.abort.set_value(None);
         state.phase.set(Phase::Idle);
         match outcome {
             Ok(()) => {
-                engine::finish(&SpeedtestResults {
+                let results = SpeedtestResults {
                     meta: state.meta.get_untracked(),
                     latency: state.latency.get_untracked(),
                     download: state.down.summary.get_untracked(),
                     upload: state.up.summary.get_untracked(),
-                })
-                .await
+                };
+                share::snapshot(state, cfg, &results);
+                engine::finish(&results).await
             }
             Err(Interrupt::Cancelled) => {}
             Err(Interrupt::Failed(e)) => state.error.set(Some(format!("{e:?}"))),
@@ -171,9 +181,7 @@ async fn hold(state: State) -> Result<(), Interrupt> {
     }
 }
 
-async fn run_all(state: State) -> Result<(), Interrupt> {
-    let cfg = TestConfig::default();
-
+async fn run_all(state: State, cfg: &TestConfig) -> Result<(), Interrupt> {
     let mut pings = Vec::new();
     for _ in 0..cfg.latency_samples {
         hold(state).await?;

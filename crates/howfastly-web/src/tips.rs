@@ -10,3 +10,4 @@ pub const LOADED: &str =
     "Round trips taken while the transfers ran, the rise over unloaded is bufferbloat";
 pub const JITTER: &str = "Mean absolute difference between consecutive round trips";
 pub const ROUTE: &str = "Your address and network as Fastly sees them, then the datacenter that served the test and the HTTP version";
+pub const PUBLICATION: &str = "The network and datacenter Fastly saw when this result was published, which can differ from the connection that was measured";

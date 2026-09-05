@@ -37,12 +37,11 @@ pub fn save_autostart() {
     }
 }
 
-async fn fetch(
+fn request(
     method: &str,
-    url: &str,
     json: Option<&str>,
     signal: Option<&AbortSignal>,
-) -> Result<Response, JsValue> {
+) -> Result<RequestInit, JsValue> {
     let init = RequestInit::new();
     init.set_method(method);
     init.set_signal(signal);
@@ -51,11 +50,30 @@ async fn fetch(
         headers.set("content-type", "application/json")?;
         init.set_headers_headers(&headers);
         init.set_body_opt_str(Some(json));
-        // a closing tab must still deliver the report
-        let _ = Reflect::set(&init, &"keepalive".into(), &JsValue::TRUE);
     }
-    let resp = JsFuture::from(window().fetch_with_str_and_init(url, &init)).await?;
+    Ok(init)
+}
+
+async fn send(url: &str, init: &RequestInit) -> Result<Response, JsValue> {
+    let resp = JsFuture::from(window().fetch_with_str_and_init(url, init)).await?;
     resp.dyn_into()
+}
+
+async fn fetch(
+    method: &str,
+    url: &str,
+    json: Option<&str>,
+    signal: Option<&AbortSignal>,
+) -> Result<Response, JsValue> {
+    send(url, &request(method, json, signal)?).await
+}
+
+// status and body of an exchange whose answer the caller reads either way
+async fn exchange(method: &str, url: &str, json: Option<&str>) -> Result<(u16, String), JsValue> {
+    let resp = fetch(method, url, json, None).await?;
+    let status = resp.status();
+    let text = JsFuture::from(resp.text()?).await?;
+    Ok((status, text.as_string().unwrap_or_default()))
 }
 
 // run markers for the edge side counting, the outcome is ignored
@@ -64,9 +82,53 @@ pub async fn start() {
 }
 
 pub async fn finish(results: &SpeedtestResults) {
-    if let Ok(json) = serde_json::to_string(results) {
-        let _ = fetch("POST", "/finish", Some(&json), None).await;
-    }
+    let Ok(json) = serde_json::to_string(results) else {
+        return;
+    };
+    let Ok(init) = request("POST", Some(&json), None) else {
+        return;
+    };
+    // a closing tab must still deliver the report
+    let _ = Reflect::set(&init, &"keepalive".into(), &JsValue::TRUE);
+    let _ = send("/finish", &init).await;
+}
+
+pub async fn share(json: &str) -> Result<(u16, String), JsValue> {
+    exchange("POST", "/share", Some(json)).await
+}
+
+pub async fn report(id: &str) -> Result<(u16, String), JsValue> {
+    exchange("GET", &format!("/share/{id}.json"), None).await
+}
+
+pub fn describe(e: JsValue) -> String {
+    e.dyn_ref::<js_sys::Error>()
+        .map(|e| String::from(e.message()))
+        .or_else(|| e.as_string())
+        .unwrap_or_else(|| format!("{e:?}"))
+}
+
+pub fn unix_secs() -> u64 {
+    (js_sys::Date::now() / 1e3) as u64
+}
+
+pub fn pathname() -> String {
+    window().location().pathname().unwrap_or_default()
+}
+
+pub fn embedded(id: &str) -> Option<String> {
+    window().document()?.get_element_by_id(id)?.text_content()
+}
+
+// the write is issued before the future is awaited
+// navigator.clipboard is absent outside secure contexts and the typed getter would trap there
+pub fn copy(text: &str) -> JsFuture {
+    let clipboard = Reflect::get(&window().navigator(), &"clipboard".into())
+        .and_then(|value| value.dyn_into::<web_sys::Clipboard>());
+    JsFuture::from(match clipboard {
+        Ok(clipboard) => clipboard.write_text(text),
+        Err(error) => js_sys::Promise::reject(&error),
+    })
 }
 
 fn server_dur_ms(resp: &Response) -> f64 {
