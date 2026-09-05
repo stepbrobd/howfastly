@@ -36,12 +36,10 @@ pub fn App() -> impl IntoView {
             Ok(m) => {
                 state
                     .notice
-                    .set(m.mismatch().map(|w| format!("{w}, reload to update")));
+                    .set(m.mismatch().map(|w| format!("{w}, reload to update.")));
                 state.meta.set(Some(m));
             }
-            Err(e) => state
-                .notice
-                .set(Some(e.as_string().unwrap_or_else(|| format!("{e:?}")))),
+            Err(e) => state.notice.set(Some(engine::describe(e))),
         }
     });
 
@@ -79,10 +77,10 @@ pub fn App() -> impl IntoView {
                     let href = url.clone();
                     let note = match clip {
                         Clip::Pending => "",
-                        Clip::Copied => "Copied to the clipboard",
-                        Clip::Failed => "Copy failed, select the link or press Share again",
+                        Clip::Copied => "Copied to the clipboard.",
+                        Clip::Failed => "Copy failed, select the link or press Share again.",
                     };
-                    let until = format!("Valid until {}", iso_utc(expires_at));
+                    let until = format!("Valid until {}.", iso_utc(expires_at));
                     Some(view! {
                         <div class="rounded border border-nord-8 bg-nord-1 p-4">
                             <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">

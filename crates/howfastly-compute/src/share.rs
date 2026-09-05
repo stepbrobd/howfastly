@@ -47,7 +47,7 @@ fn unavailable(cause: impl std::fmt::Display) -> Reject {
     eprintln!("sharing unavailable, {cause}");
     (
         StatusCode::SERVICE_UNAVAILABLE,
-        "Sharing is unavailable right now, try again later".into(),
+        "Sharing is unavailable right now, try again later.".into(),
     )
 }
 
@@ -114,7 +114,7 @@ fn admit(req: &Request) -> Result<(), Reject> {
         Ok(true) => Ok(()),
         Ok(false) => Err((
             StatusCode::TOO_MANY_REQUESTS,
-            "Your address shared three results in the last 15 min, try again later".into(),
+            "Your address shared three results in the last 15 min, try again later.".into(),
         )),
         Err(e) => {
             eprintln!("rate limit unavailable, {e}");
@@ -140,7 +140,7 @@ fn existing(store: &KVStore, id: &str, now: u64) -> Result<Option<Report>, Rejec
     if id_of(&canonical) != id {
         return Err((
             StatusCode::CONFLICT,
-            "A different result already holds this link".into(),
+            "A different result already holds this link.".into(),
         ));
     }
     Ok(Some(report))
@@ -152,7 +152,7 @@ fn create(req: &mut Request) -> Result<(StatusCode, ShareResponse), Reject> {
     if !json_body(req) {
         return Err((
             StatusCode::UNSUPPORTED_MEDIA_TYPE,
-            "Publish a result as application/json".into(),
+            "Publish a result as application/json.".into(),
         ));
     }
     // one byte past the cap tells an oversized body from one that fits exactly
@@ -163,26 +163,26 @@ fn create(req: &mut Request) -> Result<(StatusCode, ShareResponse), Reject> {
         .map_err(|_| {
             (
                 StatusCode::BAD_REQUEST,
-                "The result body could not be read".to_string(),
+                "The result body could not be read.".to_string(),
             )
         })?;
     if buf.len() > MAX_BYTES {
         return Err((
             StatusCode::PAYLOAD_TOO_LARGE,
-            format!("A result may not exceed {} KiB", MAX_BYTES / 1024),
+            format!("A result may not exceed {} KiB.", MAX_BYTES / 1024),
         ));
     }
     let mut payload: Payload = serde_json::from_slice(&buf).map_err(|e| {
         (
             StatusCode::BAD_REQUEST,
-            format!("The result JSON is invalid: {e}"),
+            format!("The result JSON is invalid: {e}."),
         )
     })?;
     if payload.format != FORMAT {
         return Err((
             StatusCode::UNPROCESSABLE_ENTITY,
             format!(
-                "Result format {} is not supported, this build publishes format {FORMAT}",
+                "Result format {} is not supported, this build publishes format {FORMAT}.",
                 payload.format
             ),
         ));
@@ -210,7 +210,7 @@ fn create(req: &mut Request) -> Result<(StatusCode, ShareResponse), Reject> {
     if now.abs_diff(payload.finished_at) > CREATION_WINDOW_SECS {
         return Err((
             StatusCode::BAD_REQUEST,
-            "A result can only be published within 1 day of finishing".into(),
+            "A result can only be published within 1 day of finishing.".into(),
         ));
     }
 
@@ -224,7 +224,7 @@ fn create(req: &mut Request) -> Result<(StatusCode, ShareResponse), Reject> {
     if record.len() > MAX_BYTES {
         return Err((
             StatusCode::PAYLOAD_TOO_LARGE,
-            format!("A stored result may not exceed {} KiB", MAX_BYTES / 1024),
+            format!("A stored result may not exceed {} KiB.", MAX_BYTES / 1024),
         ));
     }
     // add never touches an existing key, so the first publication keeps its context and expiry
@@ -258,7 +258,7 @@ fn create(req: &mut Request) -> Result<(StatusCode, ShareResponse), Reject> {
         },
         Err(KVStoreError::TooManyRequests) => Err((
             StatusCode::SERVICE_UNAVAILABLE,
-            "Sharing is busy right now, try again later".into(),
+            "Sharing is busy right now, try again later.".into(),
         )),
         Err(e) => Err(unavailable(e)),
     }

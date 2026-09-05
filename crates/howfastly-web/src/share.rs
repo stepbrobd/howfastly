@@ -113,7 +113,7 @@ async fn post(payload: &Payload) -> Result<ShareResponse, String> {
     let (status, body) = engine::share(&json).await.map_err(engine::describe)?;
     match status {
         200 | 201 => serde_json::from_str(&body)
-            .map_err(|e| format!("The share response could not be read, {e}")),
+            .map_err(|e| format!("The share response could not be read, {e}.")),
         _ => Err(explain(status, &body)),
     }
 }
@@ -123,7 +123,7 @@ fn explain(status: u16, body: &str) -> String {
     serde_json::from_str::<serde_json::Value>(body)
         .ok()
         .and_then(|v| v.get("error")?.as_str().map(str::to_string))
-        .unwrap_or_else(|| format!("The server answered {status}"))
+        .unwrap_or_else(|| format!("The server answered {status}."))
 }
 
 // the id under a shared route, any path under /share stays out of the live app
@@ -155,7 +155,7 @@ pub enum Problem {
 pub async fn load(id: String) -> Result<Report, Problem> {
     if !valid_id(&id) {
         return Err(Problem::Invalid(
-            "This is not a link to a shared result".into(),
+            "This is not a link to a shared result.".into(),
         ));
     }
     if let Some(text) = engine::embedded(EMBED) {
@@ -176,19 +176,21 @@ pub async fn load(id: String) -> Result<Report, Problem> {
 // the format is checked before the shape so a newer record says so instead of failing to parse
 fn decode(text: &str) -> Result<Report, Problem> {
     let unreadable = |e: serde_json::Error| {
-        Problem::Invalid(format!("The shared result could not be read, {e}"))
+        Problem::Invalid(format!("The shared result could not be read, {e}."))
     };
     let value: serde_json::Value = serde_json::from_str(text).map_err(unreadable)?;
     match value.get("format").and_then(serde_json::Value::as_u64) {
         Some(f) if f == u64::from(FORMAT) => {}
         Some(f) => {
             return Err(Problem::Unsupported(format!(
-                "Format {f} is unknown to this build ({}), reload to update",
+                "Format {f} is unknown to this build ({}), reload to update.",
                 howfastly::VERSION
             )));
         }
         None => {
-            return Err(Problem::Invalid("The shared result names no format".into()));
+            return Err(Problem::Invalid(
+                "The shared result names no format.".into(),
+            ));
         }
     }
     serde_json::from_value(value).map_err(unreadable)

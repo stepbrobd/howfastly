@@ -136,7 +136,7 @@ pub fn launch(state: State) {
                 engine::finish(&results).await
             }
             Err(Interrupt::Cancelled) => {}
-            Err(Interrupt::Failed(e)) => state.error.set(Some(format!("{e:?}"))),
+            Err(Interrupt::Failed(e)) => state.error.set(Some(engine::describe(e))),
         }
     });
 }

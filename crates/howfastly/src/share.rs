@@ -156,25 +156,25 @@ impl Payload {
     // the error is shown to the client, wall clock checks belong to the server
     pub fn normalize(&mut self) -> Result<(), String> {
         if self.format != FORMAT {
-            return Err(format!("Result format {} is not supported", self.format));
+            return Err(format!("Result format {} is not supported.", self.format));
         }
         if self.build.is_empty()
             || self.build.len() > MAX_BUILD_LEN
             || !self.build.bytes().all(|b| b.is_ascii_graphic())
         {
             return Err(format!(
-                "Build must be 1 to {MAX_BUILD_LEN} printable ASCII characters"
+                "Build must be 1 to {MAX_BUILD_LEN} printable ASCII characters."
             ));
         }
         if !FINISHED_AT.contains(&self.finished_at) {
-            return Err("Finish time is out of range".into());
+            return Err("Finish time is out of range.".into());
         }
         normalize_config(&mut self.config)?;
         if let Some(latency) = &mut self.latency {
             normalize_latency(latency, "Latency")?;
         }
         if self.download.is_none() && self.upload.is_none() {
-            return Err("Result has neither a download nor an upload".into());
+            return Err("Result has neither a download nor an upload.".into());
         }
         let config = &self.config;
         for dir in Direction::ALL {
@@ -187,10 +187,13 @@ impl Payload {
             }
         }
         let bytes = serde_json::to_vec(self)
-            .map_err(|e| format!("Result does not serialize: {e}"))?
+            .map_err(|e| format!("Result does not serialize: {e}."))?
             .len();
         if bytes > MAX_BYTES {
-            return Err(format!("Result is {bytes} bytes, the limit is {MAX_BYTES}"));
+            return Err(format!(
+                "Result is {bytes} bytes, the limit is {} KiB.",
+                MAX_BYTES / 1024
+            ));
         }
         Ok(())
     }
@@ -198,7 +201,7 @@ impl Payload {
 
 fn check(value: f64, max: f64, what: &str) -> Result<(), String> {
     if !value.is_finite() || value < 0.0 || value > max {
-        return Err(format!("{what} is out of range"));
+        return Err(format!("{what} is out of range."));
     }
     Ok(())
 }
@@ -212,32 +215,32 @@ fn round(value: f64, scale: f64) -> f64 {
 fn normalize_config(config: &mut TestConfig) -> Result<(), String> {
     if config.latency_samples > MAX_LATENCY_SAMPLES {
         return Err(format!(
-            "Latency sample count exceeds {MAX_LATENCY_SAMPLES}"
+            "Latency sample count exceeds {MAX_LATENCY_SAMPLES}."
         ));
     }
     check(config.time_budget_secs, MAX_BUDGET_SECS, "Time budget")?;
     config.time_budget_secs = round(config.time_budget_secs, 1e3);
     if config.time_budget_secs <= 0.0 {
-        return Err("Time budget must be positive".into());
+        return Err("Time budget must be positive.".into());
     }
     for dir in Direction::ALL {
         let name = dir.name();
         let plan = config.plans(dir);
         if plan.len() > MAX_PLAN_SIZES {
-            return Err(format!("{name} plan has more than {MAX_PLAN_SIZES} sizes"));
+            return Err(format!("{name} plan has more than {MAX_PLAN_SIZES} sizes."));
         }
         let mut last = 0;
         for p in plan {
             if p.bytes == 0 || p.bytes > MAX_DOWN_BYTES {
-                return Err(format!("{name} plan size {} is out of range", p.bytes));
+                return Err(format!("{name} plan size {} is out of range.", p.bytes));
             }
             if p.bytes <= last {
-                return Err(format!("{name} plan sizes must increase"));
+                return Err(format!("{name} plan sizes must increase."));
             }
             last = p.bytes;
             if p.iterations == 0 || p.iterations > MAX_ITERATIONS {
                 return Err(format!(
-                    "{name} plan iterations must be 1 to {MAX_ITERATIONS}"
+                    "{name} plan iterations must be 1 to {MAX_ITERATIONS}."
                 ));
             }
         }
@@ -256,7 +259,7 @@ fn normalize_latency(latency: &mut LatencySummary, what: &str) -> Result<(), Str
         *value = round(*value, 10.0);
     }
     if latency.min > latency.median || latency.min > latency.avg {
-        return Err(format!("{what} minimum exceeds its median or average"));
+        return Err(format!("{what} minimum exceeds its median or average."));
     }
     Ok(())
 }
@@ -268,7 +271,7 @@ fn normalize_direction(
 ) -> Result<(), String> {
     let name = dir.name();
     if plan.is_empty() {
-        return Err(format!("{name} has no planned sizes"));
+        return Err(format!("{name} has no planned sizes."));
     }
     if let Some(loaded) = &mut shared.summary.loaded {
         normalize_latency(loaded, &format!("{name} loaded latency"))?;
@@ -286,7 +289,7 @@ fn normalize_direction(
         None => normalize_summary(&mut shared.summary, name, plan)?,
     }
     if shared.summary.p90.is_none() {
-        return Err(format!("{name} has no samples"));
+        return Err(format!("{name} has no samples."));
     }
     if let Some(timeline) = &shared.timeline {
         check_timeline(timeline, name)?;
@@ -297,10 +300,10 @@ fn normalize_direction(
 // transfers fail and the budget stops a size midway, so fewer samples than planned pass
 fn check_count(samples: usize, skipped: bool, plan: &SizePlan, what: &str) -> Result<(), String> {
     if samples > plan.iterations {
-        return Err(format!("{what} has more samples than planned"));
+        return Err(format!("{what} has more samples than planned."));
     }
     if skipped && samples == plan.iterations {
-        return Err(format!("{what} is marked skipped but completed its plan"));
+        return Err(format!("{what} is marked skipped but completed its plan."));
     }
     Ok(())
 }
@@ -312,7 +315,7 @@ fn normalize_samples(
 ) -> Result<(), String> {
     if samples.len() != plan.len() {
         return Err(format!(
-            "{name} samples cover {} sizes but the plan has {}",
+            "{name} samples cover {} sizes but the plan has {}.",
             samples.len(),
             plan.len()
         ));
@@ -321,7 +324,7 @@ fn normalize_samples(
         let what = format!("{name} {}", size_label(p.bytes));
         if s.bytes != p.bytes {
             return Err(format!(
-                "{what} samples carry {} instead",
+                "{what} samples carry {} instead.",
                 size_label(s.bytes)
             ));
         }
@@ -341,7 +344,7 @@ fn normalize_summary(
 ) -> Result<(), String> {
     if summary.sizes.len() != plan.len() {
         return Err(format!(
-            "{name} summary covers {} sizes but the plan has {}",
+            "{name} summary covers {} sizes but the plan has {}.",
             summary.sizes.len(),
             plan.len()
         ));
@@ -351,7 +354,7 @@ fn normalize_summary(
         let what = format!("{name} {}", size_label(p.bytes));
         if s.bytes != p.bytes {
             return Err(format!(
-                "{what} summary carries {} instead",
+                "{what} summary carries {} instead.",
                 size_label(s.bytes)
             ));
         }
@@ -359,12 +362,12 @@ fn normalize_summary(
         match &mut s.median {
             Some(median) => {
                 if s.samples == 0 {
-                    return Err(format!("{what} has a median without samples"));
+                    return Err(format!("{what} has a median without samples."));
                 }
                 check(*median, MAX_MBPS, &format!("{what} median"))?;
                 *median = round(*median, 1e3);
             }
-            None if s.samples > 0 => return Err(format!("{what} median is missing")),
+            None if s.samples > 0 => return Err(format!("{what} median is missing.")),
             None => {}
         }
         any |= s.samples > 0;
@@ -372,12 +375,12 @@ fn normalize_summary(
     match &mut summary.p90 {
         Some(p90) => {
             if !any {
-                return Err(format!("{name} has a p90 without samples"));
+                return Err(format!("{name} has a p90 without samples."));
             }
             check(*p90, MAX_MBPS, &format!("{name} p90"))?;
             *p90 = round(*p90, 1e3);
         }
-        None if any => return Err(format!("{name} p90 is missing")),
+        None if any => return Err(format!("{name} p90 is missing.")),
         None => {}
     }
     Ok(())
@@ -397,22 +400,24 @@ fn round_summary(summary: &mut DirectionSummary) {
 
 fn check_timeline(timeline: &Timeline, name: &str) -> Result<(), String> {
     if timeline.time_ms.len() != timeline.kbps.len() {
-        return Err(format!("{name} timeline arrays differ in length"));
+        return Err(format!("{name} timeline arrays differ in length."));
     }
     if timeline.time_ms.is_empty() {
-        return Err(format!("{name} timeline is empty"));
+        return Err(format!("{name} timeline is empty."));
     }
     if timeline.time_ms.len() > MAX_POINTS {
-        return Err(format!("{name} timeline has more than {MAX_POINTS} points"));
+        return Err(format!(
+            "{name} timeline has more than {MAX_POINTS} points."
+        ));
     }
     if timeline.time_ms.windows(2).any(|w| w[1] <= w[0]) {
-        return Err(format!("{name} timeline times must increase"));
+        return Err(format!("{name} timeline times must increase."));
     }
     if timeline.time_ms.iter().any(|&t| t > MAX_TIME_MS) {
-        return Err(format!("{name} timeline runs past a day"));
+        return Err(format!("{name} timeline runs past a day."));
     }
     if timeline.kbps.iter().any(|&k| k > MAX_KBPS) {
-        return Err(format!("{name} timeline speed is out of range"));
+        return Err(format!("{name} timeline speed is out of range."));
     }
     Ok(())
 }

@@ -101,11 +101,14 @@ pub async fn report(id: &str) -> Result<(u16, String), JsValue> {
     exchange("GET", &format!("/share/{id}.json"), None).await
 }
 
+// the message of a js error as a sentence, the debug form of anything else
 pub fn describe(e: JsValue) -> String {
-    e.dyn_ref::<js_sys::Error>()
+    let text = e
+        .dyn_ref::<js_sys::Error>()
         .map(|e| String::from(e.message()))
         .or_else(|| e.as_string())
-        .unwrap_or_else(|| format!("{e:?}"))
+        .unwrap_or_else(|| format!("{e:?}"));
+    format!("{}.", text.trim_end_matches('.'))
 }
 
 pub fn unix_secs() -> u64 {
@@ -148,7 +151,9 @@ pub async fn ping() -> Result<f64, JsValue> {
 }
 
 async fn drain(resp: &Response, on_progress: &mut impl FnMut(f64, u64)) -> Result<(), JsValue> {
-    let stream = resp.body().ok_or_else(|| JsValue::from_str("no body"))?;
+    let stream = resp
+        .body()
+        .ok_or_else(|| JsValue::from_str("The download had no body"))?;
     let reader: ReadableStreamDefaultReader = stream.get_reader().dyn_into()?;
     let mut total = 0u64;
     loop {
@@ -212,7 +217,8 @@ pub async fn upload(
     });
     xhr.set_onloadend(Some(onloadend.as_ref().unchecked_ref()));
 
-    let len = u32::try_from(bytes).map_err(|_| JsValue::from_str("upload size exceeds u32"))?;
+    let len =
+        u32::try_from(bytes).map_err(|_| JsValue::from_str("The upload is larger than 4 GiB"))?;
     let body = Uint8Array::new_with_length(len);
     let start = now_ms();
     xhr.send_with_opt_buffer_source(Some(&body))?;
@@ -222,7 +228,7 @@ pub async fn upload(
     let status = xhr.status().unwrap_or(0);
     if !(200..300).contains(&status) {
         return Err(JsValue::from_str(&format!(
-            "upload failed with status {status}"
+            "The upload failed with status {status}"
         )));
     }
     let server_ms = http::server_dur_ms(
