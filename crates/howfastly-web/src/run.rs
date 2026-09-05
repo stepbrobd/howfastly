@@ -4,8 +4,9 @@ use std::rc::Rc;
 use gloo_timers::future::TimeoutFuture;
 use howfastly::share::Payload;
 use howfastly::types::{
-    Direction, DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse, SizePlan,
-    SizeSamples, SpeedtestResults, TestConfig, summarize_direction, summarize_latency,
+    Direction, DirectionSummary, LOADED_PING_INTERVAL_MS, LatencySummary, MetaResponse, Outcome,
+    Run, SizePlan, SizeSamples, SpeedtestResults, Stage, TestConfig, summarize_direction,
+    summarize_latency,
 };
 use howfastly_map::chart::throughput_points;
 use leptos::prelude::*;
@@ -68,6 +69,8 @@ pub struct State {
     pub latency: RwSignal<Option<LatencySummary>>,
     pub down: Lane,
     pub up: Lane,
+    // where the run stands, a run cut short reports it
+    pub stage: StoredValue<Stage>,
     // the completed run as published, only a finished run has one
     // the rc tells a late response whether its run is still the one on screen
     pub snapshot: RwSignal<Option<Rc<Payload>>, LocalStorage>,
@@ -103,8 +106,7 @@ enum Interrupt {
     Failed(JsValue),
 }
 
-// one full run bracketed by the start and finish markers
-// a canceled run sends no finish and counts as abandoned
+// one full run bracketed by the start marker and the report of how it ended
 pub fn launch(state: State) {
     if state.phase.get_untracked() != Phase::Idle {
         return;
@@ -112,6 +114,7 @@ pub fn launch(state: State) {
     state.phase.set(Phase::Running);
     state.error.set(None);
     state.latency.set(None);
+    state.stage.set_value(Stage::Latency);
     state.snapshot.set(None);
     state.share.set(Share::Ready);
     state.down.reset();
@@ -124,21 +127,43 @@ pub fn launch(state: State) {
         state.up.running.set(false);
         state.abort.set_value(None);
         state.phase.set(Phase::Idle);
-        match outcome {
-            Ok(()) => {
-                let results = SpeedtestResults {
-                    meta: state.meta.get_untracked(),
-                    latency: state.latency.get_untracked(),
-                    download: state.down.summary.get_untracked(),
-                    upload: state.up.summary.get_untracked(),
-                };
-                share::snapshot(state, cfg, &results);
-                engine::finish(&results).await
+        let stage = state.stage.get_value();
+        let outcome = match outcome {
+            Ok(()) => Outcome::Completed,
+            Err(Interrupt::Canceled) => Outcome::Canceled { stage },
+            Err(Interrupt::Failed(e)) => {
+                state.error.set(Some(engine::describe(e)));
+                Outcome::Failed { stage }
             }
-            Err(Interrupt::Canceled) => {}
-            Err(Interrupt::Failed(e)) => state.error.set(Some(engine::describe(e))),
+        };
+        let results = results(state);
+        if outcome == Outcome::Completed {
+            share::snapshot(state, cfg, &results);
         }
+        engine::finish(&Run { outcome, results });
     });
+}
+
+// the page is going away, a run that has not reported yet ends as left
+pub fn leave(state: State) {
+    if state.phase.get_untracked() != Phase::Idle {
+        engine::finish(&Run {
+            outcome: Outcome::Left {
+                stage: state.stage.get_value(),
+            },
+            results: results(state),
+        });
+    }
+}
+
+// whatever the run has so far, a completed run has it all
+fn results(state: State) -> SpeedtestResults {
+    SpeedtestResults {
+        meta: state.meta.get_untracked(),
+        latency: state.latency.get_untracked(),
+        download: state.down.summary.get_untracked(),
+        upload: state.up.summary.get_untracked(),
+    }
 }
 
 fn abort(state: State) {
@@ -210,6 +235,10 @@ async fn segment(
     budget_secs: f64,
 ) -> Result<(), Interrupt> {
     run.lane.running.set(true);
+    state.stage.set_value(Stage::Transfer {
+        direction: run.lane.dir,
+        bytes: plan.bytes,
+    });
     let stop = Rc::new(Cell::new(false));
     let seg_loaded = Rc::new(RefCell::new(Vec::new()));
 

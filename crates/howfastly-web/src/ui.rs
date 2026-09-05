@@ -1,7 +1,7 @@
 use howfastly::share::{Client, Report, SharedDirection, iso_utc};
 use howfastly::stats;
 use howfastly::types::{
-    Direction, LatencySummary, MetaResponse, SizePlan, SizeSummary, size_label,
+    Direction, LatencySummary, MetaResponse, SizePlan, SizeSummary, Stage, size_label,
 };
 use howfastly_map::chart::{chart_y, format_speed, peak, svg_path};
 use leptos::prelude::*;
@@ -27,9 +27,11 @@ pub fn App() -> impl IntoView {
         latency: RwSignal::new(None),
         down: Lane::new(Direction::Download),
         up: Lane::new(Direction::Upload),
+        stage: StoredValue::new(Stage::Latency),
         snapshot: RwSignal::new_local(None),
         share: RwSignal::new(Share::Ready),
     };
+    window_event_listener(leptos::ev::pagehide, move |_| run::leave(state));
 
     spawn_local(async move {
         match engine::meta().await {

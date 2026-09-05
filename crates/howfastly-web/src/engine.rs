@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use howfastly::http;
 use howfastly::stats;
-use howfastly::types::{MetaResponse, SpeedtestResults, parse_meta};
+use howfastly::types::{MetaResponse, Run, parse_meta};
 use js_sys::{Reflect, Uint8Array};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
@@ -37,11 +37,12 @@ pub fn save_autostart() {
     }
 }
 
-fn request(
+async fn fetch(
     method: &str,
+    url: &str,
     json: Option<&str>,
     signal: Option<&AbortSignal>,
-) -> Result<RequestInit, JsValue> {
+) -> Result<Response, JsValue> {
     let init = RequestInit::new();
     init.set_method(method);
     init.set_signal(signal);
@@ -51,21 +52,8 @@ fn request(
         init.set_headers_headers(&headers);
         init.set_body_opt_str(Some(json));
     }
-    Ok(init)
-}
-
-async fn send(url: &str, init: &RequestInit) -> Result<Response, JsValue> {
-    let resp = JsFuture::from(window().fetch_with_str_and_init(url, init)).await?;
+    let resp = JsFuture::from(window().fetch_with_str_and_init(url, &init)).await?;
     resp.dyn_into()
-}
-
-async fn fetch(
-    method: &str,
-    url: &str,
-    json: Option<&str>,
-    signal: Option<&AbortSignal>,
-) -> Result<Response, JsValue> {
-    send(url, &request(method, json, signal)?).await
 }
 
 // status and body of an exchange whose answer the caller reads either way
@@ -81,16 +69,13 @@ pub async fn start() {
     let _ = fetch("POST", "/start", None, None).await;
 }
 
-pub async fn finish(results: &SpeedtestResults) {
-    let Ok(json) = serde_json::to_string(results) else {
-        return;
-    };
-    let Ok(init) = request("POST", Some(&json), None) else {
-        return;
-    };
-    // a closing tab must still deliver the report
-    let _ = Reflect::set(&init, &"keepalive".into(), &JsValue::TRUE);
-    let _ = send("/finish", &init).await;
+// a beacon leaves even while the page unloads
+pub fn finish(run: &Run) {
+    if let Ok(json) = serde_json::to_string(run) {
+        let _ = window()
+            .navigator()
+            .send_beacon_with_opt_str("/finish", Some(&json));
+    }
 }
 
 pub async fn share(json: &str) -> Result<(u16, String), JsValue> {
