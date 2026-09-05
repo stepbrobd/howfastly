@@ -1,4 +1,4 @@
-use howfastly::share::{Client, Report, SharedDirection, iso_utc};
+use howfastly::share::{Client, Report, SharedDirection};
 use howfastly::stats;
 use howfastly::types::{
     Direction, LatencySummary, MetaResponse, SizePlan, SizeSummary, Stage, planned_bytes,
@@ -86,7 +86,7 @@ pub fn App() -> impl IntoView {
                         Clip::Copied => "Copied to the clipboard.",
                         Clip::Failed => "Copy failed, select the link or press Share again.",
                     };
-                    let until = format!("Valid until {}.", iso_utc(expires_at));
+                    let until = format!("Valid until {}.", engine::local_time(expires_at));
                     Some(view! {
                         <div class="rounded border border-nord-8 bg-nord-1 p-4">
                             <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -248,7 +248,7 @@ fn Viewer(report: Report) -> impl IntoView {
     };
     let measured = format!(
         "{} with HowFastly {} {client}",
-        iso_utc(payload.finished_at),
+        engine::local_time(payload.finished_at),
         payload.build
     );
     // the publication context, what fastly saw of the request that published
@@ -275,10 +275,10 @@ fn Viewer(report: Report) -> impl IntoView {
     };
     let published = format!(
         "{} from {network} by HowFastly {}{service}",
-        iso_utc(published_at),
+        engine::local_time(published_at),
         publication.cargo
     );
-    let expires = iso_utc(expires_at);
+    let expires = engine::local_time(expires_at);
     let store = publication.store.clone();
     let meta: Signal<Option<MetaResponse>> = RwSignal::new(Some(meta)).into();
 

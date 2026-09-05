@@ -100,6 +100,20 @@ pub fn unix_secs() -> u64 {
     (js_sys::Date::now() / 1e3) as u64
 }
 
+// unix seconds as a date and time in the browser's zone, 2026-09-05 19:19:00
+pub fn local_time(secs: u64) -> String {
+    let date = js_sys::Date::new(&JsValue::from_f64(secs as f64 * 1e3));
+    format!(
+        "{:04}-{:02}-{:02} {:02}:{:02}:{:02}",
+        date.get_full_year(),
+        date.get_month() + 1,
+        date.get_date(),
+        date.get_hours(),
+        date.get_minutes(),
+        date.get_seconds()
+    )
+}
+
 pub fn pathname() -> String {
     window().location().pathname().unwrap_or_default()
 }

@@ -539,10 +539,10 @@ fn summary(report: &Report) -> String {
     };
     format!(
         "Measured {} with the HowFastly {client} client {}. Published {}{from}{through}{over}, the link expires {}.",
-        share::iso_utc(p.finished_at),
+        share::utc(p.finished_at),
         p.build,
-        share::iso_utc(report.published_at),
-        share::iso_utc(report.expires_at),
+        share::utc(report.published_at),
+        share::utc(report.expires_at),
     )
 }
 

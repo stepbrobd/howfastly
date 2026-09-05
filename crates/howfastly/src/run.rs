@@ -72,7 +72,7 @@ pub async fn run(opts: &Options) -> Result<SpeedtestResults> {
             Ok(shared) => eprintln!(
                 "Shared: {}\nExpires: {}",
                 shared.url,
-                share::iso_utc(shared.expires_at),
+                share::utc(shared.expires_at),
             ),
             Err(e) => eprintln!("Warning: sharing failed: {e:#}"),
         }

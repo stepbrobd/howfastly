@@ -518,8 +518,8 @@ pub fn error_message(body: &str) -> Option<String> {
         .map(str::to_owned)
 }
 
-// unix seconds as an iso 8601 utc timestamp, 2026-09-05T10:22:07Z
-pub fn iso_utc(secs: u64) -> String {
+// unix seconds as a utc date and time, 2026-09-05 10:22:07 UTC
+pub fn utc(secs: u64) -> String {
     let (days, rest) = (secs / 86_400, secs % 86_400);
     // civil date from days since 1970-01-01, after howard hinnant
     let z = days + 719_468;
@@ -532,7 +532,7 @@ pub fn iso_utc(secs: u64) -> String {
     let month = if mp < 10 { mp + 3 } else { mp - 9 };
     let year = yoe + era * 400 + u64::from(month <= 2);
     format!(
-        "{year:04}-{month:02}-{day:02}T{:02}:{:02}:{:02}Z",
+        "{year:04}-{month:02}-{day:02} {:02}:{:02}:{:02} UTC",
         rest / 3_600,
         rest % 3_600 / 60,
         rest % 60
@@ -829,10 +829,10 @@ mod tests {
 
     #[test]
     fn utc_dates() {
-        assert_eq!(iso_utc(0), "1970-01-01T00:00:00Z");
-        assert_eq!(iso_utc(951_782_400), "2000-02-29T00:00:00Z");
-        assert_eq!(iso_utc(1_600_000_000), "2020-09-13T12:26:40Z");
-        assert_eq!(iso_utc(4_102_444_800), "2100-01-01T00:00:00Z");
+        assert_eq!(utc(0), "1970-01-01 00:00:00 UTC");
+        assert_eq!(utc(951_782_400), "2000-02-29 00:00:00 UTC");
+        assert_eq!(utc(1_600_000_000), "2020-09-13 12:26:40 UTC");
+        assert_eq!(utc(4_102_444_800), "2100-01-01 00:00:00 UTC");
     }
 
     #[test]
