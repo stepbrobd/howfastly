@@ -25,5 +25,5 @@ wasm-bindgen.workspace             = true
 wasm-bindgen-futures.workspace     = true
 
 [dependencies.web-sys]
-features  = ["Clipboard", "Document", "Element", "Location", "Navigator", "Node"]
+features  = ["AbortController", "AbortSignal", "Clipboard", "Document", "Element", "Headers", "Location", "Navigator", "Node", "Performance", "ProgressEvent", "ReadableStream", "ReadableStreamDefaultReader", "ReadableStreamReadResult", "RequestInit", "Response", "Storage", "Window", "XmlHttpRequest", "XmlHttpRequestEventTarget", "XmlHttpRequestUpload"]
 workspace = true
