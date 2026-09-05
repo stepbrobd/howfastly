@@ -21,6 +21,15 @@ pub const LATENCY_SAMPLES: usize = 25;
 pub const TIME_BUDGET_SECS: f64 = 30.0;
 pub const LOADED_PING_INTERVAL_MS: u32 = 400;
 
+// bytes a run moves when no size is skipped
+pub fn planned_bytes() -> u64 {
+    DOWNLOAD_PLAN
+        .iter()
+        .chain(&UPLOAD_PLAN)
+        .map(|p| p.bytes * p.iterations as u64)
+        .sum()
+}
+
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Direction {
@@ -500,6 +509,11 @@ mod tests {
         assert_eq!(title_case("stoke-on-trent"), "Stoke-On-Trent");
         assert_eq!(title_case("San Francisco"), "San Francisco");
         assert_eq!(title_case(""), "");
+    }
+
+    #[test]
+    fn planned_total() {
+        assert_eq!(planned_bytes(), 637_600_000);
     }
 
     #[test]

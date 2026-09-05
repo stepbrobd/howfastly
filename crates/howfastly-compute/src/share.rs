@@ -35,6 +35,14 @@ fn now() -> u64 {
         .as_secs()
 }
 
+// a span of whole days in words, 1 day or 7 days
+fn days(secs: u64) -> String {
+    match secs / 86_400 {
+        1 => "1 day".to_string(),
+        n => format!("{n} days"),
+    }
+}
+
 // the full digest as 64 lowercase hex characters, never truncated
 fn id_of(canonical: &[u8]) -> String {
     let mut hasher = Sha256::new();
@@ -114,7 +122,10 @@ fn admit(req: &Request) -> Result<(), Reject> {
         Ok(true) => Ok(()),
         Ok(false) => Err((
             StatusCode::TOO_MANY_REQUESTS,
-            "Your address shared three results in the last 15 min, try again later.".into(),
+            format!(
+                "Your address shared {SLOTS} results in the last {} min, try again later.",
+                SLOT_TTL.as_secs() / 60
+            ),
         )),
         Err(e) => {
             eprintln!("rate limit unavailable, {e}");
@@ -210,7 +221,10 @@ fn create(req: &mut Request) -> Result<(StatusCode, ShareResponse), Reject> {
     if now.abs_diff(payload.finished_at) > CREATION_WINDOW_SECS {
         return Err((
             StatusCode::BAD_REQUEST,
-            "A result can only be published within 1 day of finishing.".into(),
+            format!(
+                "A result can only be published within {} of finishing.",
+                days(CREATION_WINDOW_SECS)
+            ),
         ));
     }
 
@@ -306,13 +320,20 @@ impl Miss {
     }
 
     fn explain(&self) -> String {
+        let kept = days(RETENTION_SECS);
         match self {
-            Self::Unknown => "No shared result lives at this link. Shared results stay available for 7 days after publication.".into(),
-            Self::Expired => "This shared result expired. Shared results stay available for 7 days after publication.".into(),
+            Self::Unknown => format!(
+                "No shared result lives at this link. Shared results stay available for {kept} after publication."
+            ),
+            Self::Expired => format!(
+                "This shared result expired. Shared results stay available for {kept} after publication."
+            ),
             Self::Unsupported(format) => format!(
                 "This result was published in format {format}, which this build cannot show."
             ),
-            Self::Unavailable => "The shared result could not be read right now, try again later.".into(),
+            Self::Unavailable => {
+                "The shared result could not be read right now, try again later.".into()
+            }
         }
     }
 }

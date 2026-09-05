@@ -1,7 +1,8 @@
 use howfastly::share::{Client, Report, SharedDirection, iso_utc};
 use howfastly::stats;
 use howfastly::types::{
-    Direction, LatencySummary, MetaResponse, SizePlan, SizeSummary, Stage, size_label,
+    Direction, LatencySummary, MetaResponse, SizePlan, SizeSummary, Stage, planned_bytes,
+    size_label,
 };
 use howfastly_map::chart::{chart_y, format_speed, peak, svg_path};
 use leptos::prelude::*;
@@ -46,6 +47,8 @@ pub fn App() -> impl IntoView {
         }
     });
 
+    // the plan total to the nearest ten megabytes
+    let total = format!("~{} MB", (planned_bytes() as f64 / 1e7).round() * 10.0);
     // first visit gates behind the popup, later visits start right away
     let gate = RwSignal::new(!engine::autostart_saved());
     if !gate.get_untracked() {
@@ -165,7 +168,7 @@ pub fn App() -> impl IntoView {
                     <div class="w-full max-w-md rounded bg-nord-1 p-6">
                         <h2 class="text-lg font-semibold">HowFastly</h2>
                         <p class="mt-2">
-                            "Tests run automatically and transfer up to ~640 MB in total. "
+                            {format!("Tests run automatically and transfer up to {total} in total. ")}
                             "Pause or cancel at any time, retest once it is done."
                         </p>
                         <button
@@ -772,7 +775,7 @@ fn SizeTable(lane: Lane, plans: Vec<SizePlan>) -> impl IntoView {
                                 };
                                 view! {
                                     <tr class="odd:bg-nord-1">
-                                        <td class="px-2 py-2 whitespace-nowrap sm:px-4" title=tips::COUNT>{label}</td>
+                                        <td class="px-2 py-2 whitespace-nowrap sm:px-4" title=tips::count()>{label}</td>
                                         <td class="px-2 py-2 font-mono whitespace-nowrap sm:px-4" title=tips::MEDIAN>{text}</td>
                                         <td class="px-2 py-2 sm:px-4" title=tips::PLOT>
                                             <BoxPlot samples=mbps max=max dir=lane.dir/>
