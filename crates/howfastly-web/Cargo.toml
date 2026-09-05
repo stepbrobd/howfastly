@@ -10,7 +10,6 @@ version.workspace      = true
 # test builds
 [[bin]]
 name = "howfastly-web"
-path = "src/main.rs"
 test = false
 
 [dependencies]

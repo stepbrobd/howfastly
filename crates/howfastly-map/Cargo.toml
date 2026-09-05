@@ -6,9 +6,5 @@ edition.workspace      = true
 rust-version.workspace = true
 version.workspace      = true
 
-[lib]
-name = "howfastly_map"
-path = "src/lib.rs"
-
 [dev-dependencies]
 proptest.workspace = true
