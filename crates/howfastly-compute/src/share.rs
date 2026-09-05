@@ -311,15 +311,6 @@ impl Miss {
         }
     }
 
-    fn title(&self) -> &'static str {
-        match self {
-            Self::Unknown => "Result not found",
-            Self::Expired => "Result expired",
-            Self::Unsupported(_) => "Result format not supported",
-            Self::Unavailable => "Sharing unavailable",
-        }
-    }
-
     fn explain(&self) -> String {
         let kept = days(RETENTION_SECS);
         match self {
@@ -398,28 +389,20 @@ pub fn json(id: &str) -> Response {
     }
 }
 
-// the shell around a live record, a plain page for anything else
+// the shell around a live record, anything else sends the visitor home
 pub fn page(req: &Request, id: &str) -> Response {
-    let now = now();
-    let miss = match load(id, now) {
-        Ok(report) => match shell(
-            &report,
-            &handlers::url_at(req.get_url(), &format!("/share/{id}")),
-        ) {
-            Some(html) => return document(StatusCode::OK, "no-cache").with_body(html),
-            None => {
-                eprintln!("app shell has no head, the shared page cannot render");
-                Miss::Unavailable
-            }
-        },
-        Err(miss) => miss,
-    };
-    document(miss.status(), "no-store").with_body(plain_page(miss.title(), &miss.explain()))
+    let url = handlers::url_at(req.get_url(), &format!("/share/{id}"));
+    match load(id, now()).ok().and_then(|report| shell(&report, &url)) {
+        Some(html) => document(html),
+        None => handlers::home(),
+    }
 }
 
 // a share is reached by its link and stays out of search indexes
-fn document(status: StatusCode, cache: &str) -> Response {
-    assets::headed(status, "text/html; charset=utf-8", cache).with_header("x-robots-tag", "noindex")
+fn document(html: String) -> Response {
+    assets::headed(StatusCode::OK, "text/html; charset=utf-8", "no-cache")
+        .with_header("x-robots-tag", "noindex")
+        .with_body(html)
 }
 
 // the embedded json is what the app renders, the tags are what link previews read
@@ -544,14 +527,5 @@ fn summary(report: &Report) -> String {
         p.build,
         share::utc(report.published_at),
         share::utc(report.expires_at),
-    )
-}
-
-// a small standalone page, the app never boots on an error
-fn plain_page(title: &str, message: &str) -> String {
-    let title = share::escape_html(title);
-    let message = share::escape_html(message);
-    format!(
-        "<!DOCTYPE html>\n<html lang=\"en-US\">\n<head>\n<meta charset=\"utf-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<title>HowFastly: {title}</title>\n</head>\n<body>\n<main>\n<h1>{title}</h1>\n<p>{message}</p>\n<p><a href=\"/\">Run your own test</a></p>\n</main>\n</body>\n</html>\n"
     )
 }

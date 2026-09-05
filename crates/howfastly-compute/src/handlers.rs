@@ -202,6 +202,11 @@ pub fn not_found() -> Response {
     Response::from_status(StatusCode::NOT_FOUND)
 }
 
+// a dead link or a typo sends the visitor to the live app
+pub fn home() -> Response {
+    Response::from_status(StatusCode::SEE_OTHER).with_header(header::LOCATION, "/")
+}
+
 pub fn method_not_allowed(allow: &'static str) -> Response {
     Response::from_status(StatusCode::METHOD_NOT_ALLOWED).with_header(header::ALLOW, allow)
 }

@@ -3,7 +3,13 @@
 use std/assert
 
 def fetch [path: string]: nothing -> record {
-  http get --full --allow-errors $path
+  http get --full --allow-errors --redirect-mode manual $path
+}
+
+# a dead link or a typo answers with a redirect to the live app
+def sent-home [response: record] {
+  assert equal $response.status 303
+  assert equal ($response.headers.response | where name == location | first | get value) "/"
 }
 
 def share-payload [] {
@@ -87,7 +93,8 @@ def sharing [url: string] {
   assert (not ($html | str contains '</script><svg'))
   assert equal (curl -s -o /dev/null -w '%{http_code}' -I $link.url) "200"
   assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($link.url).json") "200"
-  assert equal (fetch $"($url)/share" | get status) 404
+  sent-home (fetch $"($url)/share")
+  sent-home (fetch $"($url)/share/short")
   assert equal (fetch $"($url)/share/short.json" | get status) 404
   assert equal (http delete --full --allow-errors $link.url | get status) 405
   assert equal (http delete --full --allow-errors $link.url | get headers.response | where name == allow | first | get value) "GET, HEAD"
@@ -103,12 +110,10 @@ def sharing [url: string] {
 
   # the seeded record remains in KV despite being past its public expiry
   let expired = $"($url)/share/0000000000000000000000000000000000000000000000000000000000000000"
-  let gone = fetch $expired
-  assert equal $gone.status 404
-  assert equal ($gone.headers.response | where name == x-robots-tag | first | get value) noindex
+  sent-home (fetch $expired)
   assert equal (fetch $"($expired).json" | get status) 404
   let unsupported = $"($url)/share/1111111111111111111111111111111111111111111111111111111111111111"
-  assert equal (fetch $unsupported | get status) 422
+  sent-home (fetch $unsupported)
   assert equal (fetch $"($unsupported).json" | get status) 422
   let missing = fetch $"($url)/share/ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff.json"
   assert equal $missing.status 404
@@ -123,13 +128,15 @@ def checks [url: string, log: string] {
   assert equal (fetch $"($url)/down?bytes=abc" | get status) 400
   assert equal (http delete --full --allow-errors $"($url)/ping" | get status) 405
   assert equal (http delete --full --allow-errors $"($url)/ping" | get headers.response | where name == allow | first | get value) "GET, HEAD"
-  assert equal (fetch $"($url)/nope" | get status) 404
+  sent-home (fetch $"($url)/nope")
+  assert equal (fetch $"($url)/assets/nope.js" | get status) 404
+  assert equal (http post --full --allow-errors $"($url)/nope" "" | get status) 404
 
   # a head takes the get path and answers with its headers alone
   assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($url)/") "200"
   assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($url)/ping") "204"
   assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($url)/down?bytes=1000") "200"
-  assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($url)/nope") "404"
+  assert equal (curl -s -o /dev/null -w '%{http_code}' -I $"($url)/nope") "303"
   assert ((curl -sI $"($url)/" | str lowercase) =~ "content-type: text/html")
   assert equal (http get $"($url)/down?bytes=1000000" | into binary | bytes length) 1000000
 
