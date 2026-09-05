@@ -6,8 +6,9 @@ use howfastly::http;
 use howfastly::share;
 use howfastly::stats;
 use howfastly::types::{
-    Direction, DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, SizePlan, SizeSamples,
-    SpeedtestResults, TestConfig, parse_meta, size_label, summarize_direction, summarize_latency,
+    Direction, DirectionSummary, LOADED_PING_INTERVAL_MS, MetaResponse, Outcome, Run, SizePlan,
+    SizeSamples, SpeedtestResults, Stage, TestConfig, parse_meta, size_label, summarize_direction,
+    summarize_latency,
 };
 use reqwest::{Client, ClientBuilder, Method, RequestBuilder, Response, StatusCode, Version};
 use tokio::sync::mpsc;
@@ -52,7 +53,41 @@ pub async fn run(opts: &Options) -> Result<SpeedtestResults> {
         meta: Some(meta),
         ..Default::default()
     };
+    let mut stage = Stage::Latency;
+    let outcome = measure(&runner, opts, &mut results, &mut stage).await;
+    let finished_at = SystemTime::now();
+    let run = Run {
+        outcome: match &outcome {
+            Ok(()) => Outcome::Completed,
+            Err(_) => Outcome::Failed { stage },
+        },
+        results,
+    };
+    runner.finish(&run).await;
+    outcome?;
 
+    // a failed publication warns and keeps the results
+    if opts.share {
+        match runner.share(&opts.cfg, &run.results, finished_at).await {
+            Ok(shared) => eprintln!(
+                "Shared: {}\nExpires: {}",
+                shared.url,
+                share::iso_utc(shared.expires_at),
+            ),
+            Err(e) => eprintln!("Warning: sharing failed: {e:#}"),
+        }
+    }
+    Ok(run.results)
+}
+
+// the latency phase then each direction, stage follows along for the report
+// a direction fails only after every one of its sizes, so the stage is its last
+async fn measure(
+    runner: &Runner,
+    opts: &Options,
+    results: &mut SpeedtestResults,
+    stage: &mut Stage,
+) -> Result<()> {
     let mut pings = Vec::new();
     for i in 0..opts.cfg.latency_samples {
         match runner.ping().await {
@@ -74,24 +109,19 @@ pub async fn run(opts: &Options) -> Result<SpeedtestResults> {
         None => &Direction::ALL,
     };
     for &dir in dirs {
+        let last = opts
+            .cfg
+            .plans(dir)
+            .last()
+            .expect("the cap keeps the smallest size");
+        *stage = Stage::Transfer {
+            direction: dir,
+            bytes: last.bytes,
+        };
         let summary = runner.direction(dir, &opts.cfg).await?;
         results.record(dir, summary);
     }
-    let finished_at = SystemTime::now();
-    runner.finish(&results).await;
-
-    // only a completed run gets here, a failed publication warns and keeps the results
-    if opts.share {
-        match runner.share(&opts.cfg, &results, finished_at).await {
-            Ok(shared) => eprintln!(
-                "Shared: {}\nExpires: {}",
-                shared.url,
-                share::iso_utc(shared.expires_at),
-            ),
-            Err(e) => eprintln!("Warning: sharing failed: {e:#}"),
-        }
-    }
-    Ok(results)
+    Ok(())
 }
 
 // error bodies are {"error": "..."} written for the user
@@ -218,8 +248,8 @@ impl Runner {
         let _ = self.req(Method::POST, "/start").send().await;
     }
 
-    async fn finish(&self, results: &SpeedtestResults) {
-        let _ = self.req(Method::POST, "/finish").json(results).send().await;
+    async fn finish(&self, run: &Run) {
+        let _ = self.req(Method::POST, "/finish").json(run).send().await;
     }
 
     // summary only, the raw samples stay local
