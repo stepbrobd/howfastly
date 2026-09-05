@@ -118,6 +118,11 @@ pub fn pathname() -> String {
     window().location().pathname().unwrap_or_default()
 }
 
+// the live app replaces the page in the history, so back does not return to a dead link
+pub fn go_home() {
+    let _ = window().location().replace("/");
+}
+
 pub fn embedded(id: &str) -> Option<String> {
     window().document()?.get_element_by_id(id)?.text_content()
 }

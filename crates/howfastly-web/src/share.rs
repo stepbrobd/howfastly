@@ -137,59 +137,26 @@ pub fn route() -> Option<String> {
 // the element the server embeds the report in
 const EMBED: &str = "howfastly-report";
 
-// why a shared result cannot be shown, each one gets its own page
-#[derive(Clone, PartialEq, Eq)]
-pub enum Problem {
-    // the path or the record is not something this build reads
-    Invalid(String),
-    // the server has no live record, its explanation says whether it expired
-    Missing(String),
-    Unsupported(String),
-    // the server or the network failed, not the record
-    Unavailable(String),
-}
-
 // the embedded report of a shared page, or its json twin when the shell came without one
-pub async fn load(id: String) -> Result<Report, Problem> {
+// none for anything that cannot be shown, the server explained every miss on its own page
+pub async fn load(id: String) -> Option<Report> {
     if !valid_id(&id) {
-        return Err(Problem::Invalid(
-            "This is not a link to a shared result.".into(),
-        ));
+        return None;
     }
     if let Some(text) = engine::embedded(EMBED) {
         return decode(&text);
     }
     match engine::report(&id).await {
         Ok((200, body)) => decode(&body),
-        Ok((404, body)) => Err(Problem::Missing(explain(404, &body))),
-        Ok((422, body)) => Err(Problem::Unsupported(explain(422, &body))),
-        Ok((status, body)) => Err(Problem::Unavailable(explain(status, &body))),
-        Err(e) => Err(Problem::Unavailable(format!(
-            "The shared result could not be loaded. {}",
-            engine::describe(e)
-        ))),
+        _ => None,
     }
 }
 
-// the format is checked before the shape so a newer record says so instead of failing to parse
-fn decode(text: &str) -> Result<Report, Problem> {
-    let unreadable = |e: serde_json::Error| {
-        Problem::Invalid(format!("The shared result could not be read, {e}."))
-    };
-    let value: serde_json::Value = serde_json::from_str(text).map_err(unreadable)?;
-    match value.get("format").and_then(serde_json::Value::as_u64) {
-        Some(f) if f == u64::from(FORMAT) => {}
-        Some(f) => {
-            return Err(Problem::Unsupported(format!(
-                "Format {f} is unknown to this build ({}), reload to update.",
-                howfastly::VERSION
-            )));
-        }
-        None => {
-            return Err(Problem::Invalid(
-                "The shared result names no format.".into(),
-            ));
-        }
+// a record of another format is not read, whatever its shape
+fn decode(text: &str) -> Option<Report> {
+    let value: serde_json::Value = serde_json::from_str(text).ok()?;
+    if value.get("format")?.as_u64()? != u64::from(FORMAT) {
+        return None;
     }
-    serde_json::from_value(value).map_err(unreadable)
+    serde_json::from_value(value).ok()
 }

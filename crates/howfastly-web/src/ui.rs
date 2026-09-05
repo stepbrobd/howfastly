@@ -11,7 +11,7 @@ use leptos::task::spawn_local;
 use crate::engine;
 use crate::map::Map;
 use crate::run::{self, Lane, Phase, State};
-use crate::share::{self, Clip, Problem, Share};
+use crate::share::{self, Clip, Share};
 use crate::tips;
 
 // the ci pushes every build here, the footer points at the served one
@@ -185,10 +185,16 @@ pub fn App() -> impl IntoView {
 }
 
 // the read-only page of a published result, nothing here measures or reports
+// a result that cannot be shown sends the visitor home
 #[component]
 pub fn Shared(id: String) -> impl IntoView {
-    let loaded = RwSignal::new(None::<Result<Report, Problem>>);
-    spawn_local(async move { loaded.set(Some(share::load(id).await)) });
+    let loaded = RwSignal::new(None::<Report>);
+    spawn_local(async move {
+        match share::load(id).await {
+            Some(report) => loaded.set(Some(report)),
+            None => engine::go_home(),
+        }
+    });
     view! {
         <main class="mx-auto flex min-h-screen w-full max-w-[65ch] flex-col gap-8 p-4 lg:max-w-6xl">
             {move || match loaded.get() {
@@ -196,8 +202,7 @@ pub fn Shared(id: String) -> impl IntoView {
                     <section class="rounded bg-nord-1 p-4 text-nord-4">"Loading the shared result..."</section>
                 }
                     .into_any(),
-                Some(Ok(report)) => view! { <Viewer report=report/> }.into_any(),
-                Some(Err(problem)) => view! { <Failure problem=problem/> }.into_any(),
+                Some(report) => view! { <Viewer report=report/> }.into_any(),
             }}
             <Footer/>
         </main>
@@ -351,24 +356,6 @@ fn Viewer(report: Report) -> impl IntoView {
                     summary=Signal::derive(move || up.summary.get().and_then(|d| d.loaded))
                 />
             </div>
-        </section>
-    }
-}
-
-// each way a shared result is out of reach gets its own words and a way to run a test
-#[component]
-fn Failure(problem: Problem) -> impl IntoView {
-    let (title, text) = match problem {
-        Problem::Invalid(e) => ("Not a shared result", e),
-        Problem::Missing(e) => ("No such shared result", e),
-        Problem::Unsupported(e) => ("Unsupported shared result", e),
-        Problem::Unavailable(e) => ("Shared results unavailable", e),
-    };
-    view! {
-        <section class="rounded bg-nord-1 p-4">
-            <h2 class="text-lg font-semibold">{title}</h2>
-            <p class="mt-2">{text}</p>
-            <p class="mt-4"><a href="/">"Run your own test"</a></p>
         </section>
     }
 }
