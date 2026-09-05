@@ -94,6 +94,8 @@ def sharing [url: string] {
   assert equal (http post --full --allow-errors --content-type text/plain $"($url)/share" "nope" | get status) 415
   assert equal (http post --full --allow-errors --content-type application/json $"($url)/share" "nope" | get status) 400
   assert equal (http post --full --allow-errors --content-type application/json $"($url)/share" ($payload | upsert format 2) | get status) 422
+  # a finish time older than a day is refused before anything is stored
+  assert equal (http post --full --allow-errors --content-type application/json $"($url)/share" ($payload | upsert finished_at 1_000_000_000) | get status) 400
   # nu reserializes a json body and would drop the padding, curl sends the bytes
   let oversized = ($payload | to json --raw) ++ ("" | fill --width 65537)
   let refused = $oversized | curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary @- $"($url)/share"
