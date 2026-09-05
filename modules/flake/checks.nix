@@ -13,14 +13,6 @@
       web = pkgs.howfastly.web;
       compute = config.legacyPackages.crates.howfastly-compute;
 
-      # the same dependency build the compute package links against
-      computeDeps = crane.lib.buildDepsOnly (crane.commonArgs // {
-        pname = "howfastly-compute";
-        cargoExtraArgs = "--package howfastly-compute";
-        doCheck = false;
-        env.CARGO_BUILD_TARGET = "wasm32-wasip1";
-      });
-
       # a tool that only reads the tree
       over = name: tools: command: pkgs.runCommand "howfastly-${name}" { nativeBuildInputs = tools; } ''
         export HOME="$TMPDIR"
@@ -42,9 +34,10 @@
 
         # the compute modules only exist for wasm32, the host lint never sees them
         # clippy runs locked, so the whole workspace must be present for the lock to match
+        # the lint links against the dependency build of the package itself
         clippy-compute = crane.lib.cargoClippy (crane.commonArgs // {
           pname = "howfastly-compute";
-          cargoArtifacts = computeDeps;
+          inherit (compute) cargoArtifacts;
           src = workspace;
           cargoClippyExtraArgs = "--package howfastly-compute -- -D warnings";
           env.CARGO_BUILD_TARGET = "wasm32-wasip1";
