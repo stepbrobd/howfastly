@@ -124,13 +124,9 @@ async fn measure(
     Ok(())
 }
 
-// error bodies are {"error": "..."} written for the user
-// anything else, such as a proxy page, leaves the status to speak
+// an unexplained status, such as a proxy page, speaks for itself
 fn share_error(status: StatusCode, body: &str) -> anyhow::Error {
-    let explained = serde_json::from_str::<serde_json::Value>(body)
-        .ok()
-        .and_then(|v| v.get("error")?.as_str().map(str::to_owned));
-    match explained {
+    match share::error_message(body) {
         Some(msg) => anyhow!("{status}: {msg}"),
         None => anyhow!("{status}"),
     }

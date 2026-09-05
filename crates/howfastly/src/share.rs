@@ -509,6 +509,15 @@ pub fn valid_id(id: &str) -> bool {
     id.len() == 64 && id.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
 }
 
+// the explanation in an error body of {"error": "..."}, none for anything else such as a proxy page
+pub fn error_message(body: &str) -> Option<String> {
+    serde_json::from_str::<serde_json::Value>(body)
+        .ok()?
+        .get("error")?
+        .as_str()
+        .map(str::to_owned)
+}
+
 // unix seconds as an iso 8601 utc timestamp, 2026-09-05T10:22:07Z
 pub fn iso_utc(secs: u64) -> String {
     let (days, rest) = (secs / 86_400, secs % 86_400);
@@ -806,6 +815,16 @@ mod tests {
         assert_eq!(back.ip, "");
         assert_eq!(back.asn, 64496);
         assert_eq!(back.city, "Lyon");
+    }
+
+    #[test]
+    fn error_bodies() {
+        assert_eq!(
+            error_message(r#"{"error":"Too big."}"#),
+            Some("Too big.".to_string())
+        );
+        assert_eq!(error_message(r#"{"error":5}"#), None);
+        assert_eq!(error_message("<html>"), None);
     }
 
     #[test]

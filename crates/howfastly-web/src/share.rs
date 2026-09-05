@@ -1,7 +1,8 @@
 use std::rc::Rc;
 
 use howfastly::share::{
-    Client, FORMAT, Payload, Report, ShareResponse, SharedDirection, Timeline, valid_id,
+    Client, FORMAT, Payload, Report, ShareResponse, SharedDirection, Timeline, error_message,
+    valid_id,
 };
 use howfastly::types::{SpeedtestResults, TestConfig};
 use leptos::prelude::*;
@@ -118,12 +119,9 @@ async fn post(payload: &Payload) -> Result<ShareResponse, String> {
     }
 }
 
-// the server explains errors as {"error": "..."}, the status stands in when it does not
+// the status stands in when the server did not explain
 fn explain(status: u16, body: &str) -> String {
-    serde_json::from_str::<serde_json::Value>(body)
-        .ok()
-        .and_then(|v| v.get("error")?.as_str().map(str::to_string))
-        .unwrap_or_else(|| format!("The server answered {status}."))
+    error_message(body).unwrap_or_else(|| format!("The server answered {status}."))
 }
 
 // the id under a shared route, any path under /share stays out of the live app
