@@ -19,11 +19,20 @@ pub fn serve(path: &str) -> Option<Response> {
 
     let name = file.path().to_str().unwrap_or_default();
     Some(
-        Response::from_status(StatusCode::OK)
-            .with_header(header::CONTENT_TYPE, howfastly::http::content_type(name))
-            .with_header(header::CACHE_CONTROL, cache)
-            .with_header("alt-svc", "h3=\":443\"; ma=86400")
-            .with_header("x-compress-hint", "on")
+        headed(StatusCode::OK, howfastly::http::content_type(name), cache)
             .with_body(file.contents()),
     )
+}
+
+// the shell as text, the shared page rewrites its head
+pub fn shell() -> Option<&'static str> {
+    DIST.get_file("index.html")?.contents_utf8()
+}
+
+pub fn headed(status: StatusCode, content_type: &'static str, cache: &str) -> Response {
+    Response::from_status(status)
+        .with_header(header::CONTENT_TYPE, content_type)
+        .with_header(header::CACHE_CONTROL, cache)
+        .with_header("alt-svc", "h3=\":443\"; ma=86400")
+        .with_header("x-compress-hint", "on")
 }

@@ -2,7 +2,7 @@ use std::io::{Read, Write};
 use std::time::{Duration, Instant};
 
 use fastly::cache::simple::{self, CacheEntry};
-use fastly::http::{StatusCode, Version, header};
+use fastly::http::{StatusCode, Url, Version, header};
 use fastly::{Request, Response};
 
 static CHUNK: [u8; 64 * 1024] = [0x55; 64 * 1024];
@@ -149,7 +149,13 @@ pub fn protocol(req: &Request) -> &'static str {
     }
 }
 
-pub fn meta(req: &Request, start: Instant) -> Response {
+// the same scheme and authority with this path alone, join drops the query and fragment
+pub fn url_at(url: &Url, path: &str) -> String {
+    url.join(path).expect("an http url takes a path").into()
+}
+
+// what the edge knows about the request, the meta route and a publication both read it
+pub fn lookup_meta(req: &Request) -> howfastly::types::MetaResponse {
     let ip = req.get_client_ip_addr();
     let geo = ip.and_then(fastly::geo::geo_lookup);
     let code = fastly::compute_runtime::pop();
@@ -161,7 +167,7 @@ pub fn meta(req: &Request, start: Instant) -> Response {
         }
     });
 
-    let meta = howfastly::types::MetaResponse {
+    howfastly::types::MetaResponse {
         ip: ip.map(|ip| ip.to_string()).unwrap_or_default(),
         asn: geo.as_ref().map(|g| g.as_number()).unwrap_or_default(),
         org: geo
@@ -189,11 +195,13 @@ pub fn meta(req: &Request, start: Instant) -> Response {
         version: std::env::var("FASTLY_SERVICE_VERSION").unwrap_or_default(),
         cargo: howfastly::VERSION.to_string(),
         store: option_env!("HOWFASTLY_OUTPATH").map(str::to_string),
-    };
+    }
+}
 
+pub fn meta(req: &Request, start: Instant) -> Response {
     base(StatusCode::OK, start)
         .with_header(header::CONTENT_TYPE, "application/json")
-        .with_body(serde_json::to_string(&meta).expect("meta serializes"))
+        .with_body(serde_json::to_string(&lookup_meta(req)).expect("meta serializes"))
 }
 
 pub fn not_found() -> Response {

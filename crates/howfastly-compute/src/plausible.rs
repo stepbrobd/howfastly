@@ -1,8 +1,10 @@
 use fastly::Request;
-use fastly::http::header;
+use fastly::http::{Url, header};
 use howfastly::stats::{latency_bucket, speed_bucket};
 use howfastly::types::{Direction, SpeedtestResults};
 use serde_json::{Map, json};
+
+use crate::handlers;
 
 const BACKEND: &str = "plausible";
 const ENDPOINT: &str = "https://stats.ysun.co/api/event";
@@ -14,6 +16,10 @@ pub enum Event {
     Pageview,
     Start,
     Finish(Box<SpeedtestResults>),
+    // a first publication of a result, a reuse counts nothing
+    Share(String),
+    // a view of a shared result page, json reads and heads count nothing
+    View(String),
 }
 
 impl Event {
@@ -22,24 +28,37 @@ impl Event {
             Self::Pageview => "pageview",
             Self::Start => "Start",
             Self::Finish(_) => "Finish",
+            Self::Share(_) => "Share",
+            Self::View(_) => "pageview",
         }
     }
 
     // measurements reach plausible as coarse buckets, never raw numbers
+    // shared pages all count under one url and carry their id here instead
     fn props(&self) -> Vec<(&'static str, String)> {
-        let Self::Finish(results) = self else {
-            return Vec::new();
-        };
         let mut props = Vec::new();
-        for dir in Direction::ALL {
-            if let Some(mbps) = results.direction(dir).and_then(|d| d.p90) {
-                props.push((dir.name(), speed_bucket(mbps).to_string()));
+        match self {
+            Self::Finish(results) => {
+                for dir in Direction::ALL {
+                    if let Some(mbps) = results.direction(dir).and_then(|d| d.p90) {
+                        props.push((dir.name(), speed_bucket(mbps).to_string()));
+                    }
+                }
+                if let Some(latency) = &results.latency {
+                    props.push(("Latency", latency_bucket(latency.median).to_string()));
+                }
             }
-        }
-        if let Some(latency) = &results.latency {
-            props.push(("Latency", latency_bucket(latency.median).to_string()));
+            Self::Share(id) | Self::View(id) => props.push(("Share", id.clone())),
+            Self::Pageview | Self::Start => {}
         }
         props
+    }
+
+    fn url(&self, req: &Request) -> String {
+        match self {
+            Self::Share(_) | Self::View(_) => handlers::url_at(req.get_url(), "/share"),
+            Self::Pageview | Self::Start | Self::Finish(_) => req.get_url_str().to_string(),
+        }
     }
 }
 
@@ -60,15 +79,11 @@ pub fn send(req: &Request, event: &Event) {
     for (key, value) in event.props() {
         props.insert(key.into(), value.into());
     }
-    let referrer = req
-        .get_header(header::REFERER)
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("");
     let body = json!({
         "domain": DOMAIN,
         "name": event.name(),
-        "url": req.get_url_str(),
-        "referrer": referrer,
+        "url": event.url(req),
+        "referrer": referrer(req),
         "props": props,
     });
     let Ok(mut event) = Request::post(ENDPOINT)
@@ -91,5 +106,18 @@ fn client(agent: &str) -> &'static str {
         "CLI"
     } else {
         "Web"
+    }
+}
+
+// a referrer that is a shared page collapses the same way, whichever host served it
+// so a click through to a new run does not carry the id either
+fn referrer(req: &Request) -> String {
+    let raw = req
+        .get_header(header::REFERER)
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("");
+    match Url::parse(raw) {
+        Ok(url) if url.path().starts_with("/share/") => handlers::url_at(&url, "/share"),
+        _ => raw.to_string(),
     }
 }

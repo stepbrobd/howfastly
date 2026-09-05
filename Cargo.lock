@@ -989,6 +989,7 @@ dependencies = [
  "howfastly",
  "include_dir",
  "serde_json",
+ "sha2 0.9.9",
 ]
 
 [[package]]

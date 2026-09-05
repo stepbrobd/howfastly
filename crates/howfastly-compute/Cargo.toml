@@ -17,3 +17,4 @@ fastly.workspace      = true
 howfastly.workspace   = true
 include_dir.workspace = true
 serde_json.workspace  = true
+sha2.workspace        = true

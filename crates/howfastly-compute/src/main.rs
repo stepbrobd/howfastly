@@ -4,12 +4,14 @@ mod assets;
 mod handlers;
 #[cfg(target_arch = "wasm32")]
 mod plausible;
+#[cfg(target_arch = "wasm32")]
+mod share;
 
 #[cfg(target_arch = "wasm32")]
 fn main() {
     use std::time::Instant;
 
-    use fastly::http::Method;
+    use fastly::http::{Method, StatusCode};
     use fastly::{Request, Response};
     use plausible::Event;
 
@@ -57,6 +59,39 @@ fn main() {
             let (resp, results) = handlers::finish(&mut req, start);
             send(resp);
             results.map(|r| Event::Finish(Box::new(r)))
+        }
+        (&Method::POST, "/share") => {
+            let (resp, created) = share::publish(&mut req);
+            send(resp);
+            created.map(Event::Share)
+        }
+        // the bare share path names nothing, other methods learn the one it takes
+        (&Method::GET, "/share") => {
+            send(handlers::not_found());
+            None
+        }
+        (_, "/share") => {
+            send(handlers::method_not_allowed("POST"));
+            None
+        }
+        (&Method::GET, p) if p.starts_with("/share/") => {
+            let rest = &p["/share/".len()..];
+            match rest.strip_suffix(".json") {
+                Some(id) => {
+                    send(share::json(id));
+                    None
+                }
+                None => {
+                    let resp = share::page(&req, rest);
+                    let shown = resp.get_status() == StatusCode::OK;
+                    send(resp);
+                    (shown && !head).then(|| Event::View(rest.to_string()))
+                }
+            }
+        }
+        (_, p) if p.starts_with("/share/") => {
+            send(handlers::method_not_allowed("GET, HEAD"));
+            None
         }
         (_, "/ping" | "/down" | "/meta") => {
             send(handlers::method_not_allowed("GET, HEAD"));
