@@ -30,10 +30,9 @@ jobs:
             if gh pr checks "$pr" 2>/dev/null; then
               echo "All checks passed for PR #${pr}, merging."
               # a push made with the workflow token starts no workflow
-              # dispatch what a human push would have run
+              # dispatch the ci a human push would have run, deploy follows it
               gh pr merge "$pr" --rebase --delete-branch \
                 && gh workflow run ci.yaml --ref master \
-                && gh workflow run deploy.yaml --ref master \
                 || true
             else
               echo "PR #${pr} has pending or failed checks, skipping."

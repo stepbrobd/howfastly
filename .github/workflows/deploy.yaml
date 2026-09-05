@@ -1,7 +1,9 @@
 name: Deploy
 
 on:
-  push:
+  workflow_run: # zizmor: ignore[dangerous-triggers]
+    workflows: [CI]
+    types: [completed]
   workflow_dispatch:
     inputs:
       version:
@@ -13,11 +15,14 @@ permissions:
 
 jobs:
   Deploy:
+    # a green ci on master has pushed the package to the cache
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'master')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
       - name: Install Nix
         uses: cachix/install-nix-action@v31
@@ -27,7 +32,8 @@ jobs:
             trusted-public-keys = cache.ysun.co-1:WxPYwT5g3kt9XhUhHPpNLZKI9HIOsVVAuqSHpok8Qt4= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
             substituters = https://cache.ysun.co https://cache.nixos.org/
       - name: Build
-        run: nix build -L .#crates.howfastly-compute
+        # download what ci built, never a second build of the same derivation
+        run: nix build -L --max-jobs 0 .#crates.howfastly-compute
       - name: Deploy
         if: github.ref == 'refs/heads/master'
         env:
