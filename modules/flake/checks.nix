@@ -78,7 +78,7 @@
           export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
           export HOWFASTLY_WASM=${compute}/bin/howfastly-compute.wasm
           export HOWFASTLY_CONFIG=${../../fastly.toml}
-          nu ${../../crates/howfastly-compute/tests/e2e.nu}
+          nu ${../../crates/howfastly-compute/tests}/e2e.nu
           touch "$out"
         '';
       };

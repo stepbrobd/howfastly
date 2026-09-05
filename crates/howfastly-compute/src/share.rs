@@ -1,6 +1,8 @@
 use std::io::Read;
+use std::net::{IpAddr, Ipv6Addr};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use fastly::erl::{ERLError, Penaltybox};
 use fastly::http::{StatusCode, header};
 use fastly::kv_store::{InsertMode, KVStore, KVStoreError};
 use fastly::{Request, Response};
@@ -17,6 +19,11 @@ const STORE: &str = "kvstore";
 // hashed ahead of the canonical payload, changes with the format
 const DOMAIN: &[u8] = b"howfastly-share-v1\n";
 const CREATION_WINDOW_SECS: u64 = 86_400;
+// every publication holds one entry of this penalty box for the slot ttl
+// the box is the memory of one pop and bounds one source, a fleet of addresses is not its job
+const BOX: &str = "share";
+const SLOTS: u32 = 3;
+const SLOT_TTL: Duration = Duration::from_secs(15 * 60);
 
 // a status and the explanation the client shows
 type Reject = (StatusCode, String);
@@ -67,7 +74,53 @@ fn reply(status: StatusCode, cache: &str) -> Response {
 }
 
 fn error(status: StatusCode, message: &str) -> Response {
-    reply(status, "no-store").with_body(json!({ "error": message }).to_string())
+    let resp = reply(status, "no-store").with_body(json!({ "error": message }).to_string());
+    if status != StatusCode::TOO_MANY_REQUESTS {
+        return resp;
+    }
+    // the box frees a slot on the minute after its ttl, so the wait is one minute past it
+    resp.with_header(header::RETRY_AFTER, (SLOT_TTL.as_secs() + 60).to_string())
+}
+
+// the address as the limiter keys it, a v4 address whole and a v6 address by its /64
+fn source(ip: IpAddr) -> String {
+    match ip {
+        IpAddr::V4(v4) => v4.to_string(),
+        IpAddr::V6(v6) => match v6.to_ipv4_mapped() {
+            Some(v4) => v4.to_string(),
+            None => format!("{}/64", Ipv6Addr::from(u128::from(v6) & (u128::MAX << 64))),
+        },
+    }
+}
+
+fn take(pb: &Penaltybox, key: &str) -> Result<bool, ERLError> {
+    for slot in 0..SLOTS {
+        let entry = format!("{key}#{slot}");
+        if !pb.has(&entry)? {
+            pb.add(&entry, SLOT_TTL)?;
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
+// a slot is never given back, a rejected body consumed one too
+// the limiter is a defense and not a dependency, so a failed hostcall admits and says so
+fn admit(req: &Request) -> Result<(), Reject> {
+    let Some(ip) = req.get_client_ip_addr() else {
+        return Ok(());
+    };
+    match take(&Penaltybox::open(BOX), &source(ip)) {
+        Ok(true) => Ok(()),
+        Ok(false) => Err((
+            StatusCode::TOO_MANY_REQUESTS,
+            "Your address shared three results in the last 15 min, try again later".into(),
+        )),
+        Err(e) => {
+            eprintln!("rate limit unavailable, {e}");
+            Ok(())
+        }
+    }
 }
 
 // the stored record under this id when it is readable, unexpired and hashes to the id
@@ -95,6 +148,7 @@ fn existing(store: &KVStore, id: &str, now: u64) -> Result<Option<Report>, Rejec
 
 // a repeated payload answers 200 with its first publication, a new one 201
 fn create(req: &mut Request) -> Result<(StatusCode, ShareResponse), Reject> {
+    admit(req)?;
     if !json_body(req) {
         return Err((
             StatusCode::UNSUPPORTED_MEDIA_TYPE,
