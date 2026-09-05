@@ -2,7 +2,7 @@ use howfastly::types::TIME_BUDGET_SECS;
 
 // one sentence per metric, shown as a tooltip
 pub const HEADLINE: &str = "90th percentile of throughput over every transfer in this direction";
-pub const PEAK: &str = "Highest throughput over any 500ms window";
+pub const PEAK: &str = "Highest throughput over any 500 millisecond window";
 pub const MEDIAN: &str = "Median throughput of the transfers of one size";
 pub const PLOT: &str =
     "The box spans the quartiles, the bar is the median, the ticks are single transfers";
@@ -15,6 +15,6 @@ pub const PUBLICATION: &str = "The network and datacenter Fastly saw when this r
 
 pub fn count() -> String {
     format!(
-        "Transfers completed out of those planned, a size stops early once the {TIME_BUDGET_SECS} s budget of its direction is spent"
+        "Transfers completed out of those planned, a size stops early once the {TIME_BUDGET_SECS} second budget of its direction is spent"
     )
 }

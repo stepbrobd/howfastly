@@ -22,6 +22,7 @@ const CREATION_WINDOW_SECS: u64 = 86_400;
 // every publication holds one entry of this penalty box for the slot ttl
 // the box is the memory of one pop and bounds one source, a fleet of addresses is not its job
 const BOX: &str = "share";
+// three, as the limit message spells it
 const SLOTS: u32 = 3;
 const SLOT_TTL: Duration = Duration::from_secs(15 * 60);
 
@@ -123,7 +124,7 @@ fn admit(req: &Request) -> Result<(), Reject> {
         Ok(false) => Err((
             StatusCode::TOO_MANY_REQUESTS,
             format!(
-                "Your address shared {SLOTS} results in the last {} min, try again later.",
+                "Your address shared three results in the last {} minutes, try again later.",
                 SLOT_TTL.as_secs() / 60
             ),
         )),

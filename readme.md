@@ -54,7 +54,7 @@ Methodology:
 - Download transfers from 100 kB to 100 MB, uploads from 100 kB to 50 MB
 - Per size iteration counts (8/8/6/4/2, larger transfers have lower relative
   variance so fewer repeats)
-- 30s time budget per direction (roughly 640 MB transferred worst case)
+- 30 second time budget per direction (roughly 640 MB transferred worst case)
 - Reports p90 speed with loaded latency per direction (bufferbloat)
 - Server processing time calculated from samples using `Server-Timing` header
 - Reports the serving POP with its name and group, resolved on the edge from the
