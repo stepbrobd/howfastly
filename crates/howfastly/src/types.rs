@@ -45,7 +45,7 @@ impl Direction {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct SizePlan {
     pub bytes: u64,
     pub iterations: usize,
@@ -141,7 +141,7 @@ pub struct Pop {
     pub coordinates: Option<Coordinates>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TestConfig {
     pub latency_samples: usize,
     pub download: Vec<SizePlan>,
@@ -169,7 +169,7 @@ impl Default for TestConfig {
     }
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct SizeSamples {
     pub bytes: u64,
     pub mbps: Vec<f64>,

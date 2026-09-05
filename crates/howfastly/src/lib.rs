@@ -1,4 +1,5 @@
 pub mod http;
+pub mod share;
 pub mod stats;
 pub mod types;
 
