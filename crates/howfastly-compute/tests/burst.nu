@@ -1,20 +1,22 @@
 #!/usr/bin/env nu
 
-# probe the publication limit of a deployment, three posts per address per 15 minutes
+# probe the publication limit of a deployment, three posts per address per 15 min
 # the posts carry no json, so they are refused before anything is read and nothing is stored
-# the probing address is boxed for 15 minutes when the limit is active
+# a box entry is not seen by every server of a pop at once, so the posts are spaced
+# the probing address is boxed for 15 min when the limit is active
 
-def main [url: string] {
-  let posts = 1..4 | each {|_|
-    http post --full --allow-errors --content-type text/plain $"($url)/share" probe
+def main [url: string, --pause: duration = 3sec] {
+  for i in 1..6 {
+    let post = http post --full --allow-errors --content-type text/plain $"($url)/share" probe
+    match $post.status {
+      415 => { sleep $pause }
+      429 => {
+        let wait = $post.headers.response | where name == retry-after | first | get value
+        print $"limited after ($i) posts, retry after ($wait) s"
+        return
+      }
+      _ => { error make {msg: $"unexpected status ($post.status)"} }
+    }
   }
-  let codes = $posts | get status
-  if $codes == [415 415 415 429] {
-    let wait = $posts | last | get headers.response | where name == retry-after | first | get value
-    print $"limited, retry after ($wait) s"
-  } else if $codes == [415 415 415 415] {
-    print unlimited
-  } else {
-    error make {msg: $"unexpected statuses ($codes)"}
-  }
+  print unlimited
 }

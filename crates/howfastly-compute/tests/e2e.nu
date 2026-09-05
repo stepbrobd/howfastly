@@ -113,7 +113,7 @@ def sharing [url: string] {
   assert equal ($missing.headers.response | where name == cache-control | first | get value) no-store
 
   # viceroy stubs the rate limiter, the probe must still run and say so
-  assert equal (nu ($env.FILE_PWD | path join burst.nu) $url | str trim) unlimited
+  assert equal (nu ($env.FILE_PWD | path join burst.nu) $url --pause 0sec | str trim) unlimited
 }
 
 def checks [url: string, log: string] {
