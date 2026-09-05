@@ -113,7 +113,7 @@ pub struct Args {
     pub verbose: bool,
 
     /// Publish the result summary and print the link on stderr
-    #[arg(long)]
+    #[arg(long, short)]
     pub share: bool,
 }
 
@@ -214,9 +214,11 @@ mod tests {
             "-d",
             "-f",
             "json",
+            "-s",
         ])
         .unwrap();
         assert_eq!(a.url, "http://x");
+        assert!(a.share);
         assert_eq!(a.nr_tests, Some(3));
         assert_eq!(a.nr_latency_tests, 5);
         assert!(matches!(a.max_payload_size, PayloadSize::M1));
