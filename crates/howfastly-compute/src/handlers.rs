@@ -188,6 +188,7 @@ pub fn meta(req: &Request, start: Instant) -> Response {
         protocol: protocol(req).to_string(),
         version: std::env::var("FASTLY_SERVICE_VERSION").unwrap_or_default(),
         cargo: howfastly::VERSION.to_string(),
+        store: option_env!("HOWFASTLY_OUTPATH").map(str::to_string),
     };
 
     base(StatusCode::OK, start)

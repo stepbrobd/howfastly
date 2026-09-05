@@ -76,6 +76,9 @@ pub struct MetaResponse {
     pub protocol: String,
     pub version: String,
     pub cargo: String,
+    // the nix store path of the serving build, absent outside nix
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub store: Option<String>,
 }
 
 impl MetaResponse {

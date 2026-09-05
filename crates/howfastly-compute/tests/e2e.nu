@@ -29,6 +29,10 @@ def checks [url: string, log: string] {
   # viceroy geolocates the loopback address, the pop lookup has no store locally
   assert equal ($meta.coordinates.latitude | describe) "float"
   assert equal $meta.pop.coordinates null
+  # only a nix built wasm knows its store path
+  if ($meta.store? | is-not-empty) {
+    assert ($meta.store | str starts-with "/nix/store/")
+  }
   assert equal (http post --full --allow-errors $"($url)/start" "" | get status) 204
   assert equal (http post --full --allow-errors --content-type application/json $"($url)/finish" {meta: null, latency: null, download: null, upload: null} | get status) 204
   assert equal (http post --full --allow-errors --content-type application/json $"($url)/finish" "nope" | get status) 400

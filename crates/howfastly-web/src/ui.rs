@@ -9,6 +9,9 @@ use crate::map::Map;
 use crate::run::{self, Lane, Phase, State};
 use crate::tips;
 
+// the ci pushes every build here, the footer points at the served one
+const CACHE: &str = "https://cache.ysun.co";
+
 #[component]
 pub fn App() -> impl IntoView {
     let state = State {
@@ -133,6 +136,26 @@ pub fn App() -> impl IntoView {
 
             {move || state.error.get().map(|e| view! {
                 <div class="rounded border border-nord-11 bg-nord-1 p-4 text-nord-11">{e}</div>
+            })}
+
+            // the build that served the page, checkable against the cache
+            {move || state.meta.get().and_then(|m| m.store).map(|path| {
+                // the narinfo sits under the hash that opens the store name
+                let hash = path
+                    .rsplit('/')
+                    .next()
+                    .and_then(|name| name.split('-').next())
+                    .unwrap_or_default()
+                    .to_string();
+                view! {
+                    <pre class="overflow-x-auto rounded bg-nord-1 p-4 text-center text-sm text-nord-13"><code>
+                        "nix path-info "
+                        <a href=format!("{CACHE}/{hash}.narinfo") target="_blank" rel="noopener">{path}</a>
+                        " --store "
+                        <a href=CACHE target="_blank" rel="noopener">{CACHE}</a>
+                        " --json-format 2 --json"
+                    </code></pre>
+                }
             })}
 
             <footer class="text-center">
