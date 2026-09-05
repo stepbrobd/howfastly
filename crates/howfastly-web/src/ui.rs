@@ -173,7 +173,7 @@ pub fn App() -> impl IntoView {
                     <a href="https://github.com/stepbrobd/howfastly" target="_blank" rel="noopener">"GitHub"</a>
                     "."
                 </small></p>
-                <p><small>
+                <p class="mt-8"><small>
                     <a href="https://crates.io/crates/howfastly" target="_blank" rel="noopener">"HowFastly"</a>
                     " "
                     <a
