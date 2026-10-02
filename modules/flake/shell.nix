@@ -15,7 +15,9 @@
         # rustc         # from crane
         # rustfmt       # from crane
 
+        cargo-audit
         cargo-nextest
+        cargo-outdated
 
         # fastly
         fastly
