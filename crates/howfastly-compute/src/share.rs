@@ -49,7 +49,11 @@ fn id_of(canonical: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(DOMAIN);
     hasher.update(canonical);
-    format!("{:x}", hasher.finalize())
+    hasher
+        .finalize()
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect()
 }
 
 fn unavailable(cause: impl std::fmt::Display) -> Reject {
