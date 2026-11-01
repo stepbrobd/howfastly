@@ -1,5 +1,6 @@
 { lib
 , pkgsFinal
+, stdenv
 , binaryen
 , tailwindcss_4
 , wasm-bindgen-cli
@@ -46,6 +47,11 @@ crane.lib.buildTrunkPackage {
   cargoExtraArgs = "--package howfastly-web";
   inherit wasm-bindgen-cli;
   nativeBuildInputs = [ binaryen tailwindcss_4 ];
+
+  # tailwindcss is a bun binary that loads the host icu data and traps when the sandbox denies it
+  sandboxProfile = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    (allow file-read* (subpath "/usr/share/icu") (subpath "/private/var/db/timezone"))
+  '';
 
   # trunk resolves the target crate from cwd
   # the workspace root is a virtual manifest
