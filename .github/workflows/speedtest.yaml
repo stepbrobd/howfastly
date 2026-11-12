@@ -18,12 +18,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - name: Speedtest
         id: speedtest
-        uses: ./
+        uses: $/
       - name: Outputs
         env:
           DOWNLOAD: ${{ steps.speedtest.outputs.download }}
