@@ -108,6 +108,16 @@ Outputs:
 
 Each run also writes a human-readable summary to the workflow run page.
 
+## Development
+
+The workspace `wasm-bindgen` dependency in `Cargo.toml` and `Cargo.lock` must
+exactly match `wasm-bindgen-cli` from the pinned nixpkgs. Update them together
+when a `flake.lock` bump changes the CLI version. Verify the web build with:
+
+```sh
+nix build .#howfastly.web -L --no-link
+```
+
 ## Sponsorship disclaimer
 
 Not an official Fastly product or project. This project is generously supported
