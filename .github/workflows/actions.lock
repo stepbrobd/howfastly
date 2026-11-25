@@ -6,7 +6,7 @@ workflows:
     '.github/workflows/ci.yaml': []
     '.github/workflows/deploy.yaml':
         - 'actions/checkout@v7.0.1'
-        - 'cachix/install-nix-action@v31.11.5'
+        - 'cachix/install-nix-action@v32.1.0'
     '.github/workflows/merge.yaml': []
     '.github/workflows/release.yaml':
         - 'actions/checkout@v7.0.1'
@@ -31,9 +31,9 @@ dependencies:
         commit: 'sha1-cf430e030ddbb5b0abf93d22962f4752f3646cd9'
         owner_id: 44036562
         repo_id: 192625955
-    'cachix/install-nix-action@v31.11.5':
-        ref: 'v31.11.5'
-        commit: 'sha1-3dc140bfc76c49fbd4dd958429132e3746bcb086'
+    'cachix/install-nix-action@v32.1.0':
+        ref: 'v32.1.0'
+        commit: 'sha1-382a9ed9481c7c1f94f68b72ef105b3417c73877'
         owner_id: 36824654
         repo_id: 212301524
     'rust-lang/crates-io-auth-action@v1.0.6':
